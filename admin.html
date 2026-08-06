@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin · HVI PCA Trainer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800&family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#10141a; --panel:#1b212b; --panel2:#222939; --hair:rgba(255,255,255,.09);
+  --text:#e7ecf2; --dim:#8d99ad;
+  --amber:#f5a623; --amber-dim:rgba(245,166,35,.15);
+  --cyan:#4fd8e0; --cyan-dim:rgba(79,216,224,.15);
+  --green:#43d28a; --green-dim:rgba(67,210,138,.14);
+  --red:#f0645a; --red-dim:rgba(240,100,90,.16);
+  --f-display:'Big Shoulders Display',sans-serif;
+  --f-mono:'JetBrains Mono',monospace;
+  --f-body:'IBM Plex Sans',sans-serif;
+}
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;}
+body{
+  background: radial-gradient(1200px 700px at 50% -10%, #1a2029 0%, var(--bg) 60%);
+  color:var(--text); font-family:var(--f-body); min-height:100vh;
+  -webkit-font-smoothing:antialiased;
+}
+#app{max-width:760px; margin:0 auto; padding:28px 18px 60px;}
+.h1{font-family:var(--f-display); font-weight:800; text-transform:uppercase; letter-spacing:.01em; font-size:clamp(24px,5vw,32px); line-height:1;}
+.h1 span{color:var(--amber);}
+.sub{color:var(--dim); font-size:13px; font-family:var(--f-mono); margin-top:4px;}
+
+.gatewrap{display:flex; justify-content:center; padding-top:10vh;}
+.gatecard{background:#fff; color:#1a1a1a; border-radius:18px; width:100%; max-width:380px; padding:28px 26px; box-shadow:0 20px 60px rgba(0,0,0,.45);}
+.gatecard h2{margin:0 0 16px; text-align:center; font-family:var(--f-body); font-weight:600; font-size:18px;}
+.gatecard input{width:100%; padding:12px 14px; border-radius:9px; border:1.5px solid #e8c15a; font-size:14.5px; font-family:var(--f-mono); background:#fffdf7; margin-bottom:12px;}
+.gatecard input:focus{outline:none; border-color:var(--amber); background:#fff;}
+.gatecard button{width:100%; background:var(--amber); color:#2b1a02; border:none; border-radius:10px; padding:13px; font-size:14.5px; font-weight:700; font-family:var(--f-body); cursor:pointer;}
+.gatecard button:hover{filter:brightness(1.05);}
+.gateerr{background:#fdeceb; color:#c0392b; border:1px solid #f5c6c2; border-radius:8px; padding:8px 12px; font-size:12.5px; margin-bottom:12px; display:none;}
+
+.topbar{display:flex; justify-content:space-between; align-items:center; margin-bottom:22px;}
+.topbar button{background:none; border:none; color:var(--dim); font-family:var(--f-mono); font-size:11px; letter-spacing:.05em; text-transform:uppercase; cursor:pointer; text-decoration:underline;}
+.topbar button:hover{color:var(--red);}
+
+.tablewrap{background:var(--panel); border:1px solid var(--hair); border-radius:14px; overflow:hidden;}
+table{width:100%; border-collapse:collapse;}
+th{text-align:left; font-family:var(--f-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim); padding:12px 14px; border-bottom:1px solid var(--hair);}
+td{padding:12px 14px; border-bottom:1px solid var(--hair); font-size:13.5px; vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+.uname{font-weight:600;}
+.badge{display:inline-block; font-family:var(--f-mono); font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:6px; letter-spacing:.03em;}
+.badge.si{background:var(--green-dim); color:var(--green);}
+.badge.no{background:var(--amber-dim); color:var(--amber);}
+.actbtn{font-family:var(--f-mono); font-size:11px; font-weight:700; letter-spacing:.03em; border:none; border-radius:7px; padding:7px 12px; cursor:pointer; text-transform:uppercase;}
+.actbtn.aprobar{background:var(--green); color:#04250f;}
+.actbtn.revocar{background:var(--red-dim); color:var(--red); border:1px solid rgba(240,100,90,.4);}
+.actbtn:hover{filter:brightness(1.08);}
+.empty{padding:30px; text-align:center; color:var(--dim); font-family:var(--f-mono); font-size:13px;}
+.toperr{background:var(--red-dim); color:var(--red); border:1px solid rgba(240,100,90,.35); border-radius:10px; padding:10px 14px; font-size:13px; margin-bottom:16px; display:none;}
+.refresh{font-family:var(--f-mono); font-size:11px; color:var(--dim); background:none; border:1px solid var(--hair); border-radius:7px; padding:6px 10px; cursor:pointer;}
+.refresh:hover{color:var(--text); border-color:rgba(255,255,255,.25);}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <section id="screen-gate">
+    <div class="gatewrap"><div style="width:100%; max-width:380px;">
+      <div style="text-align:center; margin-bottom:22px;">
+        <div class="h1">ADMIN <span>&middot;</span> HVI PCA</div>
+        <div class="sub">PANEL DE APROBACIÓN DE CUENTAS</div>
+      </div>
+      <div class="gatecard">
+        <h2>Clave de administrador</h2>
+        <div class="gateerr" id="gateErr"></div>
+        <input type="password" id="secretInput" placeholder="Clave secreta" autocomplete="off">
+        <button onclick="entrar()">Entrar</button>
+      </div>
+    </div></div>
+  </section>
+
+  <section id="screen-panel" style="display:none;">
+    <div class="topbar">
+      <div>
+        <div class="h1" style="font-size:22px;">USUARIOS</div>
+        <div class="sub" id="resumenSub">—</div>
+      </div>
+      <div style="display:flex; gap:14px; align-items:center;">
+        <button class="refresh" onclick="cargarUsuarios()">↻ Actualizar</button>
+        <button onclick="salir()">Cerrar</button>
+      </div>
+    </div>
+    <div class="toperr" id="topErr"></div>
+    <div class="tablewrap">
+      <table>
+        <thead><tr><th>Usuario</th><th>Creado</th><th>Estado</th><th></th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </section>
+
+</div>
+
+<script>
+const ADMIN_KEY = 'hvi_pca_trainer_admin:secret';
+function getSecret(){ try{ return sessionStorage.getItem(ADMIN_KEY); }catch(e){ return null; } }
+function setSecret(s){ try{ sessionStorage.setItem(ADMIN_KEY, s); }catch(e){} }
+function clearSecret(){ try{ sessionStorage.removeItem(ADMIN_KEY); }catch(e){} }
+
+function showScreen(id){
+  document.getElementById('screen-gate').style.display = (id==='gate') ? 'block' : 'none';
+  document.getElementById('screen-panel').style.display = (id==='panel') ? 'block' : 'none';
+}
+
+async function apiAdmin(path, options={}){
+  const secret = getSecret();
+  const headers = Object.assign({}, options.headers, secret ? {'X-Admin-Secret': secret} : {});
+  let res;
+  try{
+    res = await fetch('/api/admin' + path, Object.assign({}, options, {headers}));
+  }catch(e){
+    throw new Error('No se pudo conectar con el servidor. Revisa tu conexión.');
+  }
+  let data = null;
+  try{ data = await res.json(); }catch(e){}
+  if(!res.ok){
+    throw new Error((data && data.error) || ('Error del servidor (' + res.status + ').'));
+  }
+  return data;
+}
+
+function entrar(){
+  const val = document.getElementById('secretInput').value.trim();
+  if(!val) return;
+  setSecret(val);
+  cargarUsuarios();
+}
+
+function salir(){
+  clearSecret();
+  document.getElementById('secretInput').value = '';
+  showScreen('gate');
+}
+
+function fmtFecha(unixSeconds){
+  const d = new Date(unixSeconds * 1000);
+  return d.toLocaleDateString('es-CL', {day:'2-digit', month:'2-digit', year:'numeric'}) + ' ' +
+         d.toLocaleTimeString('es-CL', {hour:'2-digit', minute:'2-digit'});
+}
+
+function renderUsuarios(users){
+  const tbody = document.getElementById('tbody');
+  const aprobados = users.filter(u => u.approved).length;
+  document.getElementById('resumenSub').textContent = users.length + ' cuentas · ' + aprobados + ' aprobadas · ' + (users.length - aprobados) + ' pendientes';
+
+  if(users.length === 0){
+    tbody.innerHTML = '<tr><td colspan="4"><div class="empty">Todavía no hay ninguna cuenta registrada.</div></td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = '';
+  users.forEach(u => {
+    const tr = document.createElement('tr');
+    const estadoBadge = u.approved
+      ? '<span class="badge si">APROBADO</span>'
+      : '<span class="badge no">PENDIENTE</span>';
+    const botonAccion = u.approved
+      ? `<button class="actbtn revocar" data-username="${u.username}" data-next="0">Revocar</button>`
+      : `<button class="actbtn aprobar" data-username="${u.username}" data-next="1">Aprobar</button>`;
+    tr.innerHTML = `
+      <td class="uname">${u.username}</td>
+      <td>${fmtFecha(u.created_at)}</td>
+      <td>${estadoBadge}</td>
+      <td>${botonAccion}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+
+  tbody.querySelectorAll('.actbtn').forEach(btn => {
+    btn.onclick = () => toggleAprobado(btn.dataset.username, btn.dataset.next === '1');
+  });
+}
+
+async function toggleAprobado(username, nuevoEstado){
+  try{
+    await apiAdmin('/approve', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({username, approved: nuevoEstado})
+    });
+    cargarUsuarios();
+  }catch(e){
+    mostrarErrorTop(e.message);
+  }
+}
+
+function mostrarErrorGate(msg){
+  const el = document.getElementById('gateErr');
+  el.textContent = msg; el.style.display = 'block';
+}
+function mostrarErrorTop(msg){
+  const el = document.getElementById('topErr');
+  el.textContent = msg; el.style.display = 'block';
+  clearTimeout(el._t);
+  el._t = setTimeout(()=>{ el.style.display = 'none'; }, 4000);
+}
+
+async function cargarUsuarios(){
+  try{
+    const data = await apiAdmin('/users');
+    showScreen('panel');
+    renderUsuarios(data.users);
+  }catch(e){
+    if(getSecret()){
+      // ya habíamos entrado antes en esta pestaña, pero algo falló ahora
+      clearSecret();
+      showScreen('gate');
+      mostrarErrorGate(e.message);
+    } else {
+      mostrarErrorGate(e.message);
+    }
+  }
+}
+
+// Si ya hay una clave guardada en esta pestaña (sessionStorage), entra directo.
+if(getSecret()){ cargarUsuarios(); }
+</script>
+</body>
+</html>

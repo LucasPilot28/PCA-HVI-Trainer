@@ -64,5 +64,3 @@ export const onRequestPost = withErrorHandling(async (context) => {
 
   return jsonResponse({ token, username: user.username, progress: progRow ? progRow.data : null });
 });
-  return jsonResponse({ token, username: user.username, progress: progRow ? progRow.data : null });
-});

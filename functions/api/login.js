@@ -34,7 +34,7 @@ export const onRequestPost = withErrorHandling(async (context) => {
   }
 
   const user = await env.DB.prepare(
-    'SELECT id, username, password_hash, password_salt, password_iterations FROM users WHERE username = ?'
+    'SELECT id, username, password_hash, password_salt, password_iterations, approved FROM users WHERE username = ?'
   )
     .bind(username)
     .first();
@@ -49,6 +49,10 @@ export const onRequestPost = withErrorHandling(async (context) => {
     return errorResponse('Usuario o contraseña incorrectos.', 401);
   }
 
+  if (!user.approved) {
+    return errorResponse('Tu cuenta existe, pero todavía no ha sido aprobada por el administrador.', 403);
+  }
+
   const now = nowSeconds();
   const token = createSessionToken();
   const expiresAt = now + SESSION_DURATION_SECONDS;
@@ -58,5 +62,7 @@ export const onRequestPost = withErrorHandling(async (context) => {
 
   const progRow = await env.DB.prepare('SELECT data FROM progress WHERE user_id = ?').bind(user.id).first();
 
+  return jsonResponse({ token, username: user.username, progress: progRow ? progRow.data : null });
+});
   return jsonResponse({ token, username: user.username, progress: progRow ? progRow.data : null });
 });

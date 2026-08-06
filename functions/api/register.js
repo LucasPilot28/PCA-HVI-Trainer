@@ -1,15 +1,17 @@
 // functions/api/register.js  ->  POST /api/register
 // Body: { username, password }
-// Respuesta 200: { token, username, progress: null }
+// Respuesta 200: { pending: true, username }
+//
+// La cuenta se crea pero queda SIN aprobar (approved = 0) y sin sesión
+// activa. Un administrador debe aprobarla desde el panel (admin.html)
+// antes de que la persona pueda iniciar sesión.
 
 import {
   hashPassword,
-  createSessionToken,
   jsonResponse,
   errorResponse,
   withErrorHandling,
   nowSeconds,
-  SESSION_DURATION_SECONDS,
   validateUsername,
   validatePassword,
 } from '../../lib/auth.js';
@@ -45,19 +47,11 @@ export const onRequestPost = withErrorHandling(async (context) => {
   const { hash, salt, iterations } = await hashPassword(password);
   const now = nowSeconds();
 
-  const insertResult = await env.DB.prepare(
-    'INSERT INTO users (username, password_hash, password_salt, password_iterations, created_at) VALUES (?, ?, ?, ?, ?)'
+  await env.DB.prepare(
+    'INSERT INTO users (username, password_hash, password_salt, password_iterations, approved, created_at) VALUES (?, ?, ?, ?, 0, ?)'
   )
     .bind(username, hash, salt, iterations, now)
     .run();
 
-  const userId = insertResult.meta.last_row_id;
-
-  const token = createSessionToken();
-  const expiresAt = now + SESSION_DURATION_SECONDS;
-  await env.DB.prepare('INSERT INTO sessions (token, user_id, created_at, expires_at) VALUES (?, ?, ?, ?)')
-    .bind(token, userId, now, expiresAt)
-    .run();
-
-  return jsonResponse({ token, username, progress: null });
+  return jsonResponse({ pending: true, username });
 });

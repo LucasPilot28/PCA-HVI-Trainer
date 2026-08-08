@@ -1182,7 +1182,24 @@ document.addEventListener('visibilitychange', () => { if (document.visibilitySta
 intentarSesionGuardada(); (function () {
   'use strict';
  
-  var repaso = null; // { bk: 'hvi'|'pca', idx: <índice temporal> }
+  var repaso = null; // { bk, idx }
+ 
+  /* ---------- CSS del botón dentro del tile ---------- */
+  var css = document.createElement('style');
+  css.textContent = [
+    '.tile .goRow{margin-top:auto; display:flex; gap:8px; align-items:stretch;}',
+    '.tile .goRow .go{margin-top:0; flex:1 1 auto;}',
+    '.tile .goFall{',
+    '  font-family:var(--f-mono); font-size:11.5px; font-weight:700;',
+    '  letter-spacing:.06em; text-transform:uppercase; white-space:nowrap;',
+    '  display:flex; align-items:center; justify-content:center;',
+    '  padding:8px 10px; border-radius:7px; cursor:pointer;',
+    '  background:var(--amber-dim); color:var(--amber);',
+    '  border:1px solid var(--amber); transition:background .15s, color .15s;',
+    '}',
+    '.tile .goFall:hover{background:var(--amber); color:var(--bg);}'
+  ].join('\n');
+  document.head.appendChild(css);
  
   /* ---------- recolección de falladas ---------- */
   function falladasDe(bk, ti) {
@@ -1195,16 +1212,6 @@ intentarSesionGuardada(); (function () {
         out.push(tema.preguntas[i]);
       }
     });
-    return out;
-  }
- 
-  function falladasDelBanco(bk) {
-    var out = [];
-    var n = bancos[bk].temas.length;
-    for (var ti = 0; ti < n; ti++) {
-      if (bancos[bk].temas[ti]._repaso) continue;
-      falladasDe(bk, ti).forEach(function (p) { if (out.indexOf(p) === -1) out.push(p); });
-    }
     return out;
   }
  
@@ -1254,6 +1261,49 @@ intentarSesionGuardada(); (function () {
       window[fn] = function () { limpiarRepaso(); return orig.apply(this, arguments); };
     });
  
+  /* ---------- botón dentro de cada tile de materia ---------- */
+  var _renderMaterias = window.renderMaterias;
+  window.renderMaterias = function () {
+    limpiarRepaso();
+    var r = _renderMaterias.apply(this, arguments);
+    try { decorarTiles(); } catch (err) { console.warn('repaso:', err); }
+    return r;
+  };
+ 
+  function decorarTiles() {
+    var grid = document.getElementById('tilesGrid');
+    if (!grid || !bancoActual) return;
+    var bk = bancoActual;
+ 
+    Array.prototype.forEach.call(grid.children, function (tile, ti) {
+      var e = estado[bk][ti];
+      var tema = bancos[bk].temas[ti];
+      if (!e || !tema || !e.finished) return;
+ 
+      var fallos = falladasDe(bk, ti);
+      if (!fallos.length) return;
+ 
+      var go = tile.querySelector('.go');
+      if (!go || go.parentNode.classList.contains('goRow')) return;
+ 
+      var row = document.createElement('div');
+      row.className = 'goRow';
+      go.parentNode.insertBefore(row, go);
+      row.appendChild(go);
+ 
+      var fb = document.createElement('span');
+      fb.className = 'goFall';
+      fb.textContent = '⟳ ' + fallos.length + ' falladas';
+      fb.title = 'Practicar solo las ' + fallos.length + ' preguntas erradas en este test';
+      fb.onclick = function (ev) {
+        ev.stopPropagation();
+        ev.preventDefault();
+        iniciarRepaso(falladasDe(bk, ti), 'Repaso · ' + tema.nombre);
+      };
+      row.appendChild(fb);
+    });
+  }
+ 
   /* ---------- botón en la pantalla de resultados ---------- */
   var _renderResultados = window.renderResultados;
   window.renderResultados = function () {
@@ -1284,50 +1334,14 @@ intentarSesionGuardada(); (function () {
     };
   }
  
-  /* ---------- botón global en la pantalla de materias ---------- */
-  var _renderMaterias = window.renderMaterias;
-  window.renderMaterias = function () {
-    limpiarRepaso();
-    var r = _renderMaterias.apply(this, arguments);
-    try { pintarBotonGlobal(); } catch (err) { console.warn('repaso:', err); }
-    return r;
-  };
- 
-  function pintarBotonGlobal() {
-    var grid = document.getElementById('tilesGrid');
-    if (!grid || !bancoActual) return;
-    var btn = document.getElementById('btnRepasoGlobal');
-    if (!btn) {
-      btn = document.createElement('button');
-      btn.id = 'btnRepasoGlobal';
-      btn.className = 'btn btn-amber';
-      btn.style.marginBottom = '18px';
-      grid.parentNode.insertBefore(btn, grid);
-    }
-    var fallos = falladasDelBanco(bancoActual);
-    if (!fallos.length) { btn.style.display = 'none'; return; }
-    btn.style.display = '';
-    btn.textContent = '⟳ Repasar todas las falladas (' + fallos.length + ')';
-    btn.onclick = function () {
-      iniciarRepaso(barajar(falladasDelBanco(bancoActual)), 'Repaso general');
-    };
-  }
- 
-  function barajar(a) {
-    for (var i = a.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var t = a[i]; a[i] = a[j]; a[j] = t;
-    }
-    return a;
-  }
- 
-  /* expuesto por si lo necesitas desde consola / otros módulos */
+  /* expuesto por si lo necesitás desde consola u otros módulos */
   window.repasoFalladas = {
     activo: function () { return repaso !== null; },
     iniciar: iniciarRepaso,
     limpiar: limpiarRepaso,
-    falladasDe: falladasDe,
-    falladasDelBanco: falladasDelBanco
+    falladasDe: falladasDe
+  };
+})();
   };
 })();
 </script>

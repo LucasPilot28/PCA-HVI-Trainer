@@ -133,7 +133,15 @@ body{
 .tile .barwrap{height:4px; background:var(--panel2); border-radius:3px; overflow:hidden;}
 .tile .barwrap > div{height:100%; background:var(--cyan);}
 .tile .go{margin-top:auto; font-family:var(--f-mono); font-size:11.5px; font-weight:700; letter-spacing:.06em; color:var(--bg); background:var(--cyan); border-radius:7px; padding:8px 10px; text-align:center; text-transform:uppercase;}
-.tile.done .go{background:var(--green);}
+.tile.done .go{background:var(--green)}
+.tile .repaso{
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  border:1px solid rgba(255,107,107,.45); background:var(--red-dim); color:var(--red);
+  font-family:var(--f-mono); font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  border-radius:7px; padding:7px 10px; cursor:pointer; transition:background .12s ease, border-color .12s ease;
+}
+.tile .repaso:hover{background:rgba(255,107,107,.22); border-color:var(--red);}
+.tile .repaso b{font-size:12px;}
 
 .footerlink{margin-top:26px; text-align:center;}
 .footerlink button{background:none; border:none; color:var(--dim); font-family:var(--f-mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; cursor:pointer; text-decoration:underline; text-underline-offset:3px;}
@@ -192,16 +200,18 @@ body{
 .statgrid .box .val{font-family:var(--f-mono); font-weight:700; font-size:19px; margin-top:4px;}
 .statgrid .box.ok .val{color:var(--green);}
 .statgrid .box.time .val{color:var(--cyan);}
-details.review{background:var(--panel); border:1px solid var(--hair); border-radius:var(--radius); margin-bottom:18px; overflow:hidden;}
-details.review summary{padding:13px 16px; font-family:var(--f-mono); font-size:12.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--dim); cursor:pointer;}
-details.review[open] summary{color:var(--text); border-bottom:1px solid var(--hair);}
+.review{background:var(--panel); border:1px solid var(--hair); border-radius:var(--radius); margin-top:18px; overflow:hidden; text-align:left; animation:fadein .2s ease;}
+.review[hidden]{display:none;}
+.rcount{display:inline-block; min-width:18px; padding:1px 6px; margin-left:6px; border-radius:20px; background:var(--red-dim); color:var(--red); font-size:11px; font-weight:700;}
+.rcount.zero{background:var(--green-dim); color:var(--green);}
+#reviewToggle.on{border-color:rgba(255,255,255,.28); color:var(--text);}
 .reviewitem{padding:13px 16px; border-top:1px solid var(--hair); font-size:13.5px;}
 .reviewitem:first-of-type{border-top:none;}
 .reviewitem .rstem{margin-bottom:8px; line-height:1.5;}
 .reviewitem .ryour{color:var(--red); font-family:var(--f-mono); font-size:12px;}
 .reviewitem .rcorrect{color:var(--green); font-family:var(--f-mono); font-size:12px; margin-top:3px;}
 .noneWrong{padding:16px; text-align:center; color:var(--green); font-family:var(--f-mono); font-size:13px;}
-.resbtns{display:flex; gap:10px; justify-content:center; flex-wrap:wrap;}
+.resbtns{display:flex; gap:10px; justify-content:center; flex-wrap:wrap; align-items:center;}
 .saveindicator{position:fixed; bottom:14px; right:16px; font-family:var(--f-mono); font-size:10.5px; color:var(--dim); background:var(--panel); border:1px solid var(--hair); padding:5px 10px; border-radius:20px; opacity:0; transition:opacity .3s;}
 .saveindicator.show{opacity:1;}
 /* ---------- TABS de pregunta ---------- */
@@ -377,11 +387,12 @@ details.review[open] summary{color:var(--text); border-bottom:1px solid var(--ha
       <div class="box time"><div class="lbl">Tiempo</div><div class="val" id="statTime"></div></div>
       <div class="box"><div class="lbl">Prom. / pregunta</div><div class="val" id="statAvg"></div></div>
     </div>
-    <details class="review" id="reviewBox"><summary>Revisar preguntas falladas</summary><div id="reviewList"></div></details>
     <div class="resbtns">
       <button class="btn btn-amber" onclick="repetirMateria()">&#8635; Repetir materia</button>
+      <button class="btn btn-ghost" id="reviewToggle" onclick="toggleRepaso()">Revisar falladas <span id="reviewCount" class="rcount">0</span></button>
       <button class="btn btn-ghost" onclick="volverAMaterias()">Volver a materias</button>
     </div>
+    <div class="review" id="reviewBox" hidden><div id="reviewList"></div></div>
   </section>
 
 </div>
@@ -432,7 +443,8 @@ function apiSaveProgress(dataStr){
 function crearEstadoBanco(bk){
   return bancos[bk].temas.map(t => ({
     respuestas: new Array(t.preguntas.length).fill(null),
-    index:0, startTime:null, finished:false, lastPct:null, lastTime:null
+    index:0, startTime:null, finished:false, lastPct:null, lastTime:null,
+    falladas: []
   }));
 }
 function contarRespondidas(e){ return e.respuestas.filter(r => r !== null).length; }
@@ -645,7 +657,7 @@ function entrarMaterias(bk){
   renderMaterias();
   showScreen('screen-materias');
 }
-function volverABancos(){ renderBancos(); showScreen('screen-bancos'); }
+function volverABancos(){ limpiarRepaso(); renderBancos(); showScreen('screen-bancos'); }
 
 function renderMaterias(){
   const bk = bancoActual;
@@ -664,10 +676,15 @@ function renderMaterias(){
   grid.innerHTML = '';
   banco.temas.forEach((t, ti) => {
     const e = est[ti];
-    const tile = document.createElement('button');
+    /* div y no button: dentro va otro botón (repasar), y anidar botones
+       es HTML inválido y rompe el clic en varios navegadores. */
+    const tile = document.createElement('div');
     tile.className = 'tile' + (e.finished ? ' done' : '');
+    tile.setAttribute('role','button');
+    tile.tabIndex = 0;
     const respondidasN = contarRespondidas(e);
     const enProgreso = !e.finished && respondidasN > 0;
+    const nFall = (e.falladas || []).filter(i => i < t.preguntas.length).length;
     let lastLine = '&nbsp;';
     if (e.finished) lastLine = 'ÚLT. ' + e.lastPct + '% · ' + fmtTime(e.lastTime);
     else if (enProgreso) lastLine = 'EN CURSO · ' + respondidasN + '/' + t.preguntas.length;
@@ -678,8 +695,14 @@ function renderMaterias(){
       <div class="last">${lastLine}</div>
       <div class="barwrap"><div style="width:${Math.round((respondidasN/t.preguntas.length)*100)}%"></div></div>
       <div class="go">${e.finished ? 'Repetir ↻' : (enProgreso ? 'Continuar →' : 'Comenzar →')}</div>
+      ${nFall > 0 ? `<button class="repaso" data-ti="${ti}">Repasar falladas <b>${nFall}</b></button>` : ''}
     `;
     tile.onclick = () => entrarMateria(ti);
+    tile.onkeydown = ev => { if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); entrarMateria(ti); } };
+    const btnRep = tile.querySelector('.repaso');
+    if (btnRep){
+      btnRep.onclick = ev => { ev.stopPropagation(); iniciarRepaso(ti); };
+    }
     grid.appendChild(tile);
   });
 }
@@ -807,12 +830,27 @@ function renderResultados(){
   document.getElementById('statAvg').textContent = (e.lastTime/1000/tema.preguntas.length).toFixed(1) + 's';
   drawGauge(e.lastPct);
   const fallos = [];
+  const idxFallados = [];
   e.respuestas.forEach((r,i) => {
     if (r !== null && r !== tema.preguntas[i].correct){
+      idxFallados.push(i);
       fallos.push({stem:tema.preguntas[i].q, tu:tema.preguntas[i].ops[r], correcta:tema.preguntas[i].ops[tema.preguntas[i].correct]});
     }
   });
+  e.falladas = idxFallados;
+  /* Si esto era una sesión de repaso, las que ya respondiste bien salen de
+     la lista de la materia original: así el botón se va vaciando a medida
+     que dominas las preguntas, en vez de repetir siempre las mismas. */
+  if (tema._repaso){
+    const orig = estado[bancoActual][tema._origen];
+    orig.falladas = idxFallados.map(i => tema._idxs[i]);
+  }
   const reviewList = document.getElementById('reviewList');
+  const badge = document.getElementById('reviewCount');
+  badge.textContent = fallos.length;
+  badge.classList.toggle('zero', fallos.length === 0);
+  document.getElementById('reviewBox').hidden = true;
+  document.getElementById('reviewToggle').classList.remove('on');
   if (fallos.length === 0){
     reviewList.innerHTML = '<div class="noneWrong">Sin errores — 100% de acierto en esta materia.</div>';
   } else {
@@ -823,6 +861,14 @@ function renderResultados(){
         <div class="rcorrect">✓ CORRECTA: ${f.correcta}</div>
       </div>`).join('');
   }
+}
+
+function toggleRepaso(){
+  const box = document.getElementById('reviewBox');
+  const btn = document.getElementById('reviewToggle');
+  box.hidden = !box.hidden;
+  btn.classList.toggle('on', !box.hidden);
+  if (!box.hidden) box.scrollIntoView({behavior:'smooth', block:'nearest'});
 }
 
 function drawGauge(pct){
@@ -853,7 +899,40 @@ function drawGauge(pct){
 }
 
 function repetirMateria(){ entrarMateria(temaActual); }
-function volverAMaterias(){ guardarProgresoAhora(); renderMaterias(); showScreen('screen-materias'); }
+
+/* ---------------- REPASO DE FALLADAS ----------------
+   Se arma una materia virtual que se añade al final del banco, con solo
+   las preguntas falladas. Así el motor del quiz funciona sin cambios: lee
+   bancos[banco].temas[temaActual] igual que siempre. Al salir se elimina.  */
+function iniciarRepaso(ti){
+  const tema = bancos[bancoActual].temas[ti];
+  const idxs = (estado[bancoActual][ti].falladas || []).filter(i => i < tema.preguntas.length);
+  if (!idxs.length) return;
+  limpiarRepaso();
+  bancos[bancoActual].temas.push({
+    nombre: 'Repaso · ' + tema.nombre,
+    preguntas: idxs.map(i => tema.preguntas[i]),
+    _repaso: true, _origen: ti, _idxs: idxs
+  });
+  estado[bancoActual].push({
+    respuestas: new Array(idxs.length).fill(null),
+    index:0, startTime:Date.now(), finished:false, lastPct:null, lastTime:null, falladas:[]
+  });
+  temaActual = bancos[bancoActual].temas.length - 1;
+  tabActiva = 'preg'; cmtUltimoConteo = 0;
+  showScreen('screen-quiz');
+  renderPregunta();
+}
+
+function limpiarRepaso(){
+  if (!bancoActual) return;
+  const temas = bancos[bancoActual].temas;
+  while (temas.length && temas[temas.length-1]._repaso){
+    temas.pop();
+    estado[bancoActual].pop();
+  }
+}
+function volverAMaterias(){ limpiarRepaso(); guardarProgresoAhora(); renderMaterias(); showScreen('screen-materias'); }
 
 
 /* =========================================================================

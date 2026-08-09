@@ -684,7 +684,6 @@ function renderMaterias(){
     tile.tabIndex = 0;
     const respondidasN = contarRespondidas(e);
     const enProgreso = !e.finished && respondidasN > 0;
-    const nFall = (e.falladas || []).filter(i => i < t.preguntas.length).length;
     let lastLine = '&nbsp;';
     if (e.finished) lastLine = 'ÚLT. ' + e.lastPct + '% · ' + fmtTime(e.lastTime);
     else if (enProgreso) lastLine = 'EN CURSO · ' + respondidasN + '/' + t.preguntas.length;
@@ -695,18 +694,13 @@ function renderMaterias(){
       <div class="last">${lastLine}</div>
       <div class="barwrap"><div style="width:${Math.round((respondidasN/t.preguntas.length)*100)}%"></div></div>
       <div class="go">${e.finished ? 'Repetir ↻' : (enProgreso ? 'Continuar →' : 'Comenzar →')}</div>
-      ${nFall > 0 ? `<button class="repaso" data-ti="${ti}">Repasar falladas <b>${nFall}</b></button>` : ''}
     `;
     tile.onclick = () => entrarMateria(ti);
     tile.onkeydown = ev => { if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); entrarMateria(ti); } };
-    const btnRep = tile.querySelector('.repaso');
-    if (btnRep){
-      btnRep.onclick = ev => { ev.stopPropagation(); iniciarRepaso(ti); };
-    }
-    grid.appendChild(tile);
-  });
-}
-
+    if (tema._repaso && typeof tema._origen === 'number'){
+    const orig = estado[bancoActual][tema._origen];
+    if (orig) orig.falladas = idxFallados.map(i => tema._idxs[i]);
+  }
 /* ---------------- QUIZ ---------------- */
 let temaActual = null;
 

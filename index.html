@@ -134,14 +134,6 @@ body{
 .tile .barwrap > div{height:100%; background:var(--cyan);}
 .tile .go{margin-top:auto; font-family:var(--f-mono); font-size:11.5px; font-weight:700; letter-spacing:.06em; color:var(--bg); background:var(--cyan); border-radius:7px; padding:8px 10px; text-align:center; text-transform:uppercase;}
 .tile.done .go{background:var(--green)}
-.tile .repaso{
-  display:flex; align-items:center; justify-content:center; gap:7px;
-  border:1px solid rgba(255,107,107,.45); background:var(--red-dim); color:var(--red);
-  font-family:var(--f-mono); font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
-  border-radius:7px; padding:7px 10px; cursor:pointer; transition:background .12s ease, border-color .12s ease;
-}
-.tile .repaso:hover{background:rgba(255,107,107,.22); border-color:var(--red);}
-.tile .repaso b{font-size:12px;}
 
 .footerlink{margin-top:26px; text-align:center;}
 .footerlink button{background:none; border:none; color:var(--dim); font-family:var(--f-mono); font-size:11px; letter-spacing:.06em; text-transform:uppercase; cursor:pointer; text-decoration:underline; text-underline-offset:3px;}
@@ -697,10 +689,10 @@ function renderMaterias(){
     `;
     tile.onclick = () => entrarMateria(ti);
     tile.onkeydown = ev => { if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); entrarMateria(ti); } };
-    if (tema._repaso && typeof tema._origen === 'number'){
-    const orig = estado[bancoActual][tema._origen];
-    if (orig) orig.falladas = idxFallados.map(i => tema._idxs[i]);
-  }
+    grid.appendChild(tile);
+  });
+}
+
 /* ---------------- QUIZ ---------------- */
 let temaActual = null;
 
@@ -835,9 +827,9 @@ function renderResultados(){
   /* Si esto era una sesión de repaso, las que ya respondiste bien salen de
      la lista de la materia original: así el botón se va vaciando a medida
      que dominas las preguntas, en vez de repetir siempre las mismas. */
-  if (tema._repaso){
+  if (tema._repaso && typeof tema._origen === 'number'){
     const orig = estado[bancoActual][tema._origen];
-    orig.falladas = idxFallados.map(i => tema._idxs[i]);
+    if (orig) orig.falladas = idxFallados.map(i => tema._idxs[i]);
   }
   const reviewList = document.getElementById('reviewList');
   const badge = document.getElementById('reviewCount');
@@ -898,26 +890,6 @@ function repetirMateria(){ entrarMateria(temaActual); }
    Se arma una materia virtual que se añade al final del banco, con solo
    las preguntas falladas. Así el motor del quiz funciona sin cambios: lee
    bancos[banco].temas[temaActual] igual que siempre. Al salir se elimina.  */
-function iniciarRepaso(ti){
-  const tema = bancos[bancoActual].temas[ti];
-  const idxs = (estado[bancoActual][ti].falladas || []).filter(i => i < tema.preguntas.length);
-  if (!idxs.length) return;
-  limpiarRepaso();
-  bancos[bancoActual].temas.push({
-    nombre: 'Repaso · ' + tema.nombre,
-    preguntas: idxs.map(i => tema.preguntas[i]),
-    _repaso: true, _origen: ti, _idxs: idxs
-  });
-  estado[bancoActual].push({
-    respuestas: new Array(idxs.length).fill(null),
-    index:0, startTime:Date.now(), finished:false, lastPct:null, lastTime:null, falladas:[]
-  });
-  temaActual = bancos[bancoActual].temas.length - 1;
-  tabActiva = 'preg'; cmtUltimoConteo = 0;
-  showScreen('screen-quiz');
-  renderPregunta();
-}
-
 function limpiarRepaso(){
   if (!bancoActual) return;
   const temas = bancos[bancoActual].temas;

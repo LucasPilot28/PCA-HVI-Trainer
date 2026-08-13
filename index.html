@@ -7,7 +7,53 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=JetBrains+Mono:wght@400;500;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
+/* ==================== MODO EXAMEN / SIMULACRO ==================== */
+.tile .goExam{
+  display:block; margin-top:8px;
+  font-family:var(--f-mono); font-size:11.5px; font-weight:700; letter-spacing:.06em;
+  color:var(--amber); background:var(--amber-dim);
+  border:1px solid rgba(245,166,35,.45); border-radius:7px;
+  padding:7px 10px; text-align:center; text-transform:uppercase; cursor:pointer;
+  transition:background .12s ease, color .12s ease;
+}
+.tile .goExam:hover{ background:var(--amber); color:#2b1a02; }
+ 
+/* opción marcada durante el examen (sin revelar si es correcta) */
+.opt.picked{ border-color:var(--cyan); background:rgba(79,216,224,.10); }
+.opt.picked .key{ background:var(--cyan); color:#04262a; }
+.opt.picked .tag{ background:var(--cyan-dim); color:var(--cyan); }
+ 
+/* navegador: respondida = neutro, sin verde/rojo */
+.navbtn.nx{ border-color:var(--cyan); color:var(--cyan); background:rgba(79,216,224,.12); }
+body.modo-examen .navlegend{ display:none; }
+.examlegend{ display:none; font-size:10.5px; color:var(--dim); font-family:var(--f-mono); }
+body.modo-examen .examlegend{ display:inline-flex; gap:5px; align-items:center; }
+.examlegend i{ width:9px; height:9px; border-radius:3px; display:inline-block; background:rgba(79,216,224,.35); border:1px solid var(--cyan); }
+ 
+/* banda de estado del simulacro */
+.exambar{
+  display:none; align-items:center; justify-content:space-between; gap:10px;
+  background:var(--amber-dim); border:1px solid rgba(245,166,35,.4);
+  color:var(--amber); font-family:var(--f-mono); font-size:11px; letter-spacing:.07em;
+  text-transform:uppercase; padding:8px 12px; border-radius:8px; margin-bottom:10px;
+}
+body.modo-examen .exambar{ display:flex; }
+ 
+/* botones contextuales */
+#examEndBtn{ display:none; margin-right:auto; }
+body.modo-examen #examEndBtn{ display:inline-flex; }
+#examReviewBtn{ display:none; }
+body.examen-revelado #examReviewBtn{ display:inline-flex; }
+ 
+/* bloqueo de la sección de explicación mientras el examen está en curso */
+body.modo-examen #screen-quiz [id*="xplic"],
+body.modo-examen #screen-quiz [class*="xplic"],
+body.modo-examen #screen-quiz [data-tab*="xplic"],
+body.modo-examen #screen-quiz [id*="xplan"],
+body.modo-examen #screen-quiz [class*="xplan"],
+body.modo-examen #screen-quiz [data-tab*="xplan"],
+body.modo-examen #screen-quiz .ex-gate{ display:none !important; }
+  <style>
 :root{
   --bg:#10141a; --panel:#1b212b; --panel2:#222939; --hair:rgba(255,255,255,.09);
   --text:#e7ecf2; --dim:#8d99ad;
@@ -1386,6 +1432,296 @@ intentarSesionGuardada(); (function () {
     limpiar: limpiarRepaso,
     falladasDe: falladasDe
   };
+})(); 
+  */
+(function(){
+  const N_EXAMEN = 20;          // cambia aquí el largo del simulacro
+  const TAG = '_esExamen';
+  let ex = null;                // {origen, virtual, revelado} o null
+  let textoRepetirOriginal = null;
+ 
+  /* ---------- helpers ---------- */
+  function mezclar(arr){
+    const a = arr.slice();
+    for (let i = a.length - 1; i > 0; i--){
+      const j = Math.floor(Math.random() * (i + 1));
+      const tmp = a[i]; a[i] = a[j]; a[j] = tmp;
+    }
+    return a;
+  }
+  function temaVirtualActual(){
+    if (!ex) return null;
+    const t = bancos[bancoActual] && bancos[bancoActual].temas[temaActual];
+    return (t && t[TAG]) ? t : null;
+  }
+ 
+  /* ---------- limpieza: elimina cualquier tema virtual ---------- */
+  function purgarVirtuales(){
+    Object.keys(bancos).forEach(bk => {
+      const temas = bancos[bk].temas;
+      for (let i = temas.length - 1; i >= 0; i--){
+        if (temas[i] && temas[i][TAG]){
+          temas.splice(i, 1);
+          if (estado[bk]) estado[bk].splice(i, 1);
+        }
+      }
+    });
+    ex = null;
+    document.body.classList.remove('modo-examen', 'examen-revelado');
+    restaurarBotonRepetir();
+  }
+ 
+  /* ---------- marcar la pestaña/sección de explicación ---------- */
+  function marcarExplicacion(){
+    const scope = document.getElementById('screen-quiz');
+    if (!scope) return;
+    scope.querySelectorAll('button,a,li,span,div,h1,h2,h3,h4').forEach(el => {
+      if (el.children.length) return;
+      const t = (el.textContent || '').trim().toLowerCase();
+      if (t === 'explicación' || t === 'explicacion' || t === 'explicaciones' || t === 'explanation'){
+        el.classList.add('ex-gate');
+      }
+    });
+  }
+ 
+  /* ---------- iniciar simulacro ---------- */
+  function iniciarExamen(ti){
+    purgarVirtuales();
+    const bk = bancoActual;
+    const base = bancos[bk].temas[ti];
+    if (!base) return;
+    const n = Math.min(N_EXAMEN, base.preguntas.length);
+    const idxs = mezclar(base.preguntas.map((_, i) => i)).slice(0, n);
+ 
+    const virtual = {
+      nombre: 'Simulacro · ' + base.nombre,
+      preguntas: idxs.map(i => base.preguntas[i]),
+      _origen: ti,
+      _idxs: idxs
+    };
+    virtual[TAG] = true;
+ 
+    bancos[bk].temas.push(virtual);
+    const vi = bancos[bk].temas.length - 1;
+    estado[bk][vi] = {
+      respuestas: new Array(n).fill(null),
+      index: 0, startTime: Date.now(), finished: false, lastPct: null, lastTime: null
+    };
+ 
+    ex = { origen: ti, virtual: vi, revelado: false };
+    temaActual = vi;
+ 
+    document.body.classList.add('modo-examen');
+    document.body.classList.remove('examen-revelado');
+    marcarExplicacion();
+    showScreen('screen-quiz');
+    renderPregunta();
+  }
+ 
+  /* ---------- terminar y revelar ---------- */
+  function terminarExamen(){
+    const tema = temaVirtualActual();
+    if (!tema) return;
+    const e = estado[bancoActual][temaActual];
+    const faltan = tema.preguntas.length - contarRespondidas(e);
+    if (faltan > 0){
+      const msg = 'Quedan ' + faltan + ' pregunta(s) sin responder.\n' +
+                  'Se contarán como incorrectas. ¿Terminar el simulacro?';
+      if (!confirm(msg)) return;
+    }
+    ex.revelado = true;
+    document.body.classList.remove('modo-examen');
+    document.body.classList.add('examen-revelado');
+    marcarBotonRepetir();
+    finalizarMateria();
+  }
+ 
+  /* ---------- volver al examen ya corregido, con explicaciones ---------- */
+  function revisarExamen(){
+    if (!ex || !ex.revelado) return;
+    const e = estado[bancoActual][temaActual];
+    e.index = 0;
+    showScreen('screen-quiz');
+    renderPregunta();
+  }
+ 
+  /* ---------- botón "Repetir materia" -> "Nuevo simulacro" ---------- */
+  function botonRepetir(){
+    return document.querySelector('#screen-results .resbtns .btn-amber');
+  }
+  function marcarBotonRepetir(){
+    const b = botonRepetir();
+    if (!b) return;
+    if (textoRepetirOriginal === null) textoRepetirOriginal = b.innerHTML;
+    b.innerHTML = '&#8635; Nuevo simulacro';
+  }
+  function restaurarBotonRepetir(){
+    const b = botonRepetir();
+    if (b && textoRepetirOriginal !== null) b.innerHTML = textoRepetirOriginal;
+  }
+ 
+  /* ---------- botones en las tarjetas de materia ---------- */
+  function inyectarBotones(){
+    const grid = document.getElementById('tilesGrid');
+    if (!grid || !bancoActual) return;
+    const temas = bancos[bancoActual].temas;
+    Array.prototype.forEach.call(grid.children, function(tile, ti){
+      const t = temas[ti];
+      if (!t || t[TAG]) return;
+      if (tile.querySelector('.goExam')) return;
+      const n = Math.min(N_EXAMEN, t.preguntas.length);
+      const b = document.createElement('span');
+      b.className = 'goExam';
+      b.setAttribute('role', 'button');
+      b.tabIndex = 0;
+      b.textContent = '\u2708 Simulacro ' + n;
+      b.title = 'Examen de ' + n + ' preguntas al azar, sin corrección hasta el final';
+      b.onclick = function(evt){ evt.stopPropagation(); evt.preventDefault(); iniciarExamen(ti); };
+      b.onkeydown = function(evt){
+        if (evt.key === 'Enter' || evt.key === ' '){
+          evt.stopPropagation(); evt.preventDefault(); iniciarExamen(ti);
+        }
+      };
+      tile.appendChild(b);
+    });
+  }
+ 
+  /* ---------- montaje de UI fija ---------- */
+  function montarUI(){
+    const quiz = document.getElementById('screen-quiz');
+    if (quiz && !document.getElementById('examBar')){
+      const bar = document.createElement('div');
+      bar.className = 'exambar';
+      bar.id = 'examBar';
+      bar.innerHTML = '<span>&#9992; Modo simulacro — sin corrección hasta terminar</span>' +
+                      '<span id="examCounter"></span>';
+      const tape = quiz.querySelector('.tape');
+      if (tape) quiz.insertBefore(bar, tape); else quiz.appendChild(bar);
+    }
+    const foot = document.querySelector('#screen-quiz .quizfoot');
+    if (foot && !document.getElementById('examEndBtn')){
+      const b = document.createElement('button');
+      b.id = 'examEndBtn';
+      b.className = 'btn btn-amber';
+      b.textContent = 'Terminar examen';
+      b.onclick = terminarExamen;
+      foot.insertBefore(b, foot.firstChild);
+    }
+    const res = document.querySelector('#screen-results .resbtns');
+    if (res && !document.getElementById('examReviewBtn')){
+      const b = document.createElement('button');
+      b.id = 'examReviewBtn';
+      b.className = 'btn btn-cyan';
+      b.textContent = 'Revisar simulacro';
+      b.onclick = revisarExamen;
+      res.insertBefore(b, res.firstChild);
+    }
+    const navlabel = document.querySelector('#screen-quiz .navlabel');
+    if (navlabel && !navlabel.querySelector('.examlegend')){
+      const lg = document.createElement('span');
+      lg.className = 'examlegend';
+      lg.innerHTML = '<i></i>Respondida &nbsp;·&nbsp; sin corregir';
+      navlabel.appendChild(lg);
+    }
+  }
+ 
+  /* ================= wrappers sobre el motor existente ================= */
+ 
+  const _renderPregunta = renderPregunta;
+  window.renderPregunta = function(){
+    _renderPregunta.apply(this, arguments);
+    const tema = temaVirtualActual();
+    if (!tema) return;
+    const e = estado[bancoActual][temaActual];
+    const qi = e.index;
+    const total = tema.preguntas.length;
+    const qBlock = document.getElementById('qBlock');
+    const filas = document.querySelectorAll('#qOpts .opt');
+    const lbl2 = document.getElementById('tapeLabel2');
+    const cod = bancos[bancoActual].codigos[bancos[bancoActual].temas[ex.origen].nombre] || '';
+    if (lbl2) lbl2.textContent = 'SIM ' + cod;
+ 
+    if (!ex.revelado){
+      if (qBlock) qBlock.className = 'q';
+      Array.prototype.forEach.call(filas, function(row, oi){
+        row.classList.remove('correct', 'incorrect');
+        Array.prototype.forEach.call(row.querySelectorAll('.tag'), function(t){ t.remove(); });
+        if (e.respuestas[qi] === oi){
+          row.classList.add('picked');
+          const tg = document.createElement('span');
+          tg.className = 'tag';
+          tg.textContent = 'TU RESPUESTA';
+          row.appendChild(tg);
+        } else {
+          row.classList.remove('picked');
+        }
+        row.onclick = function(){ elegir(oi); };
+      });
+      const sc = document.getElementById('quizScore');
+      if (sc) sc.textContent = 'RESPONDIDAS ' + contarRespondidas(e) + '/' + total;
+      const cnt = document.getElementById('examCounter');
+      if (cnt) cnt.textContent = contarRespondidas(e) + '/' + total;
+      Array.prototype.forEach.call(document.querySelectorAll('#navGrid .navbtn'), function(b, i){
+        b.classList.remove('nc', 'ni');
+        if (e.respuestas[i] !== null) b.classList.add('nx');
+      });
+      const nb = document.getElementById('nextBtn');
+      if (nb) nb.style.visibility = (qi < total - 1) ? 'visible' : 'hidden';
+      marcarExplicacion();
+    } else {
+      if (qBlock) qBlock.className = 'q answered';
+      Array.prototype.forEach.call(filas, function(row){
+        row.classList.remove('picked');
+        row.onclick = null;
+      });
+    }
+  };
+ 
+  const _elegir = elegir;
+  window.elegir = function(oi){
+    const tema = temaVirtualActual();
+    if (!tema) return _elegir.call(this, oi);
+    if (ex.revelado) return;
+    const e = estado[bancoActual][temaActual];
+    e.respuestas[e.index] = oi;
+    renderPregunta();
+  };
+ 
+  const _renderMaterias = renderMaterias;
+  window.renderMaterias = function(){
+    purgarVirtuales();
+    const r = _renderMaterias.apply(this, arguments);
+    inyectarBotones();
+    return r;
+  };
+ 
+  const _renderBancos = renderBancos;
+  window.renderBancos = function(){
+    purgarVirtuales();
+    return _renderBancos.apply(this, arguments);
+  };
+ 
+  const _repetirMateria = repetirMateria;
+  window.repetirMateria = function(){
+    if (ex){
+      const origen = ex.origen;
+      iniciarExamen(origen);
+      return;
+    }
+    return _repetirMateria.apply(this, arguments);
+  };
+ 
+  const _guardarProgresoAhora = guardarProgresoAhora;
+  window.guardarProgresoAhora = function(){
+    if (ex) return Promise.resolve();
+    return _guardarProgresoAhora.apply(this, arguments);
+  };
+ 
+  if (document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', montarUI);
+  } else {
+    montarUI();
+  }
 })();
 </script>
 </body>

@@ -276,6 +276,52 @@ body{
 .cmtform textarea::placeholder{color:var(--dim);}
 .cmtformfoot{display:flex; justify-content:space-between; align-items:center; margin-top:10px; gap:10px;}
 .cmtcount{font-family:var(--f-mono); font-size:11px; color:var(--dim);}
+    <!-- ============ BLOQUE CSS  (pegar antes de </style>) ============ -->
+.tile .goExam{
+  display:block; margin-top:8px;
+  font-family:var(--f-mono); font-size:11.5px; font-weight:700; letter-spacing:.06em;
+  color:var(--amber); background:var(--amber-dim);
+  border:1px solid rgba(245,166,35,.45); border-radius:7px;
+  padding:7px 10px; text-align:center; text-transform:uppercase; cursor:pointer;
+  transition:background .12s ease, color .12s ease;
+}
+.tile .goExam:hover{ background:var(--amber); color:#2b1a02; }
+ 
+/* opción marcada durante el examen (sin revelar si es correcta) */
+.opt.picked{ border-color:var(--cyan); background:rgba(79,216,224,.10); }
+.opt.picked .key{ background:var(--cyan); color:#04262a; }
+.opt.picked .tag{ background:var(--cyan-dim); color:var(--cyan); }
+ 
+/* navegador: respondida = neutro, sin verde/rojo */
+.navbtn.nx{ border-color:var(--cyan); color:var(--cyan); background:rgba(79,216,224,.12); }
+body.modo-examen .navlegend{ display:none; }
+.examlegend{ display:none; font-size:10.5px; color:var(--dim); font-family:var(--f-mono); }
+body.modo-examen .examlegend{ display:inline-flex; gap:5px; align-items:center; }
+.examlegend i{ width:9px; height:9px; border-radius:3px; display:inline-block; background:rgba(79,216,224,.35); border:1px solid var(--cyan); }
+ 
+/* banda de estado del simulacro */
+.exambar{
+  display:none; align-items:center; justify-content:space-between; gap:10px;
+  background:var(--amber-dim); border:1px solid rgba(245,166,35,.4);
+  color:var(--amber); font-family:var(--f-mono); font-size:11px; letter-spacing:.07em;
+  text-transform:uppercase; padding:8px 12px; border-radius:8px; margin-bottom:10px;
+}
+body.modo-examen .exambar{ display:flex; }
+ 
+/* botones contextuales */
+#examEndBtn{ display:none; margin-right:auto; }
+body.modo-examen #examEndBtn{ display:inline-flex; }
+#examReviewBtn{ display:none; }
+body.examen-revelado #examReviewBtn{ display:inline-flex; }
+ 
+/* bloqueo de la sección de explicación mientras el examen está en curso */
+body.modo-examen #screen-quiz [id*="xplic"],
+body.modo-examen #screen-quiz [class*="xplic"],
+body.modo-examen #screen-quiz [data-tab*="xplic"],
+body.modo-examen #screen-quiz [id*="xplan"],
+body.modo-examen #screen-quiz [class*="xplan"],
+body.modo-examen #screen-quiz [data-tab*="xplan"],
+body.modo-examen #screen-quiz .ex-gate{ display:none !important; }
 </style>
 </head>
 <body>

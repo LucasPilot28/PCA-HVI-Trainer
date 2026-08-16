@@ -1725,7 +1725,556 @@ intentarSesionGuardada(); (function () {
     montarUI();
   }
 })();
-  
+  /* =============================================================================
+   EXPLICACIONES · PCA · REGLAMENTACIÓN  —  LOTE 1: DAN 91 "REGLAS DEL AIRE"
+   -----------------------------------------------------------------------------
+   No hay que editar las preguntas a mano. Este módulo recorre la materia
+   "Reglamentación" del banco PCA y adjunta la explicación a cada pregunta
+   haciendo coincidir el enunciado (normalizado: sin tildes, sin puntuación,
+   en minúsculas). Solo escribe si la pregunta aún no tiene `exp`, así que si
+   más adelante las incorporas al HTML, este módulo deja de tocarlas.
+
+   Fuente única de este lote:
+     DAN 91 "Reglas del Aire", Edición 4 / Sep. 2015 (Resol. Exenta N° 0373
+     del 02.SEP.2015), DGAC Chile. Es la edición contemporánea al examen.
+     Donde la clave del examen difiere de la norma, se documenta en el texto
+     y NO se altera la respuesta correcta.
+
+   Al cargar, imprime en consola un resumen:
+     [explicaciones] Reglamentación PCA: N aplicadas, M sin coincidencia
+   ============================================================================= */
+(function () {
+  'use strict';
+  if (window.__EXP_REG_PCA__) return;
+  window.__EXP_REG_PCA__ = true;
+
+  var SRC_DEF  = 'DAN 91 «Reglas del Aire», Capítulo A — Definiciones (Ed. 4 / Sep. 2015, DGAC)';
+  var SRC_GEN  = 'DAN 91 «Reglas del Aire», Capítulo B — Reglas Generales (Ed. 4 / Sep. 2015, DGAC)';
+  var SRC_VFR  = 'DAN 91 «Reglas del Aire», Capítulo C — Reglas de Vuelo Visual (Ed. 4 / Sep. 2015, DGAC)';
+  var SRC_IFR  = 'DAN 91 «Reglas del Aire», Capítulo D — Reglas de Vuelo por Instrumentos (Ed. 4 / Sep. 2015, DGAC)';
+  var SRC_ANX  = 'DAN 91 «Reglas del Aire», Anexos A y C (Ed. 4 / Sep. 2015, DGAC)';
+
+  /* clave = comienzo del enunciado; t = cuerpo HTML; s = fuente */
+  var EXPS = [
+
+  { k:'¿Cuál de las siguientes definiciones corresponde a una REGIÓN DE INFORMACIÓN DE VUELO',
+    s:SRC_DEF,
+    t:'<span class="key">FIR: espacio aéreo <b>de dimensiones definidas</b> dentro del cual se facilitan los servicios de <b>información de vuelo</b> y de <b>alerta</b>.</span>'+
+      '<p>Los tres elementos de la definición son los que se preguntan: dimensiones definidas, información de vuelo y alerta. Nótese que el control de tránsito aéreo <i>no</i> forma parte de la definición: una FIR puede contener espacio aéreo controlado y no controlado, y lo que la caracteriza es que en toda ella hay alguien que informa y alguien que da la alarma si una aeronave se pierde.</p>'+
+      '<p>Los distractores fallan por omisión: uno deja fuera «de dimensiones definidas» y otro deja fuera el servicio de alerta. En este examen las definiciones se preguntan casi textuales, así que conviene memorizarlas completas.</p>' },
+
+  { k:'¿Cuál de los siguientes símbolos se utiliza para designar las reglas de vuelo visual?',
+    s:SRC_DEF,
+    t:'<span class="key">VFR — <i>Visual Flight Rules</i>, reglas de vuelo visual.</span>'+
+      '<p>La DAN 91 define VFR como el conjunto de normas que se deben cumplir para realizar un vuelo por referencias visuales, y usa siempre la sigla en inglés, no una traducción al castellano.</p>'+
+      '<p>Cuidado con confundir <b>VFR</b> (las reglas) con <b>VMC</b> (<i>Visual Meteorological Conditions</i>, las condiciones meteorológicas). Se puede volar IFR en VMC, y esa distinción es materia de otra pregunta del mismo examen.</p>' },
+
+  { k:'¿Cuál de los siguientes símbolos se utiliza para designar las reglas de vuelo por instrumentos?',
+    s:SRC_DEF,
+    t:'<span class="key">IFR — <i>Instrument Flight Rules</i>.</span>'+
+      '<p>Es el conjunto de normas para realizar un vuelo basado exclusivamente en los instrumentos de a bordo. Igual que con VFR, la norma usa la sigla inglesa; «RVI» no existe en la reglamentación chilena.</p>'+
+      '<p>Su par meteorológico es <b>IMC</b>: condiciones de visibilidad, distancia a las nubes y techo <i>inferiores</i> a los mínimos VMC.</p>' },
+
+  { k:'El piloto al mando de la aeronave, manipule o no los mandos, es responsable de que la operación',
+    s:SRC_GEN,
+    t:'<span class="key">Verdadero. El piloto al mando responde de la operación aunque no esté a los mandos, y puede apartarse de la norma cuando la seguridad lo haga absolutamente necesario.</span>'+
+      '<p>Las dos mitades del enunciado son igual de importantes. La primera fija la responsabilidad en la persona, no en quien tiene las manos en el control: si vuela el copiloto o un alumno, el responsable sigue siendo el piloto al mando.</p>'+
+      '<p>La segunda es la cláusula de emergencia. La DAN 91 la reitera en varios puntos —por ejemplo en 91.123, al permitir apartarse del plan de vuelo ante una emergencia— pero siempre con la obligación de informar después a los servicios de tránsito aéreo lo actuado y su motivo.</p>' },
+
+  { k:'¿Cuál de las siguientes definiciones corresponde a la AUTORIDAD AERONÁUTICA',
+    s:SRC_DEF,
+    t:'<span class="key">La Dirección General de Aeronáutica Civil (DGAC).</span>'+
+      '<p>La DAN 91 lo dice en una línea: «AUTORIDAD AERONÁUTICA — La Dirección General de Aeronáutica Civil (DGAC)». No es el controlador de turno ni la torre.</p>'+
+      '<p>Conviene distinguirla de la <b>Autoridad ATS competente</b>, que la misma norma define aparte como la autoridad designada por el Director General para administrar y suministrar los servicios de tránsito aéreo en un espacio aéreo determinado. Varias preguntas del examen juegan con esa diferencia.</p>' },
+
+  { k:'Medidas previas al vuelo que debe efectuar el Piloto al Mando',
+    s:'DAR 91 «Reglas de Vuelo y Operación General», Medidas previas al vuelo (DGAC)',
+    t:'<span class="key">Todas: conocer la información del vuelo proyectado, estudiar la meteorología y calcular combustible, y comprobar el equipo de emergencia y la instrucción de los pasajeros.</span>'+
+      '<p>La norma distingue dos niveles. Para cualquier vuelo basta conocer «toda la información disponible apropiada al vuelo proyectado». Para los que salen de las inmediaciones del aeródromo y para <b>todos</b> los IFR, se exige además el estudio minucioso de informes y pronósticos meteorológicos —incluyendo posibles condiciones de engelamiento en tierra y en el aire—, el cálculo de combustible y un plan alternativo por si el vuelo no puede completarse.</p>'+
+      '<p>El tercer bloque es el que más se olvida: verificar que el equipo de emergencia y supervivencia esté a bordo, y asegurarse de que los pasajeros fueron instruidos sobre cómo actuar en una emergencia y cómo usar ese equipo.</p>' },
+
+  { k:'Los niveles de crucero a que ha de efectuarse un vuelo o parte de él se referirán a',
+    s:SRC_GEN,
+    t:'<span class="key">A niveles de vuelo por encima de la altitud de transición, y a altitudes en o por debajo de ella.</span>'+
+      '<p>El criterio es el reglaje altimétrico. Arriba de la altitud de transición todos vuelan con 1013,2 hPa, de modo que la referencia común son los <b>niveles de vuelo</b>. Abajo se vuela con QNH, y la referencia son <b>altitudes</b> sobre el nivel medio del mar.</p>'+
+      '<p>La tercera alternativa, «alturas de vuelo respecto al terreno», no corresponde: la altura se mide sobre una referencia especificada (por ejemplo el umbral) y no sirve para separar tránsito entre aeronaves distintas.</p>' },
+
+  { k:'Definición de NIVEL DE CRUCERO',
+    s:SRC_DEF,
+    t:'<span class="key">Nivel que se mantiene durante una <b>parte considerable</b> del vuelo.</span>'+
+      '<p>La definición es deliberadamente cualitativa: no fija minutos ni millas. Lo que importa es que se trata del nivel de la fase estable del vuelo, no de los que se cruzan durante el ascenso o el descenso.</p>'+
+      '<p>Ojo con las alternativas que hablan de «una parte del vuelo» o «una parte mínima»: cambian una sola palabra respecto del texto de la norma, y ese es exactamente el tipo de distractor que usa este examen.</p>' },
+
+  { k:'NIVEL DE VUELO está definido por la Superficie de presión atmosférica constante',
+    s:SRC_DEF,
+    t:'<span class="key">Verdadero. Superficie isobárica referida a 1013,2 hPa, separada de otras análogas por determinados intervalos de presión.</span>'+
+      '<p>Los niveles de vuelo no son alturas geométricas sino superficies de igual presión. Por eso dos aviones al mismo FL están realmente a alturas distintas sobre el mar si la atmósfera no es estándar — pero, y esto es lo que importa, mantienen entre sí la separación vertical pretendida porque ambos usan la misma referencia.</p>'+
+      '<p>La misma definición de la norma agrega la regla práctica del altímetro: con QNH indica <b>altitud</b>, con QFE indica <b>altura</b> sobre esa referencia, y con 1013,2 hPa sirve para indicar <b>niveles de vuelo</b>.</p>' },
+
+  { k:'No se debe hacer ningún lanzamiento ni rociado desde aeronaves en vuelo',
+    s:SRC_GEN,
+    t:'<span class="key">La autoridad aeronáutica, es decir la DGAC.</span>'+
+      '<p>La norma agrupa el lanzamiento de objetos o rociado junto al remolque de aeronaves u objetos, los descensos en paracaídas (salvo emergencia) y los vuelos de sanidad o asistencia que requieran condiciones especiales: todas son «operaciones aéreas especiales» que solo pueden realizarse con autorización de la DGAC y en las condiciones que fije la normativa de detalle.</p>'+
+      '<p>Hay un segundo paso que la pregunta no menciona pero conviene recordar: además de la autorización, estas operaciones deben coordinarse previamente con las dependencias de los Servicios de Tránsito Aéreo correspondientes.</p>' },
+
+  { k:'Una ZONA RESTRINGIDA es un Espacio aéreo de dimensiones definidas sobre el territorio o las aguas',
+    s:SRC_DEF,
+    t:'<span class="key">Verdadero según la clave del examen: espacio aéreo de dimensiones definidas dentro del cual el vuelo está <b>restringido</b> conforme a condiciones especificadas.</span>'+
+      '<p>La distinción esencial es con la zona prohibida: en la restringida se puede volar <i>si</i> se cumplen las condiciones publicadas; en la prohibida no se vuela. La zona peligrosa es distinta a ambas: no restringe el vuelo, solo advierte que allí pueden desarrollarse actividades peligrosas en determinados momentos.</p>'+
+      '<p><b>Nota de actualización:</b> la Edición 4 de la DAN 91 (Sep. 2015) reemplazó «sobre el territorio o las aguas jurisdiccionales de un Estado» por «sobre el <b>territorio nacional</b>». La clave del examen conserva la redacción anterior, que es la que debes marcar.</p>' },
+
+  { k:'Sobre el derecho de paso',
+    s:SRC_GEN,
+    t:'<span class="key">La aeronave con derecho de paso mantiene rumbo y velocidad; la que debe apartarse evita pasar por encima, por debajo o por delante, salvo a suficiente distancia.</span>'+
+      '<p>Que quien tiene el derecho <b>mantenga</b> rumbo y velocidad es tan obligatorio como que el otro se aparte: si ambos maniobran, la maniobra evasiva se vuelve impredecible. Y el derecho de paso nunca exime al piloto al mando de proceder del modo más eficaz para evitar una colisión, incluida la respuesta a un aviso ACAS.</p>'+
+      '<p>La norma agrega un factor que el enunciado no menciona pero que se pregunta aparte: en cualquier caso deben tenerse en cuenta los efectos de la <b>estela turbulenta</b> de las aeronaves involucradas.</p>' },
+
+  { k:'Cuando dos aeronaves se aproximen de frente, o casi de frente, y haya peligro de colisión',
+    s:SRC_GEN,
+    t:'<span class="key">Ambas alteran su rumbo hacia la <b>derecha</b>.</span>'+
+      '<p>Es el único caso en que las dos aeronaves maniobran: como ninguna tiene derecho de paso sobre la otra, la regla fija un sentido común para las dos. Si cada piloto elige por su cuenta, existe la posibilidad de que ambos viren hacia el mismo lado del espacio y la maniobra empeore la situación.</p>'+
+      '<p>La misma lógica y el mismo sentido se aplican en el suelo: dos aeronaves en rodaje que se aproximan de frente se detienen o, de ser posible, alteran su rumbo hacia la derecha.</p>' },
+
+  { k:'Se denomina "aeronave que alcanza"',
+    s:SRC_GEN,
+    t:'<span class="key">La que se aproxima a otra por detrás siguiendo una línea que forme un ángulo <b>menor de 70°</b> con el plano de simetría de la que va delante.</span>'+
+      '<p>Los 70° no son arbitrarios: la norma los explica en el propio texto. Es la posición desde la cual, de noche, la aeronave que alcanza <b>no podría ver</b> las luces de navegación izquierda o derecha de la de adelante — solo vería la luz blanca de cola. Ese cono es precisamente el sector de alcance.</p>'+
+      '<p>La aeronave alcanzada tiene el derecho de paso, y la que alcanza debe apartarse <b>hacia la derecha</b>, ya sea ascendiendo, descendiendo o en vuelo horizontal. Ningún cambio posterior en la posición relativa la libera de esa obligación hasta haberla pasado y dejado atrás por completo.</p>' },
+
+  { k:'Las aeronaves en vuelo, y también las que estén operando en tierra o agua, cederán el paso',
+    s:SRC_GEN,
+    t:'<span class="key">A las aeronaves que estén <b>aterrizando</b> o en las <b>fases finales</b> de una aproximación para aterrizar.</span>'+
+      '<p>La prioridad es para quien aterriza, no para quien despega: el que está en final tiene mucho menos margen de energía y de opciones que cualquier otro. Por eso la regla alcanza incluso a las aeronaves que están en tierra o en el agua.</p>'+
+      '<p>La regla complementaria: cuando dos o más aerodinos se aproximan a aterrizar en un aeródromo sin servicio de control, el que está <b>más alto</b> cede el paso al que está más bajo — pero el de abajo no puede aprovechar esa regla para cruzarse por delante de otro en final ni para alcanzarlo.</p>' },
+
+  { k:'Luces que deben ostentar las aeronaves en vuelo',
+    s:SRC_GEN,
+    t:'<span class="key">Luces <b>anticolisión</b> y luces de <b>navegación</b>. Las de aterrizaje no forman parte del requisito.</span>'+
+      '<p>Cada una tiene un propósito distinto que la norma explicita: las anticolisión sirven para <i>llamar la atención</i> hacia la aeronave, y las de navegación para <i>indicar su trayectoria relativa</i> a quien la observa. Por eso está prohibido ostentar otras luces que puedan confundirse con ellas.</p>'+
+      '<p>Las luces de aterrizaje sí aparecen en la norma, pero con otro rol: como refuerzo optativo para destacar mejor la aeronave, y como <b>señal de urgencia</b> cuando se encienden y apagan sucesivamente.</p>' },
+
+  { k:'No se volará ninguna aeronave en condiciones simuladas de vuelo por instrumentos, a menos que',
+    s:SRC_GEN,
+    t:'<span class="key">Las tres condiciones son obligatorias y simultáneas: doble mando operativo, piloto de seguridad calificado en un puesto de mando, y campo visual suficiente para ese piloto de seguridad.</span>'+
+      '<p>El doble mando y el piloto calificado son el par obvio: alguien tiene que poder tomar el control de inmediato. La tercera condición es la que se olvida — el piloto de seguridad debe tener visibilidad suficiente hacia adelante <b>y hacia los costados</b>.</p>'+
+      '<p>Si esa visibilidad no existe (por la configuración de la cabina o por la capota del que vuela simulado), la norma exige un <b>observador competente</b> en comunicación con él, ubicado en un puesto desde el cual su campo visual complemente al del piloto de seguridad.</p>' },
+
+  { k:'AERÓDROMO es toda área delimitada, terrestre o acuática habilitada por la autoridad aeronáutica',
+    s:SRC_DEF,
+    t:'<span class="key">Verdadero, y son cuatro los elementos: área delimitada, terrestre o acuática, habilitada por la autoridad aeronáutica, destinada a la llegada, salida y maniobra de aeronaves en la superficie.</span>'+
+      '<p>«Habilitada por la autoridad aeronáutica» es lo que separa un aeródromo de un simple potrero plano: sin habilitación de la DGAC no hay aeródromo, por más que ahí aterricen aviones.</p>'+
+      '<p>Que la definición incluya explícitamente lo <b>acuático</b> es lo que permite que un amaraje se rija por las mismas reglas de aeródromo, complementadas por la reglamentación de DIRECTEMAR.</p>' },
+
+  { k:'La expresión "Plan de Vuelo" se aplica, según el caso',
+    s:SRC_GEN,
+    t:'<span class="key">Tanto a la información completa de la totalidad de la ruta como a la información limitada que se exige para una parte del vuelo.</span>'+
+      '<p>La norma es explícita: la información que se presente para obtener autorización respecto de <i>una parte</i> del vuelo será solo la necesaria hasta el <b>límite de la autorización</b>. Cruzar una aerovía, despegar de un aeródromo controlado o aterrizar en él son ejemplos típicos de ese uso parcial.</p>'+
+      '<p>El distractor está en la palabra «ilimitada»: la información parcial es por definición <i>limitada</i>, y esa sola palabra invierte el sentido de la alternativa.</p>' },
+
+  { k:'PLAN DE VUELO ACTUALIZADO es el Plan de vuelo que comprende las modificaciones',
+    s:SRC_DEF,
+    t:'<span class="key">Verdadero. Es el plan de vuelo con las modificaciones que resultan de incorporar <b>autorizaciones posteriores</b>.</span>'+
+      '<p>La clave está en el origen de los cambios: vienen de las autorizaciones ATC recibidas, no de lo que el piloto haya escrito al presentar el plan. El plan de vuelo <b>presentado</b> es la versión original sin cambio alguno; el <b>actualizado</b> es al que uno debe atenerse durante el vuelo y el que sirve de referencia si fallan las comunicaciones.</p>'+
+      '<p>Por eso la norma distingue además el <b>AFIL</b> (presentado desde el aire) y el <b>RPL</b> (repetitivo, para vuelos regulares de características idénticas).</p>' },
+
+  { k:'Cuando no haya dependencia de los servicios de tránsito aéreo en el aeródromo de llegada',
+    s:SRC_GEN,
+    t:'<span class="key">Lo antes posible <b>después</b> de aterrizar, a la dependencia ATS más cercana, y por los medios más rápidos de que se disponga.</span>'+
+      '<p>Ese aviso es lo que cierra el plan de vuelo. Si no llega, el servicio de alerta empieza a contar los plazos y se activa la búsqueda: el olvido de un piloto puede terminar movilizando medios SAR sin necesidad.</p>'+
+      '<p>Hay una variante distinta para el caso en que se <i>sepa de antemano</i> que las comunicaciones en el aeródromo de llegada son inadecuadas: entonces el informe de llegada se transmite <b>inmediatamente antes de aterrizar</b>, no después.</p>' },
+
+  { k:'¿Cuál de las siguientes afirmaciones es correcta?',
+    s:SRC_GEN,
+    t:'<span class="key">Un <b>5%</b> en más o en menos respecto de la velocidad verdadera consignada en el plan de vuelo.</span>'+
+      '<p>El umbral existe porque el control calcula sus estimadas y su separación longitudinal con la velocidad declarada. Una desviación del 5% acumulada sobre un tramo largo desplaza la posición real lo suficiente como para invalidar esos cálculos.</p>'+
+      '<p>Es una de las tres obligaciones que la norma impone ante un <b>cambio inadvertido</b>: rectificar el rumbo de inmediato si se sale de la derrota, notificar la variación de velocidad si supera el 5%, y notificar la hora prevista revisada si la estimada se aparta más de lo permitido.</p>' },
+
+  { k:'En el caso de que un vuelo controlado se desvíe inadvertidamente de su plan de vuelo actualizado',
+    s:SRC_GEN,
+    t:'<span class="key">± 5% de la velocidad verdadera, o más de <b>2 minutos</b> en la hora prevista.</span>'+
+      '<p>Los dos umbrales de la sección de cambios inadvertidos van siempre juntos y esta pregunta los cobra juntos: 5% para la VAV promedio al nivel de crucero entre puntos de notificación, y 2 minutos para la estimada al próximo punto de notificación, al límite de FIR o al destino, el que ocurra primero.</p>'+
+      '<p><b>Ojo con una inconsistencia del propio examen:</b> otra pregunta de esta misma materia («…resulta errónea en más de ___ minutos») tiene como clave <b>3 minutos</b>, mientras que aquí la clave es <b>2</b>. La DAN 91 vigente dice 2 minutos; los 3 corresponden al umbral antiguo de OACI. Memoriza cada clave con su pregunta y, para volar, quédate con 2.</p>' },
+
+  { k:'Si la falla de las comunicaciones impide cumplir con lo dispuesto en DAN-91',
+    s:SRC_GEN,
+    t:'<span class="key">Las tres medidas: intentar por todos los demás medios disponibles, intentar con otras aeronaves o estaciones aeronáuticas, y transmitir a ciegas.</span>'+
+      '<p>La secuencia va de lo más directo a lo más indirecto. Primero se agotan los medios propios hacia la dependencia ATC pertinente. Después se recurre a terceros —otras aeronaves u otras estaciones en las frecuencias apropiadas a la ruta— que puedan retransmitir.</p>'+
+      '<p>El último recurso es transmitir el mensaje <b>dos veces</b>, precedido de la frase «TRANSMITIENDO A CIEGAS» y, si es necesario, indicando el destinatario. Se transmite aunque no se sepa si alguien escucha, precisamente porque puede haber un receptor cuyo transmisor no llegue de vuelta.</p>' },
+
+  { k:'Si una aeronave es interceptada y recibe la instrucción radial “DESCEND”',
+    s:SRC_GEN,
+    t:'<span class="key">DESCEND (pronunciado «DISSEND») significa <b>descienda para aterrizar</b>, no simplemente descender.</span>'+
+      '<p>El matiz importa: es una orden de aterrizar, no un cambio de nivel. Las frases de la tabla de interceptación son deliberadamente pocas y unívocas, porque se usan entre tripulaciones que pueden no compartir idioma.</p>'+
+      '<p>El resto del vocabulario del interceptor es igual de corto: <b>CALL SIGN</b> (¿cuál es su distintivo de llamada?), <b>FOLLOW</b> (sígame) y <b>PROCEED</b> (puede proseguir). Y de la interceptada: WILCO, CAN NOT, REPEAT, AM LOST, MAYDAY, HIJACK, LAND y DESCEND — esta última con el sentido inverso, «permiso para descender».</p>' },
+
+  { k:'VUELO LOCAL es el que comienza y finaliza en el aeródromo de origen y se realiza dentro de un radio de 50',
+    s:SRC_DEF,
+    t:'<span class="key">Verdadero: mismo aeródromo de origen, <b>sin aterrizaje intermedio</b>, dentro de un radio de 50 km (27 MN) desde el punto de referencia del aeródromo de salida, o en zonas designadas por la autoridad ATS.</span>'+
+      '<p>La condición de «sin aterrizaje intermedio» que trae la definición completa es lo que impide convertir una travesía en vuelo local haciendo escalas cortas dentro del radio.</p>'+
+      '<p>La consecuencia práctica es directa: los <b>vuelos VFR locales están exentos de presentar plan de vuelo</b>. De ahí que la definición se pregunte tanto.</p>' },
+
+  { k:'Las derrotas hacia el Sur y Este (030° a 209°) corresponde a',
+    s:SRC_ANX,
+    t:'<span class="key">Niveles <b>impares</b> para IFR e impares <b>+500 pies</b> para VFR.</span>'+
+      '<p>La tabla de niveles de crucero divide el compás en dos semicírculos por la derrota magnética. El sector <b>030° a 209°</b> —hacia el este y el sur— toma los impares: FL 050, 070, 090…, y los VFR se intercalan en FL 055, 075, 095…</p>'+
+      '<p>El truco para no confundirse es fijar un rumbo cardinal de referencia: <b>este (090°) es impar</b>. Con eso queda resuelto el semicírculo completo, y el otro es el complementario.</p>' },
+
+  { k:'Las derrotas hacia el Norte y Oeste (210° a 029°) corresponde a',
+    s:SRC_ANX,
+    t:'<span class="key">Niveles <b>pares</b> para IFR y pares <b>+500 pies</b> para VFR.</span>'+
+      '<p>Es el semicírculo complementario del anterior: de 210° a 029° se vuela en FL 040, 060, 080… y los VFR en FL 045, 065, 085…</p>'+
+      '<p>Regla mnemotécnica coherente con la anterior: <b>oeste (270°) es par</b>. Nótese que el corte no está en 000°/180° sino en 030°/210°, un detalle que el examen aprovecha con rumbos cercanos a esos límites.</p>' },
+
+  { k:'Indique que nivel de crucero deberá mantener si vuela VFR al rumbo magnético 205°',
+    s:SRC_ANX,
+    t:'<span class="key">Impares + 500 pies. El rumbo 205° cae dentro del sector 030°–209°.</span>'+
+      '<p>Dos pasos: primero el semicírculo, después el sufijo. 205° está apenas dentro del sector este/sur, que toma impares; y por ser VFR se agrega el medio nivel: FL 055, 075, 095, etc.</p>'+
+      '<p>Está elegido a propósito cerca del límite: cuatro grados más y pasaría a 210°, es decir al semicírculo de los pares. Conviene verificar siempre contra el corte 030/210 y no contra el 000/180.</p>' },
+
+  { k:'Indique que nivel de crucero deberá mantener si vuela VFR al rumbo magnético 270°',
+    s:SRC_ANX,
+    t:'<span class="key">Pares + 500 pies. El rumbo 270° está en el sector 210°–029°.</span>'+
+      '<p>Oeste franco: semicírculo de los pares, más el medio nivel de los VFR. Corresponden FL 045, 065, 085, 105…</p>'+
+      '<p>Recordar además que estos niveles solo se exigen en vuelo horizontal de crucero <b>por encima de 900 m (3.000 pies)</b> respecto del terreno o del agua. Por debajo de esa altura la tabla no aplica.</p>' },
+
+  { k:'La definición de SUSTANCIAS PSICOACTIVAS es',
+    s:SRC_DEF,
+    t:'<span class="key">Alcohol, opiáceos, canabinoides, sedantes e hipnóticos, cocaína, otros psicoestimulantes, alucinógenos y disolventes volátiles — <b>con exclusión del tabaco y la cafeína</b>.</span>'+
+      '<p>La lista completa es lo que se pregunta, y la exclusión final es la parte que distingue la alternativa correcta: tabaco y cafeína son psicoactivos en sentido farmacológico, pero la norma los deja expresamente fuera.</p>'+
+      '<p>El concepto asociado es el <b>uso problemático</b>: emplear una o más de estas sustancias de manera que constituya un riesgo directo para quien las usa o ponga en peligro a otros, o que provoque o agrave un problema ocupacional, social, mental o físico.</p>' },
+
+  { k:'Aeródromos de alternativa de destino. Para un vuelo que haya de efectuarse de acuerdo con las reglas de vuelo por instrumentos',
+    s:SRC_IFR,
+    t:'<span class="key">Se exige al menos un aeródromo de alternativa de destino, <b>salvo</b> que se prevean condiciones visuales a la llegada o que el aeródromo previsto esté aislado y no haya alternativa apropiada.</span>'+
+      '<p>La primera excepción está cuantificada en la norma: el pronóstico debe indicar que a la hora prevista de llegada, y por un período razonable —dos horas antes y dos después—, prevalecerán condiciones visuales de <b>450 m de techo y 5 km de visibilidad</b>.</p>'+
+      '<p>La segunda excepción es de hecho, no de elección: si el destino está aislado y sencillamente no existe alternativa apropiada, la norma prevé en cambio consignar un punto de no retorno a partir del cual se regresa al aeródromo de salida.</p>' },
+
+  { k:'Cuál de las siguientes definiciones corresponde a PILOTO AL MANDO',
+    s:SRC_DEF,
+    t:'<span class="key">Piloto <b>designado por el explotador</b> para cada operación aérea; a falta de designación, se presume que lo es quien dirige a bordo la operación de vuelo.</span>'+
+      '<p>La designación es lo que constituye la figura, y la presunción es la red de seguridad para que nunca quede un vuelo sin responsable identificable.</p>'+
+      '<p>La definición completa agrega lo esencial: es la <b>única y máxima autoridad a bordo</b>, encargado de la dirección de la aeronave y principal responsable de su conducción segura conforme a la reglamentación de circulación aérea y al manual de operaciones del explotador.</p>' },
+
+  { k:'¿Cuál alternativa define correctamente una AERONAVE?',
+    s:SRC_DEF,
+    t:'<span class="key">Todo <b>vehículo</b> apto para el traslado de personas o cosas, destinado a desplazarse en el espacio aéreo, en el que se sustenta por reacción del aire con independencia del suelo.</span>'+
+      '<p>La expresión decisiva es «con independencia del suelo»: excluye a los vehículos de efecto suelo, que dependen de la proximidad de la superficie para sustentarse. Y «vehículo» —no «avión» ni «avión o helicóptero»— es lo que hace que globos, dirigibles, planeadores y RPAS entren todos en la misma definición.</p>'+
+      '<p>Por eso la norma subdivide después en <b>aerodinos</b> (se sostienen por fuerzas aerodinámicas) y <b>aerostatos</b> (por fuerza ascensional), y el avión es un caso particular de aerodino propulsado por motor.</p>' },
+
+  { k:'Una ZONA PROHIBIDA es un',
+    s:SRC_DEF,
+    t:'<span class="key">Espacio aéreo <b>de dimensiones definidas</b> dentro del cual está <b>prohibido</b> el vuelo de las aeronaves.</span>'+
+      '<p>Los dos elementos que distinguen la alternativa correcta son «dimensiones definidas» y «prohibido». Los distractores omiten uno u otro: uno deja fuera las dimensiones, y otro dice «restringido», que es la zona de la categoría vecina.</p>'+
+      '<p><b>Nota de actualización:</b> la Edición 4 de la DAN 91 precisó la definición añadiendo el motivo —«por razones de seguridad nacional o de carácter militar»— y cambiando el ámbito a «territorio nacional». La clave del examen usa la redacción anterior.</p>' },
+
+  { k:'¿Cuál de las siguientes definiciones corresponde a una ÁREA DE MOVIMIENTO?',
+    s:SRC_DEF,
+    t:'<span class="key">Área de movimiento = <b>área de maniobras + plataformas</b>.</span>'+
+      '<p>La relación entre las dos es de contención, y es lo único que hay que memorizar: el <b>área de maniobras</b> es la parte que se usa para despegue, aterrizaje y rodaje <i>excluyendo</i> las plataformas; el <b>área de movimiento</b> es esa misma más las plataformas.</p>'+
+      '<p>La distinción tiene consecuencias reales: el servicio de control de aeródromo previene colisiones entre aeronaves y obstáculos <b>en el área de maniobras</b>, no en toda la plataforma, donde la responsabilidad recae en el explotador del aeródromo.</p>' },
+
+  { k:'En condiciones meteorológicas de vuelo visual, el piloto puede hacer un vuelo ajustándose a las reglas de vuelo por instrumentos',
+    s:SRC_IFR,
+    t:'<span class="key">Verdadero. En VMC el piloto puede volar IFR si lo desea, y la autoridad ATS competente incluso puede exigírselo.</span>'+
+      '<p>Las reglas de vuelo y las condiciones meteorológicas son dimensiones independientes. VMC describe el estado de la atmósfera; IFR describe bajo qué conjunto de normas se conduce el vuelo. Volar IFR en VMC es enteramente normal — de hecho es lo habitual en el transporte comercial.</p>'+
+      '<p>El caso inverso está regulado aparte: si se vuela IFR en IMC y aparecen condiciones visuales, <b>no</b> debe cancelarse el IFR salvo que se prevea un período razonable de VMC ininterrumpidas y se tenga el propósito de proseguir así.</p>' },
+
+  { k:'Ninguna aeronave podrá ser operada negligente o temerariamente',
+    s:'DAR 91 «Reglas de Vuelo y Operación General» — Protección de personas y propiedad (DGAC)',
+    t:'<span class="key">Verdadero. Es la regla general de la que dependen todas las demás.</span>'+
+      '<p>Funciona como cláusula de cierre: aunque una operación no infrinja ninguna disposición específica, puede igualmente ser sancionada si se condujo de forma negligente o temeraria poniendo en peligro vidas o propiedad ajena.</p>'+
+      '<p>Es también la contracara de la facultad del piloto al mando para apartarse de la norma por razones de seguridad: esa libertad existe para proteger, no para justificar una operación descuidada.</p>' },
+
+  { k:'Según la normativa vigente, toda aeronave obligada a apartarse de la trayectoria de otra',
+    s:SRC_GEN,
+    t:'<span class="key">Debe evitar pasar por encima, por debajo o cruzar por delante, a menos que lo haga a suficiente distancia.</span>'+
+      '<p>La razón de prohibir las tres trayectorias es la misma: todas llevan a la aeronave que se aparta a atravesar el espacio inmediato de la otra, justo donde un error de apreciación de distancia deja de tener margen.</p>'+
+      '<p>El distractor de esta pregunta dice que «en cualquier caso no se deberán tener en cuenta los efectos de la estela turbulenta», y es exactamente lo contrario de lo que dice la norma: la estela turbulenta <b>sí</b> debe considerarse en cualquier caso.</p>' },
+
+  { k:'En el caso de que exista peligro de colisión entre dos aeronaves en rodaje en el área de movimiento',
+    s:SRC_GEN,
+    t:'<span class="key">Las tres reglas: de frente ambas se detienen o viran a la derecha; en convergencia cede el que tiene al otro a su derecha; la alcanzada tiene el derecho de paso.</span>'+
+      '<p>Son las mismas reglas del aire trasladadas al suelo, con una diferencia significativa: en tierra aparece la opción de <b>detenerse</b>, que en vuelo no existe. Ante dos aeronaves de frente en una calle de rodaje, parar suele ser mejor que maniobrar.</p>'+
+      '<p>La sección agrega dos obligaciones que no son de derecho de paso sino de protección de pista: detenerse en todos los <b>puntos de espera</b> de acceso a la pista salvo autorización de la torre, y detenerse ante toda <b>barra de parada iluminada</b>, prosiguiendo solo cuando se apaguen las luces.</p>' },
+
+  { k:'A menos que la autoridad ATS competente prescriba otra cosa, se presentará un plan de vuelo para un vuelo IFR',
+    s:SRC_GEN,
+    t:'<span class="key">Por lo menos <b>30 minutos</b> antes de la salida.</span>'+
+      '<p>Ese plazo es el que necesita el sistema ATS para procesar el plan y coordinarlo con las dependencias por las que pasará el vuelo. Si el plan se presenta en vuelo (AFIL), el criterio cambia: debe llegar a la dependencia apropiada al menos <b>10 minutos</b> antes de la hora estimada de entrada al área de control o de cruce de la aerovía.</p>'+
+      '<p>Conviene memorizar junto con esto la <b>validez</b> del plan: dos horas respecto de la hora prevista de fuera calzos. Cumplidas las dos horas hay que presentar uno nuevo.</p>' },
+
+  { k:'ZONA DE TRÁNSITO DE AERÓDROMO es un',
+    s:SRC_DEF,
+    t:'<span class="key">Espacio aéreo <b>de dimensiones definidas</b> establecido <b>alrededor de un aeródromo</b> para la protección del tránsito del aeródromo.</span>'+
+      '<p>La ATZ protege específicamente el tránsito de aeródromo: lo que ocurre en el área de maniobras y lo que vuela en sus inmediaciones. No debe confundirse con la <b>CTR</b>, que es espacio aéreo <i>controlado</i> extendiéndose desde la superficie hasta un límite superior especificado.</p>'+
+      '<p>El efecto práctico: en un aeródromo controlado hay que solicitar autorización para sobrevolar o ingresar a la ATZ o a los circuitos de tránsito, y hacerlo sin ella es una infracción independiente de que se esté o no dentro de una CTR.</p>' },
+
+  { k:'SERVICIO DE ALERTA es el',
+    s:SRC_DEF,
+    t:'<span class="key">Servicio suministrado para <b>notificar</b> a los organismos pertinentes respecto de aeronaves que necesitan ayuda de búsqueda y salvamento, y <b>auxiliar</b> a dichos organismos según convenga.</span>'+
+      '<p>Son dos funciones, no una: avisar y después colaborar. El servicio de alerta no ejecuta la búsqueda —eso corresponde al SAR— pero es quien dispara la alarma y quien aporta la información de posición, plan de vuelo y autonomía que el SAR necesita.</p>'+
+      '<p>Es uno de los tres servicios de tránsito aéreo, junto con el de información de vuelo y el de control de tránsito aéreo. Y es la razón de fondo por la que cerrar el plan de vuelo al aterrizar es obligatorio.</p>' },
+
+  { k:'El Servicio suministrado con el fin de prevenir colisiones: entre aeronaves; y en el área de maniobras',
+    s:SRC_DEF,
+    t:'<span class="key">Servicio de control de tránsito aéreo.</span>'+
+      '<p>Su definición tiene dos finalidades, y el examen suele preguntar solo la primera: <b>(a)</b> prevenir colisiones entre aeronaves y, en el área de maniobras, entre aeronaves y obstáculos; y <b>(b)</b> acelerar y mantener ordenadamente el movimiento del tránsito aéreo.</p>'+
+      '<p>Nótese la limitación territorial de la letra (a): la prevención de colisiones con obstáculos se circunscribe al <b>área de maniobras</b>, no a toda el área de movimiento. En plataforma la responsabilidad es de otro.</p>' },
+
+  { k:'A menos que la autoridad ATS competente prescriba otra cosa, se dará aviso de llegada, personalmente',
+    s:SRC_GEN,
+    t:'<span class="key">Verdadero. El aviso de llegada se da tan pronto como sea posible después del aterrizaje, por cualquier medio disponible, a la dependencia ATS del aeródromo de llegada.</span>'+
+      '<p>Es lo que cierra el plan de vuelo y detiene el reloj del servicio de alerta. La norma acepta expresamente que se haga personalmente, por radio, por enlace de datos o por cualquier otro medio disponible.</p>'+
+      '<p>El contenido mínimo del informe de llegada también está fijado: identificación de la aeronave, aeródromo de salida, aeródromo de destino (si el aterrizaje no se hizo allí), aeródromo de llegada y hora de llegada.</p>' },
+
+  { k:'Si la hora prevista de llegada al próximo punto de notificación aplicable, al límite de región de información de vuelo',
+    s:SRC_GEN,
+    t:'<span class="key">La clave del examen es <b>3 minutos</b>; téngase presente que la DAN 91 vigente fija el umbral en <b>2 minutos</b>.</span>'+
+      '<p>El sentido de la regla no cambió: si la estimada al próximo punto de notificación, al límite de FIR o al aeródromo de destino —el que ocurra primero— se aparta más de ese margen respecto de lo notificado, hay que transmitir lo antes posible la nueva hora revisada, porque el control planifica su separación longitudinal con esas estimadas.</p>'+
+      '<p><b>Discrepancia documentada:</b> la Edición 4 de la DAN 91 (Sep. 2015) establece «errónea en más de <b>2 minutos</b>», alineándose con la enmienda de OACI que redujo el antiguo umbral de 3 minutos. La clave oficial de este examen conserva los 3 minutos y es la que debes marcar; para volar, el valor vigente es 2.</p>' },
+
+  { k:'Si un piloto desea efectuar cambio de nivel de crucero durante un vuelo controlado deberá entregar',
+    s:SRC_GEN,
+    t:'<span class="key">Los tres datos: identificación de la aeronave, nuevo nivel de crucero solicitado con su velocidad de crucero a ese nivel, y horas previstas revisadas sobre los límites de FIR subsiguientes cuando proceda.</span>'+
+      '<p>La velocidad acompaña siempre al nivel porque ambos determinan el perfil de tránsito: cambiar de nivel casi siempre cambia la TAS, y con ella todas las estimadas río abajo.</p>'+
+      '<p>La norma escala el requerimiento según la magnitud del cambio. Un cambio de <b>ruta sin cambiar destino</b> exige además reglas de vuelo y descripción de la nueva ruta desde el punto donde se inicia; si además <b>cambia el destino</b>, hay que agregar los aeródromos de alternativa.</p>' },
+
+  { k:'Cuando sea evidente que no será factible el vuelo en condiciones VMC de conformidad con su plan de vuelo actualizado',
+    s:SRC_GEN,
+    t:'<span class="key">Las cuatro salidas son válidas y están en orden de preferencia: permiso enmendado en VMC, salir o aterrizar notificando, VFR especial si se está en una CTR, o solicitar IFR.</span>'+
+      '<p>La lógica de la lista es de mayor a menor conservación del plan original. Lo primero es intentar seguir en VMC con una autorización enmendada. Si no se consigue, se continúa igualmente en VMC pero <b>notificando</b> qué se hará: salir del espacio aéreo o aterrizar en el aeródromo más próximo.</p>'+
+      '<p>Las dos últimas cambian la naturaleza del vuelo: el VFR especial solo está disponible dentro de una zona de control, y solicitar IFR requiere que la aeronave y el piloto estén habilitados. Lo que la norma no contempla en ningún caso es continuar hacia adentro del mal tiempo sin decidir nada.</p>' },
+
+  { k:'Toda aeronave que opere como vuelo controlado, no tiene ninguna obligación de mantener escucha permanente',
+    s:SRC_GEN,
+    t:'<span class="key">Falso. Todo vuelo controlado debe mantener escucha permanente en ambos sentidos en el canal apropiado con la dependencia ATC correspondiente.</span>'+
+      '<p>Sin escucha permanente no hay control posible: el sistema completo se apoya en que el ATC pueda emitir una instrucción y ser oído de inmediato. La obligación es <i>permanente</i>, no «cuando el piloto lo estime necesario».</p>'+
+      '<p>Dos precisiones de la misma sección: la escucha aeroterrestre oral <b>sigue vigente</b> aunque se hayan establecido comunicaciones por enlace de datos (CPDLC); y el requisito se entiende cumplido si se cuenta con <b>SELCAL</b> o un dispositivo similar de señalización automática.</p>' },
+
+  { k:'Si tiene falla de comunicaciones y no puede entrar en contacto con las dependencias de tránsito aéreo u otras aeronaves',
+    s:SRC_GEN,
+    t:'<span class="key">Las tres: proseguir en VMC, aterrizar en el aeródromo <b>adecuado</b> más próximo, y notificar la llegada por el medio más rápido.</span>'+
+      '<p>El adjetivo «adecuado» hace todo el trabajo. No es el aeródromo más cercano en línea recta, sino el más cercano que sea apto para el tipo de aeronave y para las condiciones — pista suficiente, servicios, meteorología.</p>'+
+      '<p>La notificación posterior es tan obligatoria como el aterrizaje: mientras el ATC no sepa que la aeronave está en tierra y a salvo, sigue reservando espacio aéreo y avanzando hacia la fase de alerta.</p>' },
+
+  { k:'El piloto al mando de toda aeronave que esté siendo objeto de actos de interferencia ilícita debe hacer lo posible',
+    s:SRC_GEN,
+    t:'<span class="key">Verdadero: notificar el hecho, las circunstancias significativas y cualquier desviación del plan de vuelo que las circunstancias hagan necesaria.</span>'+
+      '<p>El propósito de la notificación es doble y la norma lo dice: permitir al ATS <b>dar prioridad</b> a esa aeronave y <b>reducir al mínimo los conflictos</b> de tránsito con las demás. Una aeronave que se aparta de su derrota sin avisar es un peligro para todo el sector.</p>'+
+      '<p>La obligación principal del piloto al mando en esta situación es aterrizar lo antes posible en el aeródromo apropiado más cercano o en uno asignado al efecto, a menos que la situación a bordo dicte otro proceder.</p>' },
+
+  { k:'Si se recurriera a la interceptación, la aeronave interceptora se limitará a',
+    s:SRC_GEN,
+    t:'<span class="key">A determinar la identidad de la aeronave, salvo que sea necesario hacerla regresar a su derrota, guiarla fuera de una zona prohibida, restringida o peligrosa, o instruirla a aterrizar en un aeródromo designado.</span>'+
+      '<p>La norma parte de una premisa explícita: la interceptación de aeronaves civiles representa <b>en todos los casos un peligro posible</b>, debería evitarse y emprenderse únicamente como último recurso. De ahí que su alcance por defecto sea el mínimo: identificar.</p>'+
+      '<p>Consecuencia directa del mismo principio: los vuelos de aeronaves civiles <b>no serán objeto de prácticas</b> de interceptación. No se entrena con ellos.</p>' },
+
+  { k:'Una aeronave que es interceptada por otra aeronave',
+    s:SRC_GEN,
+    t:'<span class="key">Las cuatro medidas: seguir de inmediato las instrucciones, notificar al ATS, llamar en 121,5 MHz (y 243 MHz si es posible), y seleccionar el código <b>7700</b> en modo A.</span>'+
+      '<p>El orden refleja la urgencia. Lo primero es <b>cumplir</b> —interpretando las señales visuales del Anexo A— porque la aeronave interceptora no puede saber si hay comunicación posible. Recién después se notifica y se intenta radio.</p>'+
+      '<p>El código es 7700, el de emergencia general, no el 7500. La norma prevé además el conflicto de instrucciones: si algo recibido por radio contradice las señales visuales del interceptor, se pide aclaración <b>mientras se sigue cumpliendo</b> las instrucciones del interceptor.</p>' },
+
+  { k:'Los requisitos para VFR especial son',
+    s:SRC_VFR,
+    t:'<span class="key">Visibilidad no inferior a <b>2.000 m</b> (500 m para helicópteros), techo no inferior a <b>350 m (1.150 pies)</b> para aviones, permanecer libre de nubes y a la vista de tierra o agua, y comunicación en ambos sentidos con el ATC.</span>'+
+      '<p>El VFR especial existe para un caso muy acotado: <b>ingresar o salir de una zona de control</b> y aterrizar o despegar de aeródromos situados dentro de ella, en condiciones inferiores a las VMC. No sirve para volar en ruta con mal tiempo.</p>'+
+      '<p>Hay dos condiciones adicionales que el examen pregunta por separado: solo se concede entre el <b>CCCM y el FCCV</b> (es decir, de día), y solo a aeronaves de <b>categoría de aproximación A o B</b>.</p>' },
+
+  { k:'La mejor definición de CENTRO DE CONTROL DE ÁREA (ACC) es',
+    s:SRC_DEF,
+    t:'<span class="key">Dependencia establecida para facilitar servicio de control de tránsito aéreo a los <b>vuelos controlados</b> en las <b>áreas de control</b> bajo su jurisdicción.</span>'+
+      '<p>Las dos precisiones que distinguen la alternativa correcta son «vuelos controlados» y «áreas de control». El ACC no controla a todo el mundo ni en cualquier parte: actúa sobre los vuelos que están sujetos a autorización ATC, dentro de las CTA de su jurisdicción.</p>'+
+      '<p>Es una de las tres dependencias de control, junto con la <b>APP</b> (llegadas y salidas de uno o más aeródromos) y la <b>TWR</b> (tránsito de aeródromo). El servicio de información de vuelo y el de alerta son otra cosa.</p>' },
+
+  { k:'Excepto cuando sea necesario para despegar o aterrizar, o cuando se tenga permiso de la DGAC, las aeronaves no deben volar sobre aglomeraciones',
+    s:SRC_GEN,
+    t:'<span class="key">A una altura que permita, en caso de emergencia, efectuar un aterrizaje <b>sin peligro excesivo</b> para las personas o la propiedad que se encuentren en la superficie.</span>'+
+      '<p>El criterio de la regla general no es una cifra sino una capacidad: poder llegar planeando a un lugar donde caer no lastime a nadie. Depende por tanto del avión, del terreno y de la altura, y es el piloto quien debe evaluarlo.</p>'+
+      '<p>Los distractores agregan condiciones que la norma no pone —«de acuerdo a su pericia y experiencia»— o quitan el «peligro excesivo». Y no debe confundirse esta regla general con el mínimo <b>numérico</b> de los vuelos VFR: 300 m (1.000 ft) sobre el obstáculo más alto dentro de 600 m de radio.</p>' },
+
+  { k:'Sólo la DGAC autorizará a volar por debajo de las alturas mínimas de seguridad',
+    s:SRC_GEN,
+    t:'<span class="key">Verdadero. La excepción a las alturas mínimas solo la concede la autoridad aeronáutica, salvo lo necesario para despegar o aterrizar.</span>'+
+      '<p>La estructura de la norma es siempre la misma: prohibición general, excepción operacional inevitable (despegue y aterrizaje) y excepción administrativa (permiso de la DGAC). Ninguna dependencia ATS puede autorizar por sí sola volar bajo esos mínimos.</p>'+
+      '<p>Es lo que da cobertura legal a operaciones como fumigación, filmación o trabajos aéreos a baja altura, que se autorizan caso a caso y con condiciones específicas.</p>' },
+
+  { k:'Cuando dos aeronaves converjan a un nivel aproximadamente igual, la que tenga a la otra su derecha debe ceder el paso, con las siguientes excepciones',
+    s:SRC_GEN,
+    t:'<span class="key">Todas. La jerarquía va del más maniobrable al menos maniobrable: aerodinos motorizados → dirigibles → planeadores → globos.</span>'+
+      '<p>El criterio de fondo es la capacidad de maniobra. Un globo prácticamente no puede evitar a nadie, así que todos le ceden; un planeador puede virar pero no acelerar ni ascender a voluntad; un avión motorizado tiene todas las opciones y por eso es el que siempre cede.</p>'+
+      '<p>La cuarta excepción sigue la misma lógica: se cede el paso a las aeronaves que van <b>remolcando</b> a otras o a algún objeto, y a las que están <b>reabasteciendo de combustible</b> en vuelo — configuraciones en que maniobrar es muy costoso o directamente peligroso.</p>' },
+
+  { k:'La información referente al vuelo proyectado o parte del mismo, que ha de suministrarse a las dependencias',
+    s:SRC_GEN,
+    t:'<span class="key">En forma de <b>plan de vuelo</b>.</span>'+
+      '<p>Es el vehículo único y formal de esa información. La norma exige además que se presente antes de la salida por un medio del que quede constancia, y detalla su contenido completo: identificación, reglas y tipo de vuelo, número y tipo de aeronave y categoría de estela turbulenta, equipo, aeródromo de salida, EOBT, velocidades y niveles de crucero, ruta, destino y duración total prevista, alternativas, autonomía, personas a bordo, equipo de emergencia y supervivencia, y datos del piloto al mando.</p>'+
+      '<p>Los últimos elementos de esa lista —autonomía, personas a bordo, equipo de supervivencia— son los que utiliza el servicio SAR si el vuelo no llega. Por eso el plan de vuelo es también un documento de búsqueda y salvamento.</p>' },
+
+  { k:'Cuando se sepa que los medios de comunicación en el aeródromo de llegada son inadecuados',
+    s:SRC_GEN,
+    t:'<span class="key">Verdadero. En ese caso el informe de llegada se transmite <b>inmediatamente antes de aterrizar</b>, si es posible.</span>'+
+      '<p>Es la excepción al procedimiento normal, que es notificar después del aterrizaje. Si se sabe de antemano que desde ese aeródromo no se podrá despachar el mensaje, hay que enviarlo desde el aire mientras todavía haya cobertura.</p>'+
+      '<p>La transmisión se hace normalmente a la estación aeronáutica que sirve a la dependencia ATS encargada de la FIR en la que se está operando.</p>' },
+
+  { k:'Se ha denominado Servicio de Información de Vuelo de Aeródromo (AFIS) al',
+    s:SRC_DEF,
+    t:'<span class="key">Servicio de información de vuelo y alerta provisto a las aeronaves que se dirijan a aterrizar o despegar de aeródromos <b>no controlados</b> en que se presta este servicio.</span>'+
+      '<p>La palabra decisiva es «no controlados». El AFIS <b>informa</b> —pista en uso, tránsito conocido, meteorología— pero <b>no controla</b>: no da autorizaciones ni provee separación. La responsabilidad de evitar el tránsito sigue siendo del piloto.</p>'+
+      '<p>Por eso el distractor que dice «aeródromos controlados del país» es incorrecto: donde hay torre de control hay servicio de control de aeródromo, no AFIS.</p>' },
+
+  { k:'Un vuelo VFR que se realice dentro de áreas, hacia áreas o a lo largo de rutas designadas por la autoridad ATS competente, debe',
+    s:SRC_VFR,
+    t:'<span class="key">Mantener escucha <b>continua</b> en la radiofrecuencia apropiada de la dependencia que provee el servicio de información de vuelo, e informar su posición cuando sea necesario.</span>'+
+      '<p>Aunque el vuelo no esté controlado, en esas áreas y rutas designadas el sistema necesita saber dónde está cada aeronave para poder informar a las demás. De ahí que la escucha sea permanente y no «a requerimiento» ni «discontinua», como proponen los distractores.</p>'+
+      '<p>Nótese que se trata de comunicaciones <b>en ambos sentidos</b> con la dependencia de información de vuelo: no basta con tener la radio encendida.</p>' },
+
+  { k:'La definición de CREPUSCULO CIVIL es',
+    s:SRC_DEF,
+    t:'<span class="key">Ambas partes: es el lapso que precede a la salida del sol (matutino) y el que sigue a su puesta (vespertino), y comienza o termina cuando el centro del disco solar está a <b>seis grados</b> por debajo del horizonte verdadero.</span>'+
+      '<p>La primera parte define qué es; la segunda, cuándo empieza y termina exactamente. Los seis grados son el número que hay que retener, y «horizonte verdadero» —no el horizonte visible— es la referencia.</p>'+
+      '<p>Su importancia práctica es que delimita el vuelo nocturno: el <b>vuelo VFR nocturno</b> es el realizado entre el fin del crepúsculo civil vespertino (FCCV) y el comienzo del matutino (CCCM), y el VFR especial solo se concede entre el CCCM y el FCCV.</p>' },
+
+  { k:'El piloto al mando de aeronaves que operen en un aeródromo o en sus cercanías',
+    s:SRC_GEN,
+    t:'<span class="key">Observar el tránsito de aeródromo para evitar colisiones, y no cruzar intersecciones de pista ni ingresar a la pista de despegue sin autorización expresa del control de aeródromo.</span>'+
+      '<p>El punto fino de esta sección es que la autorización para <b>rodar hacia una pista</b> permite usar las calles de rodaje designadas y cruzar intersecciones de <i>otras calles de rodaje</i>, pero <b>no</b> autoriza cruzar intersecciones de pista ni entrar en la pista de despegue. Eso requiere autorización expresa y separada.</p>'+
+      '<p>El distractor sobre «ajustarse al circuito manteniendo sobre 2.000 AGL» inventa una cifra: la norma solo dice ajustarse al circuito formado por otras aeronaves, o evitarlo.</p>' },
+
+  { k:'Antes de realizar un vuelo controlado o una parte de un vuelo como vuelo controlado, se obtendrá la autorización',
+    s:SRC_GEN,
+    t:'<span class="key">Presentando el plan de vuelo a una dependencia de control de tránsito aéreo.</span>'+
+      '<p>El plan de vuelo es el instrumento formal por el que se solicita la autorización, y por eso debe presentarse por un medio del que quede constancia. Una solicitud verbal suelta no sustituye ese trámite, aunque sí es posible presentar el plan desde el aire (AFIL) cuando corresponde.</p>'+
+      '<p>Si la autorización que emite el ATC no resulta satisfactoria, el piloto al mando puede <b>solicitar su enmienda</b>, y si es factible se le expedirá un permiso enmendado.</p>' },
+
+  { k:'Cuando una aeronave objeto de un acto de interferencia ilícita, no pueda aterrizar y deba apartarse',
+    s:SRC_GEN,
+    t:'<span class="key">Difundir advertencias en la frecuencia VHF de emergencia y otras apropiadas, y volar a un nivel que difiera <b>300 m (1.000 ft)</b> de los usados normalmente por los IFR si está sobre FL 290, o <b>150 m (500 ft)</b> si está bajo FL 290.</span>'+
+      '<p>La idea es sencilla y eficaz: si nadie sabe dónde está la aeronave, lo mejor es ponerla deliberadamente <i>entre</i> los niveles ocupados, donde estructuralmente no debería haber nadie. Es una separación construida sin coordinación.</p>'+
+      '<p>Hay un caso particular: en espacio aéreo con separación reducida de 300 m (1.000 ft) sobre FL 290, el desplazamiento debe ser de <b>150 m (500 ft)</b>, porque los 1.000 pies ya están ocupados por niveles válidos.</p>' },
+
+  { k:'Excepto cuando lo autorice la dependencia de tránsito aéreo correspondiente, en vuelos VFR no se debe despegar ni se aterrizar en ningún aeródromo dentro de una zona de control',
+    s:SRC_VFR,
+    t:'<span class="key">Si el techo de nubes es inferior a <b>450 m (1.500 pies)</b> o la visibilidad en tierra es inferior a <b>5 km</b>.</span>'+
+      '<p>Son los mínimos VFR para operar en un aeródromo controlado dentro de una CTR, y también para entrar a su ATZ o a su circuito de tránsito. Basta que se incumpla uno de los dos para que la operación quede vedada.</p>'+
+      '<p>Justamente cuando estos mínimos no se alcanzan aparece el <b>VFR especial</b>, que baja las exigencias a 2.000 m de visibilidad y 350 m de techo, pero solo para entrar o salir de la CTR y solo con autorización expresa.</p>' },
+
+  { k:'La operación de aeronaves, tanto en vuelo como en el área de movimiento de los aeródromos, se debe ajustar a las reglas generales',
+    s:SRC_GEN,
+    t:'<span class="key">A las reglas generales siempre, y además —durante el vuelo— a las reglas VFR <b>o</b> a las IFR.</span>'+
+      '<p>La estructura de la DAN 91 reproduce exactamente esto: Capítulo B, reglas generales, aplicables a todos; Capítulo C, reglas de vuelo visual; Capítulo D, reglas de vuelo por instrumentos. Las generales no son alternativas a las otras dos: rigen siempre.</p>'+
+      '<p>Y VFR e IFR son excluyentes entre sí en un momento dado: se vuela bajo unas u otras, y el cambio de IFR a VFR exige notificar específicamente al ATC que se cancela el IFR.</p>' },
+
+  { k:'Cuando un baroaltímetro calibrado de acuerdo con la atmósfera tipo se ajuste',
+    s:SRC_DEF,
+    t:'<span class="key">Con QNH indica <b>altitud</b>; con QFE indica <b>altura</b> sobre esa referencia; con 1013,2 hPa sirve para indicar <b>niveles de vuelo</b>.</span>'+
+      '<p>Es la tríada completa que trae la definición de nivel de vuelo, y conviene memorizarla junta porque el examen la pregunta tanto entera como en partes.</p>'+
+      '<p>La nota final de la norma es un detalle que se pasa por alto: las «altitudes» y «alturas» así obtenidas son <b>altimétricas</b>, no geométricas. El altímetro barométrico no mide distancia física sino presión traducida según la atmósfera tipo.</p>' },
+
+  { k:'Excepto cuando sea necesario para el despegue o el aterrizaje, o cuando se tenga permiso de la autoridad aeronáutica, los vuelos VFR no se deben efectuar',
+    s:SRC_VFR,
+    t:'<span class="key">Sobre zonas pobladas o reuniones al aire libre, a menos de <b>300 m (1.000 ft)</b> sobre el obstáculo más alto dentro de un radio de <b>600 m (2.000 ft)</b>; y en cualquier otra parte, a menos de <b>150 m (500 ft)</b> sobre tierra o agua.</span>'+
+      '<p>Son las dos cifras numéricas de la sección y hay que tenerlas asociadas a su contexto: 1.000 sobre poblado, 500 sobre lo demás. El radio de 600 m es lo que define «el obstáculo más alto» relevante, y se mide desde la aeronave.</p>'+
+      '<p>Compárese con el mínimo IFR, que es mucho más exigente: <b>600 m (2.000 ft)</b> sobre el obstáculo más alto dentro de un radio de <b>8 km</b>, porque allí no se cuenta con referencia visual para esquivar nada.</p>' },
+
+  { k:'Vuelos VFR Nocturnos, su definición corresponde a',
+    s:SRC_DEF,
+    t:'<span class="key">Vuelo realizado entre el <b>fin del crepúsculo civil vespertino (FCCV)</b> y el <b>comienzo del crepúsculo civil matutino (CCCM)</b>, de acuerdo con las reglas de vuelo visual y los requisitos que establezca la autoridad aeronáutica.</span>'+
+      '<p>La definición es descriptiva, no prohibitiva: el VFR nocturno <b>existe</b> y está regulado. Los distractores que dicen «no podrán realizarse vuelos VFR» en ese período son incorrectos.</p>'+
+      '<p>Sí está acotado en distancia: la instrucción o práctica nocturna se hace hasta 50 km (27 MN) del aeródromo de despegue; entre dos aeródromos, hasta 270 km (150 MN); y a un VFR que se le cumpla el FCCV en ruta puede seguir hasta un destino situado a no más de 90 km (50 MN).</p>' },
+
+  { k:'Designación de Regiones de Información de Vuelo (FIR)',
+    s:SRC_DEF,
+    t:'<span class="key">Se designan como FIR aquellas partes del espacio aéreo en las cuales se decida facilitar <b>servicio de información de vuelo</b> y <b>servicio de alerta</b>.</span>'+
+      '<p>Es el criterio de designación, coherente con la definición de FIR: lo que motiva crear una región de información de vuelo es la decisión de proveer allí esos dos servicios, no la de proveer control.</p>'+
+      '<p>Donde además se decide facilitar control de tránsito aéreo, lo que se designa es otra cosa: áreas de control (CTA) o zonas de control (CTR), que son espacio aéreo <i>controlado</i> dentro de la FIR.</p>' },
+
+  { k:'Ninguna aeronave volará en una zona prohibida, o en una zona restringida o peligrosa cuyos detalles se hayan publicado',
+    s:SRC_GEN,
+    t:'<span class="key">Verdadero, con dos condiciones alternativas: ajustarse a las condiciones de las restricciones y contar con el permiso de la autoridad aeronáutica.</span>'+
+      '<p>El requisito de publicación es parte de la regla: las zonas deben estar «debidamente publicadas» en la AIP u otro medio para ser oponibles. De ahí que revisar AIP y NOTAM sea parte de las medidas previas al vuelo.</p>'+
+      '<p>Nótese la asimetría entre las tres categorías: en una zona <b>peligrosa</b> la norma no prohíbe el vuelo, solo advierte que pueden desarrollarse allí actividades peligrosas en determinados momentos; la decisión queda en el piloto.</p>' },
+
+  { k:'¿Cuál de las siguientes definiciones corresponde a SERVICIO DE TRANSITO AÉREO (ATS)?',
+    s:SRC_DEF,
+    t:'<span class="key">Expresión <b>genérica</b> que se aplica, según el caso, a los servicios de <b>información de vuelo</b>, <b>alerta</b> y <b>control de tránsito aéreo</b> (control de área, de aproximación o de aeródromo).</span>'+
+      '<p>Son tres servicios, y el de control se subdivide a su vez en tres. Esa estructura de «tres, uno de los cuales tiene tres» es la que confunde: el servicio de asesoramiento de tránsito aéreo, que aparece en algunos distractores, no forma parte de la definición chilena.</p>'+
+      '<p>La palabra «genérica» también importa: ATS no es un servicio en sí, es la etiqueta que agrupa a los tres. Por eso una «dependencia ATS» puede ser tanto una torre como una oficina ARO.</p>' },
+
+  { k:'Se presentará un plan de vuelo, antes de realizar',
+    s:SRC_GEN,
+    t:'<span class="key">Todos los casos: cualquier vuelo con servicio de control, cualquier IFR en espacio aéreo con servicio de asesoramiento, los vuelos en áreas o rutas designadas por la autoridad ATS, y todo vuelo a través de fronteras internacionales.</span>'+
+      '<p>Los tres primeros casos responden a la necesidad de coordinación del tránsito; el cuarto, al control fronterizo y a la facilitación del servicio de búsqueda y salvamento entre Estados.</p>'+
+      '<p>La excepción principal se pregunta aparte y conviene tenerla presente: los <b>vuelos VFR locales</b> están exentos de presentar plan de vuelo.</p>' },
+
+  { k:'A no ser que se indique de otro modo en las autorizaciones de Control de Tránsito Aéreo, o por disposición de la autoridad ATS competente, los vuelos VFR en vuelo horizontal de crucero',
+    s:SRC_VFR,
+    t:'<span class="key">Verdadero. Por encima de <b>900 m (3.000 pies)</b> respecto del terreno o del agua, el VFR de crucero se efectúa a un nivel apropiado a su derrota según la tabla del Anexo C.</span>'+
+      '<p>Los 3.000 pies AGL son el umbral: por debajo no rige la tabla, porque a esa altura el tránsito es local y disperso y forzar niveles semicirculares aportaría poco.</p>'+
+      '<p>Por encima sí rige, y con el sufijo de 500 pies que separa a los VFR de los IFR: impares+500 hacia el este/sur (030°–209°), pares+500 hacia el norte/oeste (210°–029°).</p>' },
+
+  { k:'De acuerdo a la DAN 91 "Reglas del Aire", a menos que la autoridad ATS competente lo autorice, no se realizarán vuelos VFR, por encima del nivel de vuelo',
+    s:SRC_VFR,
+    t:'<span class="key">FL 195.</span>'+
+      '<p>Es el techo general del VFR en Chile, salvo autorización de la autoridad ATS competente. La misma sección fija dos límites más: <b>FL 245</b> en la FIR Isla de Pascua, y la prohibición de VFR a velocidades transónicas y supersónicas.</p>'+
+      '<p>Y una prohibición absoluta que no admite autorización: <b>no se permiten vuelos VFR en espacio aéreo clase «A»</b>.</p>' },
+
+  { k:'De acuerdo a las Reglas del Aire (DAN 91), la hora que debe expresarse en horas y minutos del día de veinte y cuatro',
+    s:SRC_GEN,
+    t:'<span class="key">La hora Universal Coordinada (UTC).</span>'+
+      '<p>UTC es la referencia única de toda la aviación, precisamente para que un vuelo que cruza husos horarios no tenga que reinterpretar sus estimadas. «Zulú» es la designación fonética de UTC, no una hora distinta.</p>'+
+      '<p>La norma exige además <b>verificar la hora</b> con una dependencia ATS antes de iniciar un vuelo controlado, y en cualquier otro momento del vuelo que sea necesario. En comunicaciones por enlace de datos la tolerancia no puede exceder de un segundo respecto de UTC.</p>' },
+
+  { k:'Las disposiciones de la norma DAN 91 “Reglas del Aire“, se aplican',
+    s:'DAN 91 «Reglas del Aire», I. Propósito y III. Materia (Ed. 4 / Sep. 2015, DGAC)',
+    t:'<span class="key">A todas las alternativas: aeronaves civiles nacionales dondequiera estén, aeronaves militares y policiales cuando no realicen operaciones militares o policiales, y toda aeronave dentro de las FIR chilenas.</span>'+
+      '<p>Son tres criterios distintos de aplicación. El primero es de <b>nacionalidad</b> —y cede ante el reglamento del Estado que tenga jurisdicción sobre el territorio sobrevolado—. El segundo es <b>funcional</b>: una aeronave militar que no está cumpliendo una operación aérea militar se rige por las reglas del aire como cualquier otra.</p>'+
+      '<p>El tercero es <b>territorial</b> y es el más amplio: dentro de las FIR en que se divide el espacio aéreo chileno, la DAN 91 alcanza a toda aeronave sin importar su matrícula.</p>' },
+
+  { k:'El piloto de un vuelo VFR observará las disposiciones sobre autorizaciones del Servicio de Control de Tránsito Aéreo cuando',
+    s:SRC_VFR,
+    t:'<span class="key">Los tres casos: volar en espacio aéreo clase B, C, D o E; formar parte del tránsito de aeródromo en un aeródromo controlado; u operar con carácter de VFR especial.</span>'+
+      '<p>Ser VFR no equivale a estar libre de autorizaciones. Lo que determina la sujeción al control no son las reglas de vuelo sino <b>dónde</b> se vuela y <b>en qué carácter</b>.</p>'+
+      '<p>El espacio que queda fuera de la lista es la clase <b>G</b>, no controlada, donde el VFR opera sin autorización ATC. Y el que queda fuera por arriba es la clase <b>A</b>, donde directamente no se permiten vuelos VFR.</p>' }
+
+  ];
+
+  /* ------------------------------------------------------------ normalización */
+  function norm(s) {
+    return String(s || '')
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')  // quita tildes
+      .toLowerCase()
+      .replace(/[^a-z0-9 ]+/g, ' ')                      // quita puntuación
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+
+  function aplicar() {
+    if (typeof bancos === 'undefined' || !bancos.pca) return;
+    var tema = bancos.pca.temas.filter(function (t) {
+      return norm(t.nombre).indexOf('reglamentacion') === 0;
+    })[0];
+    if (!tema) { console.warn('[explicaciones] No se encontró la materia Reglamentación en el banco PCA.'); return; }
+
+    var ok = 0, sin = [], dup = [];
+    EXPS.forEach(function (e) {
+      var clave = norm(e.k);
+      var hits = tema.preguntas.filter(function (p) { return norm(p.q).indexOf(clave) === 0; });
+      if (hits.length === 0) { sin.push(e.k.slice(0, 50)); return; }
+      if (hits.length > 1) { dup.push(e.k.slice(0, 50)); }
+      hits.forEach(function (p) { if (!p.exp) { p.exp = { t: e.t, src: e.s }; ok++; } });
+    });
+
+    console.log('[explicaciones] Reglamentación PCA — DAN 91: ' + ok + ' aplicadas, ' +
+                sin.length + ' sin coincidencia' + (dup.length ? ', ' + dup.length + ' con enunciado ambiguo' : ''));
+    if (sin.length) console.log('[explicaciones] sin coincidencia:', sin);
+    if (dup.length) console.log('[explicaciones] ambiguas (se aplicaron a todas):', dup);
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', aplicar);
+  else aplicar();
+})();
+
 </script>
 </body>
 </html>

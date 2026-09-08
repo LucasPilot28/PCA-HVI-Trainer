@@ -3332,6 +3332,1709 @@ intentarSesionGuardada(); (function () {
     inyectar();
   }
 })();
+  /* ==========================================================================
+   MÓDULO: BANCO "WIZZ" — WIZZ AIR TECHNICAL INTERVIEW, DAY 2 (v1)
+   --------------------------------------------------------------------------
+   Registra un TERCER banco junto a `hvi` y `pca`, con la misma estructura
+   ({q, ops, correct, exp:{t,src}}) que usan los otros dos. No modifica el
+   motor: se engancha a `crearEstadoBanco`, `migrarEstado`, `entrarInvitado`
+   y `reiniciarPerfil` para que el estado del banco nuevo exista siempre.
+
+   Instalación: pegar dentro de una etiqueta script nueva, ANTES del cierre
+   de body y DESPUÉS del script principal. También funciona como archivo
+   aparte, cargado con  script src="banco_wizz.js"  desde el mismo sitio.
+
+   Fuente única: "WIZZ AIR — Technical Interview Questions, Day 2"
+   (2014 Autumn). Las citas al pie remiten al número y título del apartado
+   del cuadernillo. Donde el cuadernillo se contradice o discrepa de la
+   norma (OACI Doc 8168 / EU-OPS), la clave sigue AL CUADERNILLO y la
+   discrepancia se documenta en la explicación — nunca se altera la clave.
+   ========================================================================== */
+(function () {
+  'use strict';
+
+  if (typeof bancos === 'undefined') {
+    console.warn('[banco wizz] no encuentro `bancos`; carga este módulo después del script principal.');
+    return;
+  }
+  if (bancos.wizz) return; // ya instalado
+
+  /* ---------- helpers de autoría ---------- */
+  function E() {                       // E(concepto, parrafo, parrafo, ...)
+    var a = [].slice.call(arguments), k = a.shift();
+    return '<span class="key">' + k + '</span>' +
+           a.map(function (p) { return '<p>' + p + '</p>'; }).join('');
+  }
+  function Q(q, ops, correct, t, src) {
+    return { q: q, ops: ops, correct: correct, exp: { t: t, src: src } };
+  }
+
+  var S_POF  = 'Wizz Air Technical Interview Day 2 — Principles of Flight';
+  var S_MAB  = 'Wizz Air Technical Interview Day 2 — Mass and Balance';
+
+  /* =======================================================================
+     1. PRINCIPLES OF FLIGHT
+     ======================================================================= */
+  var POF = [
+
+    Q('The critical engine is best defined as:',
+      ['The engine whose failure would most adversely affect the aircraft\u2019s handling and performance qualities.',
+       'The engine that produces the greatest thrust at take-off power.',
+       'The engine driving the primary hydraulic and electrical services.',
+       'The engine that is started first during the normal start sequence.'], 0,
+      E('It is defined by the consequences of its failure, not by its output or by the systems it drives.',
+        'On a twin, losing either engine costs the same thrust, but the yawing moment left behind can differ between the two. The engine whose failure leaves the larger, harder-to-control moment — and therefore the worst handling and performance penalty — is the critical one.'),
+      S_POF + ', \u00a7 1: Critical Engine'),
+
+    Q('On a propeller aircraft with all propellers turning in the same direction, a critical engine exists because:',
+      ['P-factor makes the remaining yawing moment different depending on which engine has failed.',
+       'The left engine always drives more accessories than the right.',
+       'Only one engine feeds the de-icing system.',
+       'The propellers have different diameters.'], 0,
+      E('P-factor displaces each propeller\u2019s thrust line, so the surviving engine\u2019s moment arm about the CG differs depending on which side failed.',
+        'With both propellers rotating the same way, the descending blade of each one produces more thrust than the ascending blade, shifting the effective thrust line outboard on one engine and inboard on the other. Fail the engine that leaves the outboard thrust line running, and the yawing moment is larger. Counter-rotating propellers remove the asymmetry entirely.'),
+      S_POF + ', \u00a7 1: Critical Engine'),
+
+    Q('The principal advantage of a swept wing is that it:',
+      ['Delays the airflow over the wing from going supersonic, allowing a higher Mach cruise.',
+       'Increases the lift coefficient at low speed.',
+       'Lowers the stalling speed in the landing configuration.',
+       'Improves longitudinal stability at low speed.'], 0,
+      E('Sweep delays the onset of supersonic flow over the wing, which lets the aircraft cruise at a higher Mach number before shock waves appear.',
+        'The swept wing is also built with minimal camber and thickness, which reduces profile drag and pushes the speed capability higher still. Everything else about the swept wing — poorer lift, higher stall speeds — is the price paid for that Mach capability.'),
+      S_POF + ', \u00a7 2: Swept wing \u2014 Advantages'),
+
+    Q('Which of the following is a disadvantage of the swept wing?',
+      ['A tendency to stall at the wing tip, which makes the aircraft longitudinally unstable.',
+       'A lower critical Mach number than a straight wing.',
+       'Excessive lift at low speed, requiring permanent spoiler deployment.',
+       'Increased profile drag in the cruise.'], 0,
+      E('Tip stalling is the major disadvantage: the stall starts outboard, behind the CG, so the lift lost pitches the nose up rather than down.',
+        'The notebook also lists poor lift qualities and speed instability at low speed as consequences of sweep. Note that the swept wing raises, not lowers, the critical Mach number — that is its whole purpose.'),
+      S_POF + ', \u00a7 2: Swept wing \u2014 Disadvantages'),
+
+    Q('Compared with a straight-winged aircraft, a swept-wing aircraft in turbulence is:',
+      ['More stable, as a direct consequence of its poorer lift qualities.',
+       'Less stable, because sweep amplifies the gust response.',
+       'Equally affected, since sweep has no effect on gust loading.',
+       'More stable, because sweep increases the lift coefficient.'], 0,
+      E('The same poor lift qualities that penalise the swept wing at low speed also make it less responsive to a vertical gust.',
+        'A gust changes the angle of attack, and a wing that generates less lift per degree of angle of attack converts that change into a smaller load. Ride comfort in turbulence is therefore a by-product of a characteristic that is otherwise a disadvantage.'),
+      S_POF + ', \u00a7 2: Swept wing \u2014 Advantages'),
+
+    Q('High lift devices are fitted primarily in order to:',
+      ['Add lift for take-off and landing while still allowing an efficient cruising wing.',
+       'Reduce fuel consumption during the cruise.',
+       'Increase the critical Mach number.',
+       'Replace the ailerons at low speed.'], 0,
+      E('They let the designer optimise the wing for cruise and then borrow the extra lift needed at low speed.',
+        'Leading and trailing edge flaps and slats increase lift and shorten take-off and landing distances, but they also increase drag and therefore fuel consumption — which is why they are retracted in the cruise.'),
+      S_POF + ', \u00a7 3: High lift devices'),
+
+    Q('The critical Mach number (M<sub>CRIT</sub>) of an aircraft is:',
+      ['The lowest Mach number at which the airflow over some point of the aircraft reaches the speed of sound.',
+       'The Mach number at which the whole aircraft becomes supersonic.',
+       'The highest Mach number at which the aircraft can be certified to fly.',
+       'The Mach number at which the nose-down pitching moment first appears.'], 0,
+      E('M<sub>CRIT</sub> is reached while the aircraft itself is still subsonic — it is the first point on the airframe that goes sonic, not the aircraft.',
+        'Local airflow accelerates over the curved upper surface, so somewhere on the wing the flow reaches the speed of sound while the free stream is well below Mach 1.0. That first sonic patch creates a weak shock wave. The value varies from wing to wing: a thicker wing accelerates the flow more and therefore has a lower critical Mach number.'),
+      S_POF + ', \u00a7 4: Critical Mach number'),
+
+    Q('In general, a thicker wing will have:',
+      ['A lower critical Mach number.',
+       'A higher critical Mach number.',
+       'The same critical Mach number, since thickness is irrelevant.',
+       'No critical Mach number below Mach 1.0.'], 0,
+      E('The thicker the wing, the more the local flow has to accelerate over it, so sonic flow appears at a lower free-stream Mach number.',
+        'This is the reason high-speed wings are built thin, and the reason the notebook pairs the swept wing with minimal camber and thickness: both changes push M<sub>CRIT</sub> upwards.'),
+      S_POF + ', \u00a7 4: Critical Mach number'),
+
+    Q('Mach tuck is:',
+      ['A nose-down pitching tendency as the airflow around the wing reaches supersonic speeds.',
+       'A nose-up pitching tendency caused by the shock wave moving forward.',
+       'A rolling oscillation coupled with yaw at high Mach number.',
+       'The buffet felt when approaching the low-speed stall at altitude.'], 0,
+      E('The nose pitches <b>down</b>, and the aircraft first meets the effect significantly below Mach 1.0.',
+        'It is an aerodynamic effect, not a control problem: as the flow over the wing goes supersonic the centre of pressure moves and the resulting moment pushes the nose down, which if unchecked accelerates the aircraft further into the problem.'),
+      S_POF + ', \u00a7 5: Mach tuck'),
+
+    Q('The "coffin corner" is:',
+      ['The altitude at or near which the stall speed equals the critical Mach number, for a given gross weight and G loading.',
+       'The corner of the flight envelope where V<sub>MO</sub> meets the manoeuvring speed.',
+       'The point in a turn where load factor first exceeds 2 g.',
+       'The lowest altitude at which Mach tuck can occur.'], 0,
+      E('It is an <b>altitude</b>, and it depends on gross weight and G loading — change either and the corner moves.',
+        'At that altitude the low-speed and high-speed boundaries have converged, so the usable speed band has shrunk to nothing and the aircraft becomes nearly impossible to keep in stable flight.'),
+      S_POF + ', \u00a7 6: Coffin corner'),
+
+    Q('At the coffin corner, an increase in speed will cause the aeroplane to:',
+      ['Lose lift to flow separation and shock waves, or pitch heavily nose-down, and lose altitude.',
+       'Stall and lose altitude.',
+       'Climb, because of the increased dynamic pressure.',
+       'Remain in stable flight, since only a speed reduction is dangerous.'], 0,
+      E('Both boundaries end in a loss of altitude, but by opposite mechanisms: too slow and it stalls, too fast and shock-induced separation destroys the lift.',
+        'The critical Mach number is the maximum speed at which air can travel over the wings without losing lift to flow separation and shock waves. Exceed it and the aircraft either loses lift or pitches heavily nose-down.'),
+      S_POF + ', \u00a7 6: Coffin corner'),
+
+    Q('A stall occurs when:',
+      ['The angle of attack at which the wings meet the onrushing air is exceeded, and the wings lose lift.',
+       'The airspeed falls below a fixed published figure, regardless of attitude.',
+       'The thrust available falls below the drag.',
+       'The centre of pressure moves aft of the centre of gravity.'], 0,
+      E('The stall is defined by angle of attack, not by airspeed.',
+        'The notebook lists two ways to get there: too steep an angle of attack with insufficient flow over the wings, or insufficient airspeed at any angle — again leaving too little airflow to maintain lift. The angle of attack at which it happens can vary with airspeed.'),
+      S_POF + ', \u00a7 7: Stall'),
+
+    Q('A deep stall (super-stall) particularly affects aircraft with:',
+      ['A T-tail configuration.',
+       'A low-mounted tailplane.',
+       'A canard configuration.',
+       'A straight, unswept wing.'], 0,
+      E('The T-tail puts the horizontal stabiliser directly in the turbulent wake of a stalled main wing.',
+        'The wake blankets the tailplane, the elevators become ineffective, and the aircraft is prevented from recovering from the stall — which is what makes it a dangerous type of stall rather than merely an unusual one.'),
+      S_POF + ', \u00a7 8: Deep stall'),
+
+    Q('Dutch roll is a combination of rolling and yawing oscillations that normally occurs when:',
+      ['The dihedral effect of the aircraft is more powerful than its directional stability.',
+       'Directional stability is more powerful than the dihedral effect.',
+       'The aircraft is loaded beyond its forward CG limit.',
+       'The yaw damper is engaged at high altitude.'], 0,
+      E('Dutch roll is a mismatch between two stabilities: roll stability winning over yaw stability.',
+        'A yaw produces a roll through the dihedral effect; if directional stability is too weak to damp the yaw quickly, the two motions feed each other and the aircraft oscillates in a combined rolling and yawing motion.'),
+      S_POF + ', \u00a7 9: What is Dutch Roll?'),
+
+    Q('As the angle of attack increases, the centre of pressure:',
+      ['Moves forward, towards the leading edge.',
+       'Moves aft, towards the trailing edge.',
+       'Remains at a fixed point on the chord.',
+       'Moves to the quarter-chord point and stays there.'], 0,
+      E('Higher angle of attack, higher suction near the leading edge, so the centre of pressure moves <b>forward</b>.',
+        'The centre of pressure is not a fixed point: it depends on how pressure is distributed along the chord, which itself depends on the angle of attack. Lower the angle of attack and the distribution — and the centre of pressure — moves aft.'),
+      S_POF + ', \u00a7 10: Centre of Pressure'),
+
+    Q('Compared with a lighter aircraft, a heavier aircraft must:',
+      ['Start its descent earlier, because it has to maintain a shallower descent.',
+       'Start its descent later, because it descends more steeply.',
+       'Use the same top of descent point, since weight has no effect.',
+       'Descend at a higher rate to avoid an underspeed.'], 0,
+      E('The heavier aircraft has to fly a shallower descent to avoid overspeeding, so it needs more track miles and an earlier top of descent.',
+        'The notebook\u2019s reasoning is that the heavier aircraft carries greater momentum, and that weight-driven momentum produces a greater speed in a vertical dive; to stay within limits it therefore has to accept a lower rate of descent. Whatever the wording, the operational point is the one asked at interview: heavy means earlier and shallower.'),
+      S_POF + ', \u00a7 11: Why does an aircraft descend quicker when it is lighter?'),
+
+    Q('The swept wing is designed with minimal camber and thickness in order to:',
+      ['Reduce profile drag, further increasing the wing\u2019s ability to fly at high speed.',
+       'Increase the maximum lift coefficient.',
+       'Reduce the tendency to Dutch roll.',
+       'Allow the fitting of larger trailing edge flaps.'], 0,
+      E('Minimal camber and thickness cut profile drag and raise the speed at which local flow goes sonic.',
+        'Sweep and thin section work in the same direction — both raise the Mach capability. The cost is lift, which is why swept-wing aircraft need extensive high lift devices for take-off and landing.'),
+      S_POF + ', \u00a7 2: Swept wing \u2014 Advantages'),
+
+    Q('Which pair of statements about the swept wing is correct?',
+      ['It has higher stall speeds and is speed-unstable at low speed.',
+       'It has lower stall speeds and is speed-stable at low speed.',
+       'It has higher stall speeds but improved low-speed handling.',
+       'It has lower stall speeds but a reduced critical Mach number.'], 0,
+      E('Poor lift qualities produce both effects: higher stall speeds and speed instability at low speed.',
+        'This is why swept-wing transports are flown to tightly defined approach speeds and why the low-speed end of the envelope is protected so carefully — the wing gives less natural warning and less natural recovery than a straight wing.'),
+      S_POF + ', \u00a7 2: Swept wing \u2014 Disadvantages')
+  ];
+
+  /* =======================================================================
+     2. MASS AND BALANCE
+     ======================================================================= */
+  var MAB = [
+
+    Q('The centre of gravity is:',
+      ['The point through which the force of gravity is said to act on a mass.',
+       'The geometric centre of the fuselage.',
+       'The point through which lift is said to act.',
+       'The mid-point of the mean aerodynamic chord.'], 0,
+      E('It is the single point through which the whole weight of the aircraft can be considered to act.',
+        'Everything else in mass and balance — the moments, the limits, the trim setting — is derived from where that point sits relative to the aerodynamic centre.'),
+      S_MAB + ', \u00a7 12: Centre of Gravity'),
+
+    Q('With the CG outside the forward limit, which set of effects is correct?',
+      ['Drag increases, longitudinal stability increases, and stall speed increases.',
+       'Drag decreases, longitudinal stability decreases, and stall speed decreases.',
+       'Drag increases, longitudinal stability decreases, and range increases.',
+       'Drag decreases, longitudinal stability increases, and range increases.'], 0,
+      E('Forward CG needs more tail-down force, and that extra download acts exactly like extra weight.',
+        'The consequences follow from there: higher stall speed, higher take-off and landing speeds, more drag, and reduced fuel consumption efficiency, range and endurance. The one thing that improves is longitudinal stability.'),
+      S_MAB + ', \u00a7 12a: CG outside forward limit'),
+
+    Q('With the CG outside the aft limit, the aircraft will show:',
+      ['Reduced longitudinal stability, a tendency to pitch up, and more difficult spin recovery.',
+       'Increased longitudinal stability and easier spin recovery.',
+       'A tendency to pitch down and higher stall speeds.',
+       'No change in handling, only a change in fuel consumption.'], 0,
+      E('Aft of the limit the aircraft becomes very unstable in pitch, tends to pitch up, and is harder to recover from a spin.',
+        'The trade is real: the aft CG that gives the best cruise performance and range is also the one that erodes the stability margin, which is why the aft limit exists at all.'),
+      S_MAB + ', \u00a7 12b: CG outside aft limit'),
+
+    Q('Compared with a forward CG, an aft CG gives:',
+      ['A lower angle of attack, less induced drag, and better performance and range.',
+       'A higher angle of attack, more induced drag, and worse range.',
+       'The same drag, but improved longitudinal stability.',
+       'Lower take-off and landing speeds but reduced range.'], 0,
+      E('Aft CG means less tail download, so less lift is needed, so a lower angle of attack and less induced drag.',
+        'The notebook\u2019s table sets it out directly: forward CG gives high angle of attack, increased induced drag, decreased performance and range, increased stability; aft CG reverses all four, ending in an unstable aircraft.'),
+      S_MAB + ', \u00a7 13: Effect of fwd and aft C.G.'),
+
+    Q('Which of the following is NOT included in the Basic Empty Mass?',
+      ['Crew and crew baggage.',
+       'Unusable fuel and other unusable fluids.',
+       'Lubricating oil in the engine and auxiliary units.',
+       'Fire extinguishers and pyrotechnics.'], 0,
+      E('The BEM is the aircraft mass <b>before</b> crew, fuel, passengers, baggage, cargo and the equipment to support them is added.',
+        'It covers the aeroplane plus standard items: unusable fuel and other unusable fluids, lubricating oil, fire extinguishers, pyrotechnics, emergency oxygen equipment and supplementary electronic equipment. Crew and their baggage belong to the variable load, and appear one level up in the Dry Operating Mass.'),
+      S_MAB + ', \u00a7 14a: Basic Empty Mass'),
+
+    Q('The Dry Operating Mass is the total mass of the aeroplane ready for a specific type of operation, excluding:',
+      ['All usable fuel and traffic load.',
+       'Crew and crew baggage only.',
+       'Catering and removable passenger service equipment.',
+       'Potable water and lavatory chemicals.'], 0,
+      E('DOM excludes usable fuel and traffic load, but includes everything needed to operate: crew and crew baggage, catering and removable passenger service equipment, potable water and lavatory chemicals, food and beverages.',
+        'In other words, DOM = BEM + variable load. Add fuel and you get Operating Mass; add traffic load instead and you get Zero Fuel Mass.'),
+      S_MAB + ', \u00a7 14c: Dry Operating Mass'),
+
+    Q('The Operating Mass (OM) is:',
+      ['The DOM plus fuel, but without traffic load.',
+       'The DOM plus traffic load, but excluding fuel.',
+       'The BEM plus traffic load and fuel.',
+       'The maximum permissible mass at the start of the take-off run.'], 0,
+      E('OM = DOM + fuel, no traffic load.',
+        'Keep the two "DOM plus" masses apart: DOM + fuel is Operating Mass, DOM + traffic load is Zero Fuel Mass. Traffic load is then simply the take-off mass minus the operating mass.'),
+      S_MAB + ', \u00a7 14d: Operating Mass'),
+
+    Q('The traffic load is the total mass of:',
+      ['Passengers, baggage and cargo.',
+       'Passengers, baggage, cargo and crew.',
+       'Passengers, cargo and catering equipment.',
+       'Baggage, cargo and usable fuel.'], 0,
+      E('Traffic load is the revenue load only: passengers, baggage and cargo.',
+        'Crew and their baggage, catering, food and beverages, potable water and lavatory chemicals are variable load, already counted inside the Dry Operating Mass.'),
+      S_MAB + ', \u00a7 14e: Traffic Load'),
+
+    Q('Which item belongs to the Variable Load?',
+      ['Crew and their baggage.',
+       'Cargo carried for a customer.',
+       'Unusable fuel.',
+       'Passenger baggage in the hold.'], 0,
+      E('Variable load is what changes with the type of operation rather than with the payload sold.',
+        'It covers crew and their baggage, catering and other removable passenger service equipment, food and beverages, potable water, lavatory chemicals, and any other special operational equipment.'),
+      S_MAB + ', \u00a7 14f: Variable Load'),
+
+    Q('The Zero Fuel Mass is:',
+      ['The DOM plus traffic load, but excluding fuel.',
+       'The DOM plus fuel, but excluding traffic load.',
+       'The BEM plus unusable fuel.',
+       'The take-off mass minus the trip fuel.'], 0,
+      E('ZFM = DOM + traffic load, with no fuel counted.',
+        'It is the mass the wing structure has to carry as a bending load with nothing in the tanks to relieve it — which is exactly why the maximum ZFM is a structural limit rather than a performance one.'),
+      S_MAB + ', \u00a7 14g: Zero Fuel Mass'),
+
+    Q('The Maximum Zero Fuel Mass is a structural limitation imposed by:',
+      ['The bending moment on the main spar at the wing root.',
+       'The strength of the main landing gear attachments.',
+       'The pressurisation differential of the fuselage.',
+       'The maximum certificated tyre speed.'], 0,
+      E('MZFM protects the wing root against bending, which is why fuel in the wings relieves rather than aggravates it.',
+        'On the ground the bending moment comes from the upwards force of the main landing gear acting on the wings; in the air it comes from the upward force produced by lift. Either way, mass carried in the fuselage bends the wing at the root, and mass carried in the wings does not.'),
+      S_MAB + ', \u00a7 15h: Maximum Zero Fuel Mass'),
+
+    Q('The Maximum Structural Take-Off Mass is the maximum permissible total mass:',
+      ['At the start of the take-off run.',
+       'At the moment of lift-off.',
+       'At the point the aircraft reaches 35 ft.',
+       'On the ramp before taxi fuel is burned.'], 0,
+      E('MTOM is measured at the <b>start of the take-off run</b>, not at the ramp and not at lift-off.',
+        'The ramp mass may legitimately exceed MTOM by the taxi fuel, which is burned before the take-off run begins.'),
+      S_MAB + ', \u00a7 15i: Maximum Structural Take-Off Mass'),
+
+    Q('The Maximum Structural Landing Mass is the maximum permissible total mass:',
+      ['On landing under normal circumstances.',
+       'On landing in any circumstances, including an emergency return.',
+       'At the threshold with the go-around gradient met.',
+       'At touchdown with maximum reverse thrust selected.'], 0,
+      E('The qualifier "under normal circumstances" matters: it leaves room for an overweight landing when the situation demands one.',
+        'It is a structural limit, set separately from the performance-limited landing mass, and the lower of the two governs on the day.'),
+      S_MAB + ', \u00a7 15j: Maximum Structural Landing Mass'),
+
+    Q('Performance limited masses are imposed to ensure that the aircraft is light enough to:',
+      ['Complete the take-off and landing within the distances available and comply with climb and descent requirements.',
+       'Remain below the maximum zero fuel mass at all times.',
+       'Carry the full traffic load on every sector.',
+       'Keep the CG within the certified envelope.'], 0,
+      E('Performance limits are about distances and gradients — and they vary with the conditions of the day.',
+        'That variability is the point: temperature, pressure altitude, wind, runway state and obstacles all move the figure, whereas the structural limits sit in the manual and never change.'),
+      S_MAB + ', \u00a7 16: Performance Limited Masses'),
+
+    Q('The Performance Limited Take-Off Mass is the maximum take-off mass allowable to comply with:',
+      ['Runway distance available and the minimum climb gradients required.',
+       'The wing root bending moment.',
+       'The maximum landing mass at the destination.',
+       'The tyre speed and brake energy limits only.'], 0,
+      E('PLTOM answers two questions at once: can the aircraft stop or go within the distances available, and can it climb steeply enough afterwards.',
+        'Both parts have to be satisfied. A long runway does not help if an obstacle drives the net flight path requirement, and a clear departure path does not help if the runway is too short.'),
+      S_MAB + ', \u00a7 16k: Performance Limited Take-Off Mass'),
+
+    Q('The Performance Limited Landing Mass takes into account:',
+      ['Runway distance available and the minimum climb gradients required in the case of a go-around.',
+       'Runway distance available only.',
+       'The maximum zero fuel mass and the traffic load.',
+       'The en-route drift-down performance.'], 0,
+      E('The landing case is not only about stopping — the go-around climb requirement is part of the same limit.',
+        'This is where approach climb (one engine inoperative) and landing climb (all engines) feed into the mass calculation, alongside the landing distance available.'),
+      S_MAB + ', \u00a7 16l: Performance Limited Landing Mass'),
+
+    Q('The regulated mass is determined by:',
+      ['The most limiting of the structural and performance considerations.',
+       'The structural considerations in all cases.',
+       'The performance considerations in all cases.',
+       'The average of the structural and performance limits.'], 0,
+      E('Whichever limit bites first is the regulated mass.',
+        'A short runway at a high altitude airport on a hot day is the classic case where performance limits are more restrictive than the structural ones. On a long sea-level runway on a cold day, the structure usually wins.'),
+      S_MAB + ', \u00a7 17: Regulated Masses'),
+
+    Q('Increasing the tail-down force required by a forward CG has the same effect as:',
+      ['Increased weight, and therefore a higher stall speed.',
+       'Reduced weight, and therefore a lower stall speed.',
+       'An aft CG, and therefore better range.',
+       'Extending the flaps, and therefore more lift.'], 0,
+      E('The tailplane download adds to the load the wing must carry, so the wing behaves as though the aircraft were heavier.',
+        'Heavier means a higher stall speed, and higher take-off and landing speeds follow directly from it. This is the mechanism behind every forward-CG penalty in the notebook\u2019s list.'),
+      S_MAB + ', \u00a7 12a: CG outside forward limit')
+  ];
+
+  /* placeholders — se rellenan en los bloques siguientes del archivo */
+  var OPS = [];
+  var INS = [];
+  var HPL = [];
+
+  /* =======================================================================
+     3. OPERATIONAL PROCEDURES  (EU-OPS / ICAO Doc 8168) — parte A
+     ======================================================================= */
+  var S_OPS = 'Wizz Air Technical Interview Day 2 — Operational Procedures (EU-OPS and ICAO Doc 8168)';
+
+  OPS.push(
+
+    Q('Aerodrome operating minima consist of two parts:',
+      ['One relating to the cloud base and one relating to the visibility and/or RVR.',
+       'One relating to the wind and one relating to the runway state.',
+       'One relating to the aircraft category and one relating to the crew qualification.',
+       'One relating to the approach aid and one relating to the missed approach gradient.'], 0,
+      E('Two parts: a vertical one (cloud base) and a horizontal one (visibility or RVR).',
+        'AOM are the criteria a pilot uses to decide whether landing or taking off from a given runway is permitted at night or in IMC — that is, whenever visibility, distance from cloud or ceiling are below VMC.'),
+      S_OPS + ', \u00a7 18: Aerodrome operating minima'),
+
+    Q('With HI approach (HIALS) and runway (HIRL) lighting in operation, reported met visibility is converted to RVR/CMV by multiplying by:',
+      ['1.5 by day and 2.0 by night.',
+       '2.0 by day and 1.5 by night.',
+       '1.0 by day and 1.5 by night.',
+       '1.5 by day and 1.5 by night.'], 0,
+      E('High intensity approach and runway lighting: \u00d7 1.5 day, \u00d7 2.0 night.',
+        'Any other type of lighting installation gives \u00d7 1.0 by day and \u00d7 1.5 by night. With no lighting at all it is \u00d7 1.0 by day and NIL by night — meaning no conversion is possible.'),
+      S_OPS + ', \u00a7 19: Conversion of met VIS to RVR/CMV'),
+
+    Q('Conversion of met visibility to RVR is NOT allowed:',
+      ['When calculating take-off CAT II/III minima, or when a reported RVR is available.',
+       'At any aerodrome equipped with high intensity lighting.',
+       'During the hours of daylight.',
+       'When the aerodrome is the destination rather than the alternate.'], 0,
+      E('Two prohibitions: take-off CAT II/III minima, and any time an actual RVR is being reported.',
+        'The logic is simple — a converted figure is an estimate, so it may not be used where the margins are smallest, and it may never override a measured value that already exists.'),
+      S_OPS + ', \u00a7 19: Conversion of met VIS to RVR/CMV, Note'),
+
+    Q('A take-off alternate must be specified in the operational flight plan when:',
+      ['Meteorological and/or performance considerations preclude a return to the departure aerodrome.',
+       'The destination has only one runway available.',
+       'The flight time exceeds six hours.',
+       'The departure aerodrome has no published instrument approach.'], 0,
+      E('The trigger is the inability to come back — for weather or for performance reasons.',
+        'It must lie within one hour still air flight time at the one-engine-inoperative cruising speed in ISA, calculated on the actual take-off mass, which for the A320 means 250 NM great circle distance.'),
+      S_OPS + ', \u00a7 20a: Take-off Alternate'),
+
+    Q('For the A320, one hour still air flight time at the one-engine-inoperative cruising speed corresponds to a great circle distance of approximately:',
+      ['250 NM.',
+       '380 NM.',
+       '400 NM.',
+       '500 NM.'], 0,
+      E('250 NM is the take-off alternate figure for the A320.',
+        'Do not confuse it with the 380 NM used for the en-route alternate — that one is also based on one hour at OEI cruising speed in ISA, but it is quoted separately in the notebook and is the figure to use for en-route adequacy and for ETOPS-style reasoning.'),
+      S_OPS + ', \u00a7 20a: Take-off Alternate; \u00a7 22: Enroute Alternate'),
+
+    Q('According to the notebook, a take-off alternate requires a minimum LDA of:',
+      ['1800 m.',
+       '1500 m.',
+       '2000 m.',
+       '2400 m.'], 0,
+      E('A minimum LDA greater than 1800 m, in addition to the weather and one-engine-inoperative conditions.',
+        'This is an operator figure rather than a regulatory constant — it comes from the company manual and would be checked against the current OM-A before quoting it as a rule. The other conditions are: weather at or above applicable landing minima from 1 h before to 1 h after ETA, ceiling taken into account for non-precision or circling approaches, and one-engine-inoperative limitations considered.'),
+      S_OPS + ', \u00a7 20a: Take-off Alternate'),
+
+    Q('For selection as a destination alternate, en-route alternate or isolated aerodrome, the weather must be at or above the applicable planning minima during a period:',
+      ['From 1 hour before to 1 hour after the ETA.',
+       'From 2 hours before to 2 hours after the ETA.',
+       'From 30 minutes before to 30 minutes after the ETA.',
+       'From the ETD until 1 hour after the ETA.'], 0,
+      E('The planning window is symmetrical: one hour either side of the ETA.',
+        'The same window applies to the take-off alternate landing minima and to the "no alternate" ceiling and visibility conditions — it is the single time band used throughout the notebook\u2019s alternate rules.'),
+      S_OPS + ', \u00a7 20b: Destination / En-route Alternate AND Isolated Aerodrome'),
+
+    Q('For a destination or en-route alternate where a CAT II or III approach is available, the planning minima to be applied are:',
+      ['CAT I minima.',
+       'CAT II minima.',
+       'Non-precision minima.',
+       'Circling minima.'], 0,
+      E('Each type of approach is planned one step more conservatively than it is flown.',
+        'The ladder runs: CAT II and III plan to CAT I; CAT I plans to non-precision; non-precision plans to non-precision + 200 ft / 1000 m; circling plans to circling. Note 1 makes the visibility figure an RVR, and Note 2 requires the ceiling to be at or above the MDH for the middle two rows.'),
+      S_OPS + ', \u00a7 24: Planning minima'),
+
+    Q('For a destination or en-route alternate where only a non-precision approach is available, the planning minima are:',
+      ['Non-precision minima plus 200 ft and 1000 m.',
+       'Non-precision minima plus 100 ft and 500 m.',
+       'Non-precision minima unchanged.',
+       'Circling minima.'], 0,
+      E('Non-precision planning minima add 200 ft to the height and 1000 m to the visibility.',
+        'The ceiling must also be at or above the MDH. The increment exists because a non-precision approach has the least margin of the instrument options, so the planning figure buys back some of it.'),
+      S_OPS + ', \u00a7 24: Planning minima, Notes 1 and 2'),
+
+    Q('For a non-precision or circling approach at the destination, the planning requirement additionally demands that:',
+      ['The ceiling must be at or above the MDH.',
+       'The ceiling must be at or above 2000 ft.',
+       'The visibility must be at least 5 km.',
+       'A second runway must be available.'], 0,
+      E('For non-precision and circling, ceiling is a separate condition on top of the RVR/visibility check.',
+        'That is the practical difference between MDA/MDH and DA/DH: the non-precision minimum is a level you may not go below without visual reference, so a reported ceiling is necessary. For a precision approach a reported ceiling is not necessary.'),
+      S_OPS + ', \u00a7 23: Destination Aerodrome; \u00a7 28: MDA/MDH or DA/DH'),
+
+    Q('No destination alternate need be selected when, among other conditions, the flight duration does not exceed:',
+      ['6 hours.',
+       '4 hours.',
+       '8 hours.',
+       '3 hours.'], 0,
+      E('Six hours planned duration, or remaining flying time to destination in the case of in-flight re-planning.',
+        'All the other conditions must hold at the same time: two separate runways available and usable at the destination, and from 1 h before to 1 h after ETA a ceiling of at least 2000 ft or circling height + 500 ft (whichever is greater), with visibility of at least 5 km. The alternative route to "no alternate" is an isolated destination with no adequate alternate in existence.'),
+      S_OPS + ', \u00a7 20c: Number of destination alternates'),
+
+    Q('In the "no alternate" case, the required ceiling from 1 hour before until 1 hour after ETA is:',
+      ['At least 2000 ft, or circling height + 500 ft, whichever is greater.',
+       'At least 1500 ft, or circling height + 300 ft, whichever is greater.',
+       'At least 2000 ft in all cases.',
+       'At least circling height + 500 ft in all cases.'], 0,
+      E('2000 ft or circling height + 500 ft, whichever is <b>greater</b>, together with visibility of at least 5 km.',
+        'Taking the greater of the two means a high circling height cannot be absorbed inside the 2000 ft figure — the requirement rises with it.'),
+      S_OPS + ', \u00a7 20c: Number of destination alternates'),
+
+    Q('Two destination alternates must be selected when:',
+      ['The forecast weather from 1 h before to 1 h after ETA is below the applicable planning minima, or no meteorological information is available.',
+       'The flight exceeds six hours.',
+       'The destination has only one runway.',
+       'The destination is served only by a non-precision approach.'], 0,
+      E('Two alternates are required either when the destination forecast is below planning minima, or when there is no met information at all.',
+        'Everything in between — all other IFR flights — takes one alternate. That is the middle row of the table and the normal case.'),
+      S_OPS + ', \u00a7 20c: Number of destination alternates'),
+
+    Q('Two runways on the same aerodrome are considered separate runways when:',
+      ['They are separate landing surfaces, blocking one does not prevent the planned operation on the other, and each has a separate approach procedure based on a separate aid.',
+       'They are parallel and at least 1000 m apart.',
+       'They do not cross at any point.',
+       'They are served by the same ILS but different thresholds.'], 0,
+      E('Separate runways may overlay or even cross — what matters is independence of use and of approach aid.',
+        'Three tests, all of which must hold: separate landing surfaces; blocking one must not prevent the planned type of operation on the other; and each landing surface must have a separate approach procedure based on a separate aid.'),
+      S_OPS + ', \u00a7 21: Separate runways'),
+
+    Q('An en-route alternate must be reachable at every moment of the flight within:',
+      ['One hour still air flight time at the one-engine-inoperative cruising speed in ISA, i.e. 380 NM great circle air distance.',
+       'One hour at normal cruising speed, i.e. 450 NM.',
+       'Two hours at the one-engine-inoperative cruising speed.',
+       '250 NM great circle air distance.'], 0,
+      E('380 NM great circle air distance, based on one hour still air at OEI cruising speed in ISA.',
+        'If any point on the planned route exceeds 380 NM from the departure or arrival airport, an intermediate airport has to be chosen within a 380 NM radius of that point. If conditions permit, the departure and arrival aerodromes themselves may serve as the intermediate airport, and the chosen aerodrome must satisfy the destination and en-route alternate conditions.'),
+      S_OPS + ', \u00a7 22: Enroute Alternate'),
+
+    Q('For a Category C aeroplane such as the A320, the range of V<sub>AT</sub> is:',
+      ['121 to 140 kt.',
+       '91 to 120 kt.',
+       '141 to 165 kt.',
+       '166 to 210 kt.'], 0,
+      E('Category C covers V<sub>AT</sub> from 121 to 140 kt, where V<sub>AT</sub> = 1.3 \u00d7 V<sub>SO</sub>.',
+        'The full ladder is A below 91 kt, B from 91 to 120, C from 121 to 140, D from 141 to 165 and E from 166 to 210. The category drives the protected areas, and therefore the minima, for the whole approach.'),
+      S_OPS + ', \u00a7 25: Airplane approach categories; \u00a7 56: Airplane Approach Categories by Airspeed'),
+
+    Q('For a Category C aeroplane, the maximum circling speed given in the approach speeds table is:',
+      ['180 kt.',
+       '140 kt.',
+       '165 kt.',
+       '205 kt.'], 0,
+      E('180 kt is the Category C circling maximum in the Doc 8168 approach speeds table.',
+        'Watch out for an internal contradiction in the notebook: the table in \u00a7 25 gives 180 kt for circling, but the table in \u00a7 56 lists "V max circling 140 KIAS" for Category C. The 140 figure in \u00a7 56 simply repeats the upper V<sub>AT</sub> bound of the category and is an error. Doc 8168 circling maxima are 100, 135, 180 and 205 kt for A, B, C and D.'),
+      S_OPS + ', \u00a7 25: Airplane approach categories (Category C for A320)'),
+
+    Q('For a Category C aeroplane, the maximum speeds for the intermediate and final missed approach are respectively:',
+      ['160 kt and 240 kt.',
+       '240 kt and 160 kt.',
+       '180 kt and 240 kt.',
+       '115 kt and 160 kt.'], 0,
+      E('Intermediate missed approach 160 kt, final missed approach 240 kt.',
+        'The rest of the Category C row: initial approach 160–240 kt, final approach 115–160 kt, circling 180 kt. The final missed approach speed matches the top of the initial approach band, which is what the protected area is sized for.'),
+      S_OPS + ', \u00a7 25: Airplane approach categories (Category C for A320)'),
+
+    Q('Take-off minima for a given aerodrome shall not be less than the landing minima for the same aerodrome unless:',
+      ['A take-off alternate aerodrome is available.',
+       'Low visibility procedures are in force.',
+       'The runway is equipped with centreline lighting.',
+       'The crew hold a current CAT III qualification.'], 0,
+      E('The exception is the availability of a take-off alternate.',
+        'The reasoning is direct: if you cannot land back at the departure aerodrome, you need somewhere else to go, and once that somewhere exists the departure aerodrome\u2019s own landing minima stop constraining the take-off.'),
+      S_OPS + ', \u00a7 26: Take off Minima'),
+
+    Q('The lowest take-off minimum of 125 m RVR requires, among other conditions:',
+      ['LVP in force, HI centreline lights spaced 15 m or less, HI edge lights spaced 60 m or less, LVTO simulator training and a 90 m visual segment from the cockpit.',
+       'LVP in force and runway centreline markings only.',
+       'Runway edge lights and centreline lights, with multiple RVR information.',
+       'HIRL only, by day.'], 0,
+      E('125 m is the floor, and it demands the full set: lighting, training, visual segment and LVP.',
+        'The required RVR value must also have been achieved for all the relevant RVR reporting points. Below that row the table steps up: 150 m with RL, CL and multiple RVR; 200 m with RL and CL; 250 m with RL and/or RCLM — all three with LVP in force.'),
+      S_OPS + ', \u00a7 26: Take off Minima'),
+
+    Q('With runway edge lights and/or runway centreline markings, and no LVP in force, the take-off minimum is:',
+      ['400 m.',
+       '250 m.',
+       '500 m.',
+       '150 m.'], 0,
+      E('400 m without LVP, against 250 m for the same facilities with LVP in force.',
+        'With nil facilities the figure is 500 m, and take-off is restricted to day only. Note 1 allows RVR/visibility to be replaced by pilot assessment when unavailable; Note 2 requires at least runway edge and runway end lights for night operations.'),
+      S_OPS + ', \u00a7 26: Take off Minima'),
+
+    Q('Which statement about MDA/MDH and DA/DH is correct?',
+      ['At the MDA a reported ceiling is necessary and the aircraft may not descend below it; at the DA the decision is made and some descent below may occur.',
+       'At the MDA the decision is made and descent below is permitted; at the DA no descent below is permitted.',
+       'Both require a reported ceiling and neither permits descent below.',
+       'Neither requires a reported ceiling, and both permit descent below.'], 0,
+      E('MDA is a floor; DA is a decision point.',
+        'The MDA/MDH belongs to non-precision approaches (LOC, VOR, NDB, circling), is the lowest altitude and is not to be descended below, and a reported ceiling is necessary. The DA/DH belongs to precision approaches (PAR, ILS, MLS), is where the decision is made — with some descent below possible during the go-around transition — and a reported ceiling is not necessary. CAT II and CAT III use a DH measured by radio altimeter, with auto-thrust for CAT II.'),
+      S_OPS + ', \u00a7 28: MDA/MDH or DA/DH'),
+
+    Q('The lowest MDH permitted by the system minima for a localiser with or without DME is:',
+      ['250 ft.',
+       '300 ft.',
+       '350 ft.',
+       '200 ft.'], 0,
+      E('Localiser with or without DME: 250 ft, the same as VOR/DME.',
+        'The rest of the table: VOR alone 300 ft, NDB 300 ft, NDB/DME 300 ft, VDF 350 ft. The pattern follows the quality of the guidance — track guidance plus distance beats track guidance alone, and a bearing-only aid is worst.'),
+      S_OPS + ', \u00a7 29: System Minima for Non Precision approach aids'),
+
+    Q('The required minimums for a CAT I approach are:',
+      ['RVR 550 m and DH 200 ft.',
+       'RVR 750 m and DH 200 ft.',
+       'RVR 300 m and DH 100 ft.',
+       'RVR 550 m and DH 250 ft.'], 0,
+      E('CAT I: 550 m RVR, 200 ft DH.',
+        'The full table: non-precision 750 m with DH 250 to 350 ft; CAT I 550 m / 200 ft; CAT II 300 m / 100 ft; CAT IIIA 200 m / 50 ft; CAT IIIB 75 m with no DH quoted.'),
+      S_OPS + ', \u00a7 30: System Minima for Approach Categories'),
+
+    Q('The required minimums for a CAT IIIA approach are:',
+      ['RVR 200 m and DH 50 ft.',
+       'RVR 300 m and DH 100 ft.',
+       'RVR 75 m with no DH.',
+       'RVR 200 m and DH 100 ft.'], 0,
+      E('CAT IIIA: 200 m RVR, 50 ft DH. CAT IIIB drops to 75 m with no decision height in the table.',
+        'CAT II sits between them at 300 m and 100 ft. These are the system minima — the published minima for a particular runway may of course be higher.'),
+      S_OPS + ', \u00a7 30: System Minima for Approach Categories'),
+
+    Q('Under the approach ban, an instrument approach may be commenced regardless of the reported RVR, but shall not be continued beyond the outer marker or equivalent position if:',
+      ['The reported RVR/visibility is less than the applicable minima.',
+       'The ceiling is below the MDH.',
+       'The aircraft is not established on the localiser.',
+       'Low visibility procedures are not in force.'], 0,
+      E('The outer marker is the gate: below minima there, the approach stops.',
+        'If the RVR/visibility falls below the minimum <b>after</b> passing the outer marker, the approach may be continued to DA/H or MDA/H. Where no outer marker or equivalent position exists, the commander makes the continue-or-abandon decision at 1000 ft above the aerodrome.'),
+      S_OPS + ', \u00a7 31: Approach Ban'),
+
+    Q('Where no outer marker or equivalent position exists, the decision to continue or abandon the approach must be made:',
+      ['At 1000 ft above the aerodrome.',
+       'At 1500 ft above the aerodrome.',
+       'At the final approach fix.',
+       'At 500 ft above the aerodrome.'], 0,
+      E('1000 ft above the aerodrome takes the place of the outer marker.',
+        'It is the same gate expressed as a height rather than a position, and it keeps the approach ban workable on procedures with no marker beacon.'),
+      S_OPS + ', \u00a7 31b: Approach Ban'),
+
+    Q('Except in an emergency or after a significant change in reported weather, how many successive approaches ending in a go-around may be carried out at an aerodrome?',
+      ['No more than two.',
+       'No more than three.',
+       'One only.',
+       'There is no limit, provided fuel remains above final reserve.'], 0,
+      E('Two successive approaches both ending in a go-around is the limit.',
+        'The exceptions are an emergency, or a significant change in the reported weather conditions — in other words, a genuine reason to believe the third attempt is materially different from the first two.'),
+      S_OPS + ', \u00a7 31: Approach Ban'),
+
+    Q('The minimum approach climb gradient, and the configuration it assumes, are:',
+      ['2.1%, with one engine inoperative, TOGA thrust and slats/flaps in the approach configuration.',
+       '3.2%, with all engines operating and the landing configuration.',
+       '2.4%, with one engine inoperative and the landing configuration.',
+       '2.5%, with all engines operating and the approach configuration.'], 0,
+      E('Approach climb = 2.1%, one engine inoperative, approach configuration.',
+        'The name comes from the configuration, not from the phase of flight: go-around performance in this case is based on the approach configuration rather than the landing one. For Airbus FBW the available landing configurations are CONF 2 and 3. Note that the notebook lists "gear extended" for approach climb, which conflicts with the usual CS-25 approach climb definition of gear retracted — the gradient figure is the one asked at interview.'),
+      S_OPS + ', \u00a7 32: Approach Climb'),
+
+    Q('The landing climb requirement is:',
+      ['3.2% with all engines operating, in the landing configuration.',
+       '2.1% with one engine inoperative, in the approach configuration.',
+       '2.4% with one engine inoperative, in the landing configuration.',
+       '3.2% with one engine inoperative, in the landing configuration.'], 0,
+      E('Landing climb = 3.2%, <b>all engines</b> operating, landing configuration.',
+        'It ensures climb capability in a missed approach with everything running, gear extended and the engines having reached go-around thrust. For Airbus FBW the available landing configurations here are CONF 3 and FULL. Contrast it with approach climb: 2.1%, one engine out, approach configuration.'),
+      S_OPS + ', \u00a7 33: Landing Climb')
+  );
+
+  /* ---------- OPERATIONAL PROCEDURES — parte B ---------- */
+  OPS.push(
+
+    Q('Which fix is defined as the intersection of the intermediate approach altitude/height and the nominal ILS glide path?',
+      ['The FAP (Final Approach Point).',
+       'The FAF (Final Approach Fix).',
+       'The IF (Intermediate Fix).',
+       'The MAPt (Missed Approach Point).'], 0,
+      E('FAP belongs to the precision approach; FAF belongs to the non-precision approach.',
+        'The FAP is where the intermediate level segment meets the glide path. The FAF, used on a non-precision approach, is an aid or fix from which descent to the MDA/H is initiated. The IAF is where the initial approach segment begins, the IF is the intersection of initial and intermediate segments.'),
+      S_OPS + ', \u00a7 34: Approach Fixes'),
+
+    Q('The MAPt is defined as the point:',
+      ['At or before which the prescribed missed approach procedure must be initiated to ensure the minimum obstacle clearance is not infringed.',
+       'At which the aircraft must be established on the final approach track.',
+       'At which the DA/H is reached on a precision approach.',
+       'Where the missed approach climb gradient of 2.5% begins.'], 0,
+      E('"At or before" is the key phrase: the MAPt is the latest point, not a fixed one.',
+        'Going around earlier is always acceptable, and the complete missed approach procedure must still be followed even when the go-around is initiated prior to the MAPt.'),
+      S_OPS + ', \u00a7 34: Approach Fixes; \u00a7 35.5: Missed Approach Segment'),
+
+    Q('In which approach segment are the aircraft speed and configuration adjusted to prepare for the final approach?',
+      ['The intermediate approach segment, from the IF to the FAF/FAP.',
+       'The initial approach segment, from the IAF to the IF.',
+       'The arrival segment, up to the IAF.',
+       'The final approach segment, from the FAF/FAP to the MAP.'], 0,
+      E('The intermediate segment is the configuration and deceleration segment.',
+        'The sequence is: arrival (normally covered by the STAR) to the IAF; initial (IAF to IF) where reversal and racetrack procedures are flown; intermediate (IF to FAF/FAP) for speed and configuration; final (FAF/FAP to MAP) for alignment and descent; then the missed approach.'),
+      S_OPS + ', \u00a7 35.3: Intermediate Approach Segment'),
+
+    Q('In a reversal procedure, an aircraft is considered "established" on the inbound track when it is within:',
+      ['Half full scale deflection for ILS and VOR, or \u00b1 5\u00b0 of the required bearing for the NDB.',
+       'Full scale deflection for ILS and VOR, or \u00b1 10\u00b0 for the NDB.',
+       'One dot for ILS and VOR, or \u00b1 2\u00b0 for the NDB.',
+       'Half full scale deflection for all aids including the NDB.'], 0,
+      E('Half full-scale deflection for ILS and VOR; \u00b1 5\u00b0 for NDB.',
+        'It matters because a further descent specified after the inbound turn shall NOT be started until established on the inbound track. All turns in reversal procedures are designed for a bank angle of 25\u00b0.'),
+      S_OPS + ', \u00a7 35.2b: Descent; \u00a7 35.2c: Reversal Procedures'),
+
+    Q('The missed approach procedure is based on a nominal climb gradient of:',
+      ['2.5%, with turns based on a bank angle of 15\u00b0.',
+       '3.3%, with turns based on a bank angle of 25\u00b0.',
+       '2.1%, with turns based on a bank angle of 15\u00b0.',
+       '5.0%, with turns based on a bank angle of 20\u00b0.'], 0,
+      E('Missed approach: 2.5% nominal gradient, 15\u00b0 bank in the turns.',
+        'Do not confuse it with the departure PDG of 3.3% or the 25\u00b0 bank used in reversal procedures — the missed approach is flown with a shallower gradient and gentler turns because it starts from a low-energy state.'),
+      S_OPS + ', \u00a7 35.5: Missed Approach Segment'),
+
+    Q('The intermediate missed approach segment extends to the point where obstacle clearance of ___ is obtained and can be maintained, with track changes limited to a maximum of ___:',
+      ['50 m (164 ft); 15\u00b0.',
+       '30 m (98 ft); 15\u00b0.',
+       '50 m (164 ft); 30\u00b0.',
+       '90 m (295 ft); 15\u00b0.'], 0,
+      E('50 m (164 ft) of obstacle clearance, and a maximum track change of 15\u00b0.',
+        'The three phases are: initial, from the MAPt to the point where the climb is established (SOC); intermediate, normally straight ahead until 50 m clearance is obtained; and final, from there to where a new approach, holding or return to en-route flight is initiated.'),
+      S_OPS + ', \u00a7 35.5.2: Intermediate MISAP Segment'),
+
+    Q('A circling approach is defined as the visual phase of an instrument approach to position the aeroplane for landing on a runway not suitable for a straight-in approach. The minima quoted are:',
+      ['MDH 600 ft and visibility 4000 m.',
+       'MDH 400 ft and visibility 1500 m.',
+       'MDH 1000 ft and visibility 5000 m.',
+       'MDH 600 ft and visibility 1600 m.'], 0,
+      E('MDH 600 ft, visibility 4000 m.',
+        'These are the Category C circling minima, matching the A320. Remember that circling minima are an MDH — a floor that may not be descended below until the landing is assured, not a decision height.'),
+      S_OPS + ', \u00a7 36: Circling Approach'),
+
+    Q('A visual approach requires a visibility of ___ and a ceiling of ___, and must be fully stabilised at ___:',
+      ['5000 m; 2500 ft; 1000 ft AAL.',
+       '4000 m; 2500 ft; 500 ft AAL.',
+       '5000 m; 1500 ft; 1000 ft AAL.',
+       '8000 m; 2500 ft; 1500 ft AAL.'], 0,
+      E('5000 m visibility, 2500 ft ceiling, stabilised by 1000 ft AAL.',
+        'A visual approach is an approach by an IFR flight when part or all of an instrument approach procedure is not completed and the approach is executed with visual reference to the terrain — the flight remains IFR throughout.'),
+      S_OPS + ', \u00a7 37: Visual Approach'),
+
+    Q('On straight segments where track guidance is provided, the width of the primary area at any given point is equal to:',
+      ['One-half of the total width, with each secondary area equal to one-quarter.',
+       'One-third of the total width, with each secondary area equal to one-third.',
+       'Two-thirds of the total width, with each secondary area equal to one-sixth.',
+       'One-quarter of the total width, with each secondary area equal to three-eighths.'], 0,
+      E('Primary = half the total width; each secondary = a quarter.',
+        'The minimum obstacle clearance (MOC) is provided in full across the whole primary area. In the secondary area the MOC is provided at the inner edge and reduces to zero at the outer edge.'),
+      S_OPS + ', \u00a7 38: Obstacle Clearance'),
+
+    Q('For a departure procedure, the minimum obstacle clearance equals zero at the DER and thereafter increases by:',
+      ['0.8% of the horizontal distance in the direction of flight.',
+       '2.5% of the horizontal distance in the direction of flight.',
+       '3.3% of the horizontal distance in the direction of flight.',
+       '1.2% of the horizontal distance in the direction of flight.'], 0,
+      E('Zero at the departure end of the runway, then 0.8% of the distance flown.',
+        'That 0.8% is the same increment that appears inside the PDG and in the gross-to-net gradient reduction: it is the standard margin the procedure designer builds in. It assumes a maximum turn of 15\u00b0.'),
+      S_OPS + ', \u00a7 39: Obstacle Clearance \u2014 Departure Procedures'),
+
+    Q('In the turn initiation area and turn area of a departure, the minimum obstacle clearance provided is:',
+      ['90 m (295 ft).',
+       '50 m (164 ft).',
+       '120 m (394 ft).',
+       '30 m (98 ft).'], 0,
+      E('90 m (295 ft) in the turn initiation area and turn area.',
+        'Keep the three numbers separate: 90 m (295 ft) in departure turn areas, 50 m (164 ft) for the intermediate missed approach, and 120 m (394 ft) as the height until which straight flight is assumed before a turning departure.'),
+      S_OPS + ', \u00a7 39: Obstacle Clearance \u2014 Departure Procedures'),
+
+    Q('Unless otherwise specified, departure procedures assume a procedure design gradient of 3.3%, which is made up of:',
+      ['2.5% for the obstacle identification surfaces plus 0.8% increasing obstacle clearance.',
+       '2.4% for the second segment plus 0.9% margin.',
+       '3.0% for terrain plus 0.3% margin.',
+       '2.5% for obstacle clearance plus 0.8% for turn allowance.'], 0,
+      E('3.3% = 2.5% obstacle identification surface + 0.8% increasing obstacle clearance.',
+        'The 2.5% element may be replaced by a steeper gradient if the most critical obstacle penetrating the surfaces demands it — whichever is higher governs. A straight climb on the extended runway centre line is assumed until reaching 120 m (394 ft) AAL, based on all engines operating.'),
+      S_OPS + ', \u00a7 39: Obstacle Clearance \u2014 Departure Procedures'),
+
+    Q('A departure is classed as a straight departure when the initial departure track is within:',
+      ['15\u00b0 of the alignment of the runway centreline.',
+       '10\u00b0 of the alignment of the runway centreline.',
+       '30\u00b0 of the alignment of the runway centreline.',
+       '5\u00b0 of the alignment of the runway centreline.'], 0,
+      E('Within 15\u00b0 it is a straight departure; more than 15\u00b0 and a turning area is constructed.',
+        'For turning departures, straight flight is assumed until reaching at least 120 m (394 ft) above the elevation of the DER. Turns may be specified at an altitude/height, at a fix or at a facility.'),
+      S_OPS + ', \u00a7 40: Standard Instrument Departure'),
+
+    Q('Gradients caused by close-in obstacles are not specified when they apply to a height of:',
+      ['60 m (200 ft) or less.',
+       '120 m (394 ft) or less.',
+       '30 m (98 ft) or less.',
+       '90 m (295 ft) or less.'], 0,
+      E('Close-in obstacles requiring a steeper gradient only to 60 m (200 ft) or less are not promulgated.',
+        'Where obstacles do require it, procedure design gradients greater than 3.3% are promulgated to an altitude or height, after which the 3.3% gradient is considered to prevail.'),
+      S_OPS + ', \u00a7 40: Standard Instrument Departure \u2014 Straight Departures'),
+
+    Q('Contingency procedures to cover an engine failure or an emergency in flight after V1 are the responsibility of:',
+      ['The operator.',
+       'The procedure designer, as part of the SID.',
+       'ATC.',
+       'The State of the aerodrome.'], 0,
+      E('The published SID does not cover the engine-out case after V1 — the operator does.',
+        'This is why airlines produce their own engine-out standard instrument departures. The notebook adds that wind effect is compensated by the pilot while flying the procedure, but not while being vectored by ATC.'),
+      S_OPS + ', \u00a7 39: Obstacle Clearance \u2014 Departure Procedures'),
+
+    Q('In a holding pattern, the rate of turn or angle of bank to be used is:',
+      ['25\u00b0 of bank or 3\u00b0 per second, whichever requires the lesser bank.',
+       '25\u00b0 of bank in all cases.',
+       '3\u00b0 per second in all cases.',
+       '15\u00b0 of bank or 1.5\u00b0 per second, whichever is greater.'], 0,
+      E('25\u00b0 bank or rate one (3\u00b0/second), whichever requires the <b>lesser</b> bank.',
+        'At jet holding speeds rate one would demand far more than 25\u00b0, so in practice the transport aircraft holds at 25\u00b0 of bank; at low speed the rate one limit becomes the binding one.'),
+      S_OPS + ', \u00a7 42: Holding Speeds'),
+
+    Q('Under the newer ICAO Doc 8168 Vol. I, the maximum holding speed in normal conditions up to 14 000 ft is:',
+      ['230 kt (170 kt for CAT A and B).',
+       '240 kt (170 kt for CAT A and B).',
+       '265 kt.',
+       '280 kt.'], 0,
+      E('230 kt up to 14 000 ft, reduced to 170 kt for Categories A and B.',
+        'In turbulent conditions the figure at that level rises to 280 kt, again 170 kt for CAT A and B. Timing on the outbound leg is 1 minute at or below 14 000 ft.'),
+      S_OPS + ', \u00a7 42: Holding Speeds'),
+
+    Q('The maximum holding speed in normal conditions between 20 000 ft and 34 000 ft is:',
+      ['265 kt.',
+       '240 kt.',
+       '230 kt.',
+       'Mach 0.83.'], 0,
+      E('265 kt between 20 000 and 34 000 ft; above 34 000 ft it becomes Mach 0.83.',
+        'The band from 14 000 to 20 000 ft is 240 kt. In turbulence the 14 000–34 000 ft bands both become 280 kt or Mach 0.8, whichever is less; above 34 000 ft turbulent and normal are both Mach 0.83.'),
+      S_OPS + ', \u00a7 42: Holding Speeds'),
+
+    Q('Outbound leg timing in the hold is:',
+      ['1 minute at or below 14 000 ft and 1.5 minutes above 14 000 ft.',
+       '1.5 minutes at or below 14 000 ft and 1 minute above 14 000 ft.',
+       '1 minute at all levels.',
+       '2 minutes above 20 000 ft.'], 0,
+      E('1 minute up to 14 000 ft, 1.5 minutes above it.',
+        'The longer leg above 14 000 ft compensates for the higher true airspeed and the larger turn radius, keeping the pattern inside its protected area.'),
+      S_OPS + ', \u00a7 42: Holding Speeds'),
+
+    Q('The three holding entry sectors are:',
+      ['Sector 1 parallel, Sector 2 offset, Sector 3 direct.',
+       'Sector 1 direct, Sector 2 parallel, Sector 3 offset.',
+       'Sector 1 offset, Sector 2 direct, Sector 3 parallel.',
+       'Sector 1 parallel, Sector 2 direct, Sector 3 offset.'], 0,
+      E('Sector 1 parallel, Sector 2 offset (teardrop), Sector 3 direct.',
+        'Sector 3, the direct entry, spans 180\u00b0 and is by far the largest; the offset sector is bounded by the 70\u00b0 line drawn from the inbound track.'),
+      S_OPS + ', \u00a7 43: Holding Entry'),
+
+    Q('The buffer area of a holding pattern extends beyond the boundary of the holding area by:',
+      ['5.0 NM.',
+       '2.5 NM.',
+       '10.0 NM.',
+       '1.0 NM.'], 0,
+      E('5.0 NM beyond the holding area boundary.',
+        'Within that buffer the height and nature of obstacles are taken into consideration when determining the minimum holding level. The basic holding area itself allows for aircraft speed, wind effect, timing errors and holding fix characteristics; the entry area covers the specified entry procedures.'),
+      S_OPS + ', \u00a7 44: Holding Area Obstacle Clearance'),
+
+    Q('The minimum permissible holding level provides an obstacle clearance of at least:',
+      ['984 ft, increased to a total of up to 1969 ft over high terrain or in mountainous areas.',
+       '1000 ft, increased to 2000 ft in mountainous areas.',
+       '984 ft in all cases.',
+       '1500 ft, increased to 2500 ft in mountainous areas.'], 0,
+      E('984 ft (300 m) normally, up to a total of 1969 ft (600 m) over high or mountainous terrain.',
+        'The increase accommodates the possible effects of turbulence, down draughts and other meteorological phenomena on the performance of altimeters — the same reasoning behind mountainous-area increments elsewhere in procedure design.'),
+      S_OPS + ', \u00a7 45: Minimum Holding Level'),
+
+    Q('The Minimum Enroute Altitude (MEA) is the lowest published altitude between radio fixes that assures:',
+      ['Acceptable navigational signal coverage, applying to the entire width of the airway, segment or route.',
+       'Obstacle clearance only, for the entire route segment.',
+       'Radar coverage for the entire route segment.',
+       'A 1000 ft clearance within 25 NM of the navigation facility.'], 0,
+      E('MEA guarantees signal coverage (and obstacle clearance); MOCA guarantees obstacle clearance alone.',
+        'That is the whole distinction between the two. The MOCA is the lowest published altitude between radio fixes on VOR airways, off-airway routes or route segments that provides obstacle clearance requirements for the entire route segment — but says nothing about whether you can receive the aid.'),
+      S_OPS + ', \u00a7 46: MEA; \u00a7 47: MOCA'),
+
+    Q('MORA provides an obstacle clearance of:',
+      ['1000 ft below 5000 ft MSL and 2000 ft above it.',
+       '2000 ft below 5000 ft MSL and 1000 ft above it.',
+       '1000 ft at all levels.',
+       '2000 ft at all levels.'], 0,
+      E('1000 ft of clearance below 5000 ft MSL, 2000 ft above it, from man-made and terrain obstacles.',
+        'Route MORA provides that clearance within 10 NM of the route centreline and within a 10 NM radius beyond the radio fixes. Grid MORA is associated with en-route charts, which are divided into sectors each with a minimum usable altitude.'),
+      S_OPS + ', \u00a7 48: MORA \u2014 Min Off-Route ALT'),
+
+    Q('The Minimum Safe/Sector Altitude found on an instrument approach chart provides:',
+      ['1000 ft of obstacle clearance within a 25 NM radius from the navigational facility.',
+       '1000 ft of obstacle clearance within a 10 NM radius from the aerodrome.',
+       '2000 ft of obstacle clearance within a 25 NM radius from the navigational facility.',
+       '1000 ft of obstacle clearance within 5 NM of the final approach track.'], 0,
+      E('1000 ft within 25 NM of the facility.',
+        'Where the MSA is divided into sectors, each with a different altitude, those are referred to as Minimum Sector Altitudes.'),
+      S_OPS + ', \u00a7 49: MSA \u2014 Minimum Safe / Sector Altitude'),
+
+    Q('The drift down altitude is the altitude to which an aeroplane will descend and maintain following an engine failure above the one-engine-inoperative absolute ceiling, while:',
+      ['Using maximum available power/thrust on the operating engine and maintaining the OEI best rate of climb speed.',
+       'Using idle thrust and maintaining the OEI best angle of climb speed.',
+       'Using maximum continuous thrust and maintaining V<sub>MO</sub>.',
+       'Using maximum available thrust and maintaining green dot speed minus 10 kt.'], 0,
+      E('Maximum available power/thrust on the live engine, flown at the OEI best rate of climb speed.',
+        'Drift down is therefore the shallowest possible descent, not the quickest — the object is to lose as little altitude as possible while the aircraft settles at the level it can hold.'),
+      S_OPS + ', \u00a7 50: Drift Down Altitude'),
+
+    Q('ETOPS approval is required when a twin-engine aircraft operates more than ___ from a suitable alternate aerodrome with one engine inoperative:',
+      ['60 minutes.',
+       '90 minutes.',
+       '120 minutes.',
+       '180 minutes.'], 0,
+      E('More than 60 minutes away triggers the requirement; approvals then vary between 60 and 180 minutes.',
+        'For the A320 with one engine inoperative the notebook quotes 380 NM, the same distance used for en-route alternate adequacy.'),
+      S_OPS + ', \u00a7 51: ETOPS'),
+
+    Q('NADP 1 provides noise reduction for noise sensitive areas:',
+      ['In close proximity to the departure end of the runway.',
+       'More distant from the runway end.',
+       'Along the extended centreline beyond 10 NM.',
+       'Under the arrival path only.'], 0,
+      E('NADP 1 protects the close-in areas; NADP 2 protects the more distant ones.',
+        'NADP 1 keeps V<sub>2</sub> + 10 kt with take-off thrust, reduces thrust at or above 800 ft above aerodrome elevation, and delays flap/slat retraction until 3000 ft is attained. NADP 2 reduces the body angle and retracts flaps/slats on schedule from 800 ft, reducing thrust during the retraction sequence, and transitions to en-route climb speed at 3000 ft.'),
+      S_OPS + ', \u00a7 52: NADP 1; \u00a7 53: NADP 2'),
+
+    Q('Noise abatement departure procedures in the form of reduced power take-off should NOT be required when, among other conditions:',
+      ['The crosswind component including gusts exceeds 15 kt, or the tailwind component including gusts exceeds 5 kt.',
+       'The crosswind exceeds 25 kt or the tailwind exceeds 10 kt.',
+       'The runway is dry but the visibility is below 5 km.',
+       'The aerodrome elevation exceeds 5000 ft.'], 0,
+      E('15 kt crosswind and 5 kt tailwind, both including gusts, are the limits quoted.',
+        'The other adverse conditions listed are: a runway adversely affected by snow, slush, ice, water, mud, rubber or oil; horizontal visibility less than 1 NM; and reported or forecast windshear or expected thunderstorms. On the approach side, noise abatement is also not required when the ceiling is lower than 500 ft above aerodrome elevation.'),
+      S_OPS + ', \u00a7 54: Noise Abatement Procedures \u2014 Operational Limitations'),
+
+    Q('Performance Class A comprises:',
+      ['Multi-engine jets, and some turboprops, above 5700 kg or with more than 9 seats.',
+       'All small propeller aircraft.',
+       'Large reciprocating engine propeller aircraft.',
+       'All aircraft certified for commercial air transport.'], 0,
+      E('Class A: multi-engine jets and some turboprops, over 5700 kg or more than 9 seats — the Wizz Air A320 sits here.',
+        'Class B covers small propeller aircraft and Class C large reciprocating engine propeller aircraft.'),
+      S_OPS + ', \u00a7 55: Airplane Performance Classes'),
+
+    Q('The screen height is an imaginary screen just cleared by the lowest part of the aircraft, with undercarriage extended and in an unbanked attitude. It is usually:',
+      ['35 ft.',
+       '50 ft.',
+       '15 ft.',
+       '400 ft.'], 0,
+      E('35 ft for the dry runway case.',
+        'The wet runway take-off distance uses a reduced 15 ft screen, provided V<sub>2</sub> can be achieved before the aeroplane is 35 ft above the take-off surface.'),
+      S_OPS + ', \u00a7 57: Screen Height; \u00a7 60: TOD'),
+
+    Q('The second take-off segment runs from the gear-up point until the acceleration altitude of 400 ft is reached, and requires a minimum climb gradient of:',
+      ['2.4% with one engine inoperative.',
+       '1.2% with one engine inoperative.',
+       'Positive only.',
+       '3.2% with all engines operating.'], 0,
+      E('Second segment: 2.4%, gear up, take-off flap, V<sub>2</sub>, take-off thrust.',
+        'The whole ladder for a twin: first segment (35 ft to gear retracted) positive gradient; second segment 2.4%; third segment 0% while accelerating in level flight to green dot; final segment 1.2% at MCT from 400 ft to 1500 ft. All engines operating adds 0.8% to each figure.'),
+      S_OPS + ', \u00a7 58: Takeoff Path and Segments'),
+
+    Q('The third take-off segment is flown at:',
+      ['0% gradient, accelerating in level flight while the flaps are retracted.',
+       '2.4% gradient, accelerating to green dot.',
+       '1.2% gradient at maximum continuous thrust.',
+       'A positive gradient with the gear still down.'], 0,
+      E('The third segment is the level acceleration segment — 0% gradient by definition.',
+        'It covers the distance before flap retraction while accelerating to green dot, and then the acceleration after flap retraction to the final take-off climb speed. Thrust is take-off, changing to MCT. The fourth (final) segment then climbs at 1.2% to 1500 ft.'),
+      S_OPS + ', \u00a7 58: Takeoff Path and Segments'),
+
+    Q('To calculate a net gradient from a gross gradient for a twin-engine jet, the gross gradient is reduced by:',
+      ['0.8%.',
+       '0.9%.',
+       '1.0%.',
+       '1.1%.'], 0,
+      E('0.8% for a twin — the allowance for performance degradation and less than optimum pilot technique.',
+        'The net flight path must clear the limiting obstacle by a minimum of 35 ft. If an obstacle in the departure path cannot be avoided and would not be cleared by 35 ft, the planned take-off weight must be reduced.'),
+      S_OPS + ', \u00a7 59: Gross \u2013 Net Gradients'),
+
+    Q('The take-off distance on a dry runway is the GREATER of:',
+      ['The distance to 35 ft with an engine failure at V<sub>EF</sub> recognised at V<sub>1</sub>, and 115% of the all-engines distance to 35 ft.',
+       'The distance to 35 ft with an engine failure, and 100% of the all-engines distance to 35 ft.',
+       'The distance to 15 ft with an engine failure, and 115% of the all-engines distance to 15 ft.',
+       'The accelerate-stop distance and the all-engines distance to 35 ft.'], 0,
+      E('Two candidates, take the greater: engine-out to 35 ft, or 115% of the all-engines distance to 35 ft.',
+        'On a wet runway the take-off distance is the greater of the dry TOD and the distance to 15 ft with the engine failing at V<sub>EF</sub> and recognised at V<sub>1</sub>, ensuring V<sub>2</sub> is achieved before 35 ft. Take-off distance must not exceed TODA, and the clearway used may not exceed half the TODA.'),
+      S_OPS + ', \u00a7 60: TOD \u2014 Take off Distance'),
+
+    Q('Accelerate stop distance calculations assume, among other things:',
+      ['A delay of 1 second between V<sub>EF</sub> and V<sub>1</sub>, brakes at the fully worn limit, and an additional distance equivalent to 2 seconds at constant V<sub>1</sub>.',
+       'A delay of 2 seconds between V<sub>EF</sub> and V<sub>1</sub> and new brakes.',
+       'Reverse thrust credit on a dry runway.',
+       'A 3 second recognition delay and maximum reverse thrust.'], 0,
+      E('1 second between V<sub>EF</sub> and V<sub>1</sub>, fully worn brakes, plus 2 seconds at constant V<sub>1</sub> added to the distance.',
+        'Reverse thrust is not considered for the dry runway determination, though it can be used for wet runway calculations. The accelerate stop distance must not exceed the ASDA.'),
+      S_OPS + ', \u00a7 62: ASD \u2014 Accelerate Stop Distance'),
+
+    Q('ASDA is defined as:',
+      ['TORA plus stopway.',
+       'TORA plus clearway.',
+       'The length of the runway itself.',
+       'TORA plus stopway plus clearway.'], 0,
+      E('ASDA = TORA + stopway; TODA = runway + clearway.',
+        'The stopway is an area beyond the take-off runway, no less wide than the runway and centred on its extended centreline, able to support the aeroplane during an abortive take-off without causing structural damage. TORA is the length of the runway itself, by the end of which the aircraft must be airborne.'),
+      S_OPS + ', \u00a7 63: TORA; \u00a7 64: Stopway; \u00a7 65: ASDA'),
+
+    Q('A clearway is an obstacle-free area at the end of the runway with:',
+      ['An upward slope not exceeding 1.25% and a minimum width of 150 m (500 ft), centrally located about the extended centreline.',
+       'An upward slope not exceeding 2.5% and a minimum width of 90 m.',
+       'No slope limit and a minimum width of 300 m.',
+       'An upward slope not exceeding 1.25% and a minimum width of 60 m.'], 0,
+      E('Slope not exceeding 1.25%, at least 150 m (500 ft) wide, centred on the extended runway centreline.',
+        'TODA is the runway plus any clearway, and the take-off weight must be such that the aircraft reaches at least 35 ft AGL by the end of the clearway following failure of the critical engine at V<sub>1</sub>.'),
+      S_OPS + ', \u00a7 66: Clearway; \u00a7 67: TODA'),
+
+    Q('The landing distance required must satisfy:',
+      ['LDR < LDA \u00d7 0.6 — the aircraft must be able to land within 60% of the LDA.',
+       'LDR < LDA \u00d7 0.7.',
+       'LDR < LDA \u00d7 0.8.',
+       'LDR < LDA, with no additional factor.'], 0,
+      E('60% of the landing distance available.',
+        'The LDR itself is the landing airborne distance plus the landing ground distance. The LDA is the length of runway declared suitable for the landing run, starting at the landing threshold or displaced/relocated threshold.'),
+      S_OPS + ', \u00a7 69: LDA; \u00a7 70: LDR'),
+
+    Q('V<sub>1</sub> is bounded by the requirement that it:',
+      ['Cannot be less than V<sub>MCG</sub> and cannot be greater than V<sub>R</sub>.',
+       'Cannot be less than V<sub>R</sub> and cannot be greater than V<sub>2</sub>.',
+       'Cannot be less than V<sub>MCA</sub> and cannot be greater than V<sub>LOF</sub>.',
+       'Cannot be less than V<sub>EF</sub> and cannot be greater than V<sub>MCG</sub>.'], 0,
+      E('V<sub>MCG</sub> \u2264 V<sub>1</sub> \u2264 V<sub>R</sub>.',
+        'Below V<sub>MCG</sub> the aircraft could not be kept straight if the take-off were continued; above V<sub>R</sub> the decision would come after rotation has already begun. V<sub>1</sub> is the maximum speed at which the pilot can safely stop within the runway available, and also the minimum speed from which the take-off can safely be continued.'),
+      S_OPS + ', \u00a7 71: Speeds'),
+
+    Q('V<sub>2</sub> is achieved by the 35 ft screen height, maintained to 400 ft AGL in the event of an engine failure, and must be at least:',
+      ['1.2 \u00d7 V<sub>S</sub>.',
+       '1.3 \u00d7 V<sub>S</sub>.',
+       '1.05 \u00d7 V<sub>MCA</sub>.',
+       '1.1 \u00d7 V<sub>MCG</sub>.'], 0,
+      E('V<sub>2</sub> \u2265 1.2 V<sub>S</sub>, reached by 35 ft and held to 400 ft AGL.',
+        'V<sub>EF</sub> is the CAS at which the critical engine is assumed to fail; V<sub>R</sub> is where rotation begins in order to achieve V<sub>2</sub> at the screen height; V<sub>LOF</sub> is where the aeroplane first becomes airborne.'),
+      S_OPS + ', \u00a7 71: Speeds'),
+
+    Q('V<sub>MCA</sub> is the minimum speed at which the aeroplane is controllable in flight with the critical engine inoperative and:',
+      ['A maximum of 5 degrees of bank, with the remaining engines at take-off thrust.',
+       'A maximum of 15 degrees of bank, with the remaining engines at take-off thrust.',
+       'Wings level, with the remaining engines at maximum continuous thrust.',
+       'A maximum of 5 degrees of bank, with all engines at idle.'], 0,
+      E('5\u00b0 of bank is the certification limit for V<sub>MCA</sub>.',
+        'V<sub>MCG</sub> is its ground equivalent: the minimum speed on or near the ground at which the take-off can be continued safely when the critical engine becomes inoperative, with the remaining engines at take-off thrust.'),
+      S_OPS + ', \u00a7 71: Speeds'),
+
+    Q('For a given take-off weight, an increase in V<sub>1</sub> leads to:',
+      ['A decrease in TODR and an increase in ASDR.',
+       'An increase in TODR and a decrease in ASDR.',
+       'A decrease in both TODR and ASDR.',
+       'An increase in both TODR and ASDR.'], 0,
+      E('Higher V<sub>1</sub>: less distance needed to go, more distance needed to stop.',
+        'The two curves cross at one particular speed — the balanced V<sub>1</sub> — and the corresponding distance is the balanced field length, the minimum distance achievable. A balanced field exists when TODR equals ASDR.'),
+      S_OPS + ', \u00a7 72: Balance Field Length'),
+
+    Q('Contingency fuel is defined as:',
+      ['5% of trip fuel, or the amount to fly 5 minutes at holding speed at 1500 ft over the destination in standard conditions.',
+       '3% of trip fuel in all cases.',
+       '10% of trip fuel, or 15 minutes holding.',
+       '30 minutes at holding speed at 1500 ft.'], 0,
+      E('5% of trip fuel, or 5 minutes holding at 1500 ft over destination — 200 kg for the A320.',
+        'The alternative is not less than 3% or 5 minutes, whichever is greater, of the planned trip fuel, provided an en-route alternate is available within a circle of radius 20% of the total flight plan distance, centred on the planned route at 25% of the total distance from the destination, or at 20% of the total distance plus 50 NM, whichever is greater.'),
+      S_OPS + ', \u00a7 73: Fuel Policy \u2014 Contingency Fuel'),
+
+    Q('Final reserve fuel is:',
+      ['30 minutes at 1500 ft above the alternate ARP elevation in ISA, at the estimated landing mass, increased to 45 minutes if no alternate is required.',
+       '45 minutes in all cases.',
+       '30 minutes at cruising altitude at the destination.',
+       '2 hours at normal cruise consumption.'], 0,
+      E('30 minutes holding at 1500 ft, computed at the estimated landing mass at the alternate — or at the destination when there is no alternate, in which case it becomes 45 minutes.',
+        'Additional fuel is a separate item: for the isolated aerodrome procedure it is not less than the fuel to fly for two hours at normal cruise consumption after arriving overhead the destination, including final reserve. Extra fuel is at the discretion of the commander.'),
+      S_OPS + ', \u00a7 73: Fuel Policy \u2014 Final Reserve and Additional Fuel'),
+
+    Q('If it becomes apparent that the aircraft WILL land with less than final reserve fuel, the commander must declare:',
+      ['MAYDAY, reporting the estimated fuel time remaining in minutes.',
+       'PAN PAN, reporting the estimated fuel time remaining in minutes.',
+       'A minimum fuel advisory only.',
+       'Nothing, provided a diversion is already under way.'], 0,
+      E('WILL land below final reserve is a MAYDAY; MAY land below final reserve is a PAN PAN.',
+        'Both calls report the estimated fuel time remaining in minutes, and after a PAN PAN ATC must be kept informed thereafter. The distinction turns entirely on the word: possibility versus certainty.'),
+      S_OPS + ', \u00a7 74: Low Fuel State Emergency'),
+
+    Q('Icing conditions may be expected when the OAT or TAT is at or below ___ and there is visible moisture in the air, or standing water, slush, ice or snow is present on the taxiway or runway:',
+      ['10 \u00b0C.',
+       '5 \u00b0C.',
+       '0 \u00b0C.',
+       '\u201310 \u00b0C.'], 0,
+      E('At or below 10 \u00b0C with visible moisture, or contamination on the manoeuvring area.',
+        'The temperature trigger is well above freezing because of the temperature drop through the engine intake and over the wing. Clear ice forms by relatively slow freezing of large super-cooled droplets and is almost impossible to see; rime ice is a whitish rough deposit from instantaneous freezing of small droplets; blade ice forms on the back of fan blades overnight; frost forms in clear air when parked in sub-zero temperatures.'),
+      S_OPS + ', \u00a7 75: Icing conditions'),
+
+    Q('The difference between de-icing and anti-icing is that:',
+      ['De-icing removes contamination that is already present, while anti-icing protects against its formation.',
+       'De-icing protects against formation, while anti-icing removes existing contamination.',
+       'De-icing is applied cold and anti-icing hot.',
+       'De-icing applies only to the wings and anti-icing only to the engines.'], 0,
+      E('De-icing removes; anti-icing prevents.',
+        'In a two-step process the first step de-ices with hot water or a hot fluid/water mixture and the second anti-ices with hot or cold fluid to protect against freezing or refreezing. In a one-step process both are done together, and the remaining fluid film gives only very limited protection. De-icing fluids are always applied heated and diluted.'),
+      S_OPS + ', \u00a7 76: Anti-Icing; \u00a7 77: De-Icing'),
+
+    Q('Holdover time (HOT) is:',
+      ['The estimated time an anti-icing fluid will prevent frost, ice, snow or slush forming on the aircraft surfaces.',
+       'The maximum time an aircraft may hold at the runway holding point.',
+       'The time available before the de-icing fluid must be reapplied on the ground after landing.',
+       'The certified time an aircraft may remain in icing conditions in flight.'], 0,
+      E('It is a protection time, and it shortens in heavy precipitation, high wind or jet blast.',
+        'Before take-off the commander must make sure the holdover time has not run out; if it has, the aircraft must be de-iced/anti-iced again.'),
+      S_OPS + ', \u00a7 78: Hold Over Time \u2014 HOT'),
+
+    Q('CAVOK requires visibility greater than 10 km, no cloud below 5000 ft or below the highest MSA, and:',
+      ['No cumulonimbus, no precipitation, thunderstorm, shallow fog or low drifting snow.',
+       'No cloud of any type at any level.',
+       'No precipitation only.',
+       'A ceiling of at least 2500 ft.'], 0,
+      E('Four conditions together: visibility, cloud base, no CB, and no significant weather.',
+        'SKC is used when any of those conditions is not met but there is no cloud to report. TREND covers significant changes forecast in the next 2 hours, using BECMG and TEMPO with FM, TL and AT; NOSIG replaces the trend when no significant change is expected.'),
+      S_OPS + ', \u00a7 79: Routine Actual Weather Report \u2014 METAR'),
+
+    Q('A 9-hour TAF is issued and updated every ___, and a 12 to 24-hour TAF every ___:',
+      ['3 hours; 6 hours.',
+       '6 hours; 3 hours.',
+       '3 hours; 12 hours.',
+       '6 hours; 12 hours.'], 0,
+      E('9-hour TAF every 3 hours; 12–24 hour TAF every 6 hours.',
+        'TEMPO covers conditions expected to last generally less than an hour at a time and to occur during less than half the period concerned.'),
+      S_OPS + ', \u00a7 80: Aerodrome Weather forecast \u2014 TAF'),
+
+    Q('Under the RNP concept, each aircraft operating in RNP airspace must have a total system navigation position error equal to or less than the RNP value for:',
+      ['95% of the flight time.',
+       '99% of the flight time.',
+       '100% of the flight time.',
+       '90% of the flight time.'], 0,
+      E('95% of the flight time is the accuracy requirement; the containment limit is set at twice the RNP value.',
+        'B-RNAV (RNP-5) means being within 5 NM of the desired flight path for at least 95% of flight time, implemented in Europe in April 1998. P-RNAV (RNP-1) requires track-keeping accuracy of \u00b1 1 NM for at least 95% of flight time, and was progressively introduced for RNAV SIDs and STARs from March 2003.'),
+      S_OPS + ', \u00a7 81: RNP; \u00a7 84: BRNAV; \u00a7 85: PRNAV'),
+
+    Q('Typical RNP values for en-route oceanic navigation or continental areas outside radio navaid coverage are:',
+      ['RNP-10 and RNP-12.',
+       'RNP-5 and RNP-4.',
+       'RNP-1 and RNP-0.3.',
+       'RNP-2 and RNP-1.'], 0,
+      E('RNP-10 and RNP-12 outside navaid coverage; RNP-5/4 within it.',
+        'MNPS over the North Atlantic does not refer to any RNP value but may be considered equivalent to about RNP-12; RNP-10 is implemented over the North, Central and East Pacific. RNP-1 applies to SID/STAR and RNP-0.3 to the RNAV approach.'),
+      S_OPS + ', \u00a7 81: RNP; \u00a7 83: RNP-10 in oceanic or remote areas'),
+
+    Q('RVSM airspace in Europe is:',
+      ['FL290 to FL410 inclusive.',
+       'FL280 to FL400 inclusive.',
+       'FL290 to FL430 inclusive.',
+       'Above FL245.'], 0,
+      E('FL290 to FL410 inclusive, treated as special qualification airspace.',
+        'Before entry the following must be serviceable: two primary altimeter systems agreeing within \u00b1 200 ft, one automatic altitude control system, one altitude alerting system, and a transponder connectable to the altitude measurement system in use. A significant weather chart must be available for flight planning through RVSM airspace.'),
+      S_OPS + ', \u00a7 89: RVSM'),
+
+    Q('In the GPWS, which mode produces the aural alert "DON\u2019T SINK"?',
+      ['Mode 3 — excessive altitude loss after take-off or go-around.',
+       'Mode 1 — excessive descent rate.',
+       'Mode 2 — excessive terrain closure rate.',
+       'Mode 5 — excessive descent below the ILS glideslope.'], 0,
+      E('Mode 3 covers altitude loss after take-off or go-around, and has no associated warning.',
+        'Mode 1 gives "SINKRATE" then "PULL UP"; Mode 2 "TERRAIN TERRAIN" then "PULL UP"; Mode 4a "TOO LOW – GEAR", 4b "TOO LOW – FLAP", both escalating to "TOO LOW – TERRAIN"; Mode 5 "GLIDESLOPE"; Mode 7 "WINDSHEAR". The system is designed to prevent CFIT and cannot be deactivated.'),
+      S_OPS + ', \u00a7 90: Ground Proximity Warning System Procedures'),
+
+    Q('TCAS operates on the basis of:',
+      ['Secondary surveillance radar transponder signals, independently of ground-based equipment.',
+       'Primary radar returns processed by ATC.',
+       'ADS-B position reports only.',
+       'The aircraft weather radar in mapping mode.'], 0,
+      E('It uses SSR transponder signals and works independently of any ground station.',
+        'Mode C transponders transmit altitude only; Mode S adds speed and heading and both transmits and receives, which is what TCAS requires. A Traffic Advisory appears as a yellow circle about 40 seconds ahead; a Resolution Advisory as a red square about 25 seconds ahead.'),
+      S_OPS + ', \u00a7 91: TCAS'),
+
+    Q('With one engine inoperative or during an emergency descent, TCAS should be:',
+      ['Switched to TA mode only, so that two-way communication remains but no resolution advisory is generated for you.',
+       'Switched off completely.',
+       'Left in TA/RA, and all RAs followed.',
+       'Switched to standby until levelling off.'], 0,
+      E('TA only: you still see and are seen, but the system stops commanding vertical manoeuvres you may be unable to fly.',
+        'On a normal RA the PF disengages the autopilot and climbs or descends as commanded, using the red and green arcs on the VSI, while the PNF calls "TCAS RA" on the radio and "Clear of conflict" when it ends, before returning to the assigned level.'),
+      S_OPS + ', \u00a7 91: TCAS \u2014 Procedures'),
+
+    Q('The transponder codes for unlawful interference, radio failure and emergency are respectively:',
+      ['7500, 7600, 7700.',
+       '7600, 7500, 7700.',
+       '7700, 7600, 7500.',
+       '7500, 7700, 7600.'], 0,
+      E('7500 unlawful interference, 7600 radio failure, 7700 MAYDAY.',
+        'In VMC after a communications failure: continue in VMC, land at the nearest suitable airport and report arrival to the appropriate ATC unit.'),
+      S_OPS + ', \u00a7 92: Communication Failure'),
+
+    Q('After a communications failure in IMC, the aircraft maintains the last assigned speed and level, or a minimum flight altitude if higher, and adjusts level and speed in accordance with the filed flight plan after:',
+      ['20 minutes.',
+       '10 minutes.',
+       '30 minutes.',
+       '7 minutes.'], 0,
+      E('20 minutes after the position report over the CRP, then fly the filed flight plan.',
+        'Descent is then commenced from the navigation aid serving the destination as close as possible to the expected approach time last received and acknowledged, or the ETA in the filed flight plan, and the aircraft should land if possible within 30 minutes of the ETA or the last acknowledged EAT, whichever is later.'),
+      S_OPS + ', \u00a7 92: Communication Failure'),
+
+    Q('Turbulence in which occupants feel definite strain against seat belts and unsecured objects are dislodged, but the aircraft remains in positive control at all times, is classified as:',
+      ['Moderate.',
+       'Light.',
+       'Severe.',
+       'Extreme.'], 0,
+      E('Moderate turbulence: definite strain, objects dislodged, positive control retained, usually with variations in indicated airspeed.',
+        'Light turbulence causes slight erratic changes in altitude and attitude, occupants feel a slight strain and in-flight service need not be suspended. Severe turbulence causes large abrupt changes in altitude and attitude, large variations in airspeed, occupants forced violently against seatbelts and loose objects moving around the aircraft.'),
+      S_OPS + ', \u00a7 93: Turbulence'),
+
+    Q('The A320 is normally rescue and firefighting category 6, but category 4 is also suitable when movements are infrequent — no more than:',
+      ['8 movements per day, and the alternate must then be a category 6 airfield.',
+       '4 movements per day, with no condition on the alternate.',
+       '12 movements per day, and the alternate must be category 4.',
+       '2 movements per day, with the alternate at category 5.'], 0,
+      E('Category 6 normally; category 4 acceptable with no more than 8 movements per day, in which case the alternate has to be category 6.',
+        'The alternate condition is what makes the concession workable: a reduced firefighting capability at the destination is offset by a full one at the diversion field.'),
+      S_OPS + ', \u00a7 94: Airport Firefighting Categorisation'),
+
+    Q('For wake vortex separation, the Medium category covers aircraft with an MTOM of:',
+      ['Between 7000 kg and 136 000 kg.',
+       'Above 136 000 kg.',
+       'Below 7000 kg.',
+       'Between 7000 kg and 100 000 kg.'], 0,
+      E('Medium: 7000 kg < MTOM < 136 000 kg — the A320 sits here.',
+        'Heavy is above 136 000 kg, Light below 7000 kg, and Super is the A380 alone.'),
+      S_OPS + ', \u00a7 95: Wake Turbulence Categories'),
+
+    Q('A Medium aircraft departing from the same position behind a Heavy requires a minimum spacing at the time the aircraft is airborne of:',
+      ['2 minutes.',
+       '3 minutes.',
+       '5 minutes.',
+       '1 minute.'], 0,
+      E('2 minutes from the same position; 3 minutes when departing from an intermediate point on the same runway.',
+        'The 3-minute case applies to a Medium or Light following a Heavy that made a full length take-off, and to a Light following a Medium, because the follower gets airborne closer to where the leader\u2019s vortices were generated.'),
+      S_OPS + ', \u00a7 96: Separation of Aircraft on Departure'),
+
+    Q('The minimum landing separation behind an A380 and behind a Heavy are respectively:',
+      ['7 NM and 5 NM.',
+       '5 NM and 4 NM.',
+       '8 NM and 6 NM.',
+       '6 NM and 5 NM.'], 0,
+      E('7 NM behind the A380, 5 NM behind a Heavy, 3 NM behind a Medium.',
+        'Vortex strength scales with weight and inversely with speed and wingspan, which is why the Super category gets its own, larger figure.'),
+      S_OPS + ', \u00a7 97: Separation of Aircraft on Landing'),
+
+    Q('Low visibility operations include manual take-off with an RVR below:',
+      ['400 m.',
+       '550 m.',
+       '300 m.',
+       '125 m.'], 0,
+      E('Manual take-off below 400 m RVR counts as an LVO.',
+        'The other LVO cases are all auto-coupled: approach to below DH with manual flare, landing and roll-out; approach with auto-flare, autoland and manual roll-out; and approach with auto-flare, autoland and auto roll-out when the applicable RVR is less than 400 m.'),
+      S_OPS + ', \u00a7 98: Low Visibility Operations'),
+
+    Q('The relationship between the MEL and the MMEL is that the MEL:',
+      ['Is based on, but may not be less restrictive than, the Master MEL given by the manufacturer.',
+       'May be less restrictive than the MMEL if the operator has approval.',
+       'Replaces the MMEL once the aircraft enters service.',
+       'Applies only to items not covered by the MMEL.'], 0,
+      E('The operator\u2019s MEL can be more restrictive than the manufacturer\u2019s MMEL, never less.',
+        'The MEL lists the equipment, systems and installations that must be serviceable before a flight, and identifies items that may be unserviceable together with any additional limitations. The CDL is a different document: it lists panels and doors that may be missing and shows graphically which areas of skin or structure damage are acceptable for flight.'),
+      S_OPS + ', \u00a7 99: MEL; \u00a7 100: CDL'),
+
+    Q('On precision instrument runways, the runway edge lighting becomes yellow:',
+      ['In the last 2000 ft (610 m) of the runway, or the last third, whichever is less.',
+       'In the last 3000 ft (900 m) of the runway.',
+       'In the last 1000 ft (300 m) of the runway.',
+       'Only when low visibility procedures are in force.'], 0,
+      E('Last 2000 ft (610 m) or last third, whichever is <b>less</b> — so on a short runway the yellow section is shorter, not longer.',
+        'Runway edge lights are white elevated lights running the full length on both sides. Runway end lights show green to approaching aircraft and red when seen from the runway.'),
+      S_OPS + ', \u00a7 102: Runway Lights'),
+
+    Q('The Runway Centerline Lighting System is white except for the last 900 m (3000 ft), where it is:',
+      ['Alternate white and red for the next 600 m, then red for the last 300 m.',
+       'Red for the next 600 m, then alternate white and red for the last 300 m.',
+       'Alternate white and red for the whole 900 m.',
+       'Yellow for the next 600 m, then red for the last 300 m.'], 0,
+      E('White \u2192 alternate white/red for 600 m (1969 ft) \u2192 red for the final 300 m (984 ft).',
+        'The lights are embedded at 50 ft (15 m) intervals. Touchdown zone lights are rows of white light bars, three per row, at 30 or 60 m intervals either side of the centreline for 900 m. Taxiways are bordered by blue lights or have green centreline lights.'),
+      S_OPS + ', \u00a7 102: Runway Lights'),
+
+    Q('Supplemental oxygen must be supplied to 100% of the passengers for the entire flight time when the cabin pressure altitude exceeds:',
+      ['15 000 ft, and in no case for less than 10 minutes.',
+       '14 000 ft, and in no case for less than 10 minutes.',
+       '13 000 ft, and in no case for less than 30 minutes.',
+       '10 000 ft, and in no case for less than 30 minutes.'], 0,
+      E('Above 15 000 ft: 100% of passengers, minimum 10 minutes.',
+        'Below that: 30% of passengers for the whole time the cabin altitude exceeds 14 000 ft but does not exceed 15 000 ft; and 10% of passengers for the time above 10 000 ft but not exceeding 14 000 ft, after the first 30 minutes at those altitudes.'),
+      S_OPS + ', \u00a7 103: Supplemental Oxygen Requirements'),
+
+    Q('For occupants of flight deck seats on flight deck duty, the oxygen supply must in no case be less than ___ for aeroplanes certificated to fly above 25 000 ft:',
+      ['2 hours.',
+       '1 hour.',
+       '30 minutes.',
+       '45 minutes.'], 0,
+      E('Two hours minimum for the flight deck when the aeroplane is certificated above 25 000 ft.',
+        'The flight deck requirement otherwise covers the entire flight time when cabin altitude exceeds 13 000 ft, and the entire time above 10 000 ft but not exceeding 13 000 ft after the first 30 minutes at those altitudes.'),
+      S_OPS + ', \u00a7 103: Supplemental Oxygen Requirements'),
+
+    Q('For an aircraft to operate on a given pavement, the relationship required is:',
+      ['ACN < PCN.',
+       'ACN > PCN.',
+       'ACN = PCN exactly.',
+       'There is no fixed relationship; it depends on the subgrade only.'], 0,
+      E('The Aircraft Classification Number must be lower than the Pavement Classification Number.',
+        'The ACN expresses the relative effect of an aircraft on the pavement for a specified standard subgrade category; the PCN is a five-part code indicating the strength of a runway, taxiway or apron. Keeping ACN below PCN prevents excessive wear and prolongs the pavement life.'),
+      S_OPS + ', \u00a7 104: ACN \u2013 PCN')
+  );
+
+  /* =======================================================================
+     4. INSTRUMENTATION
+     ======================================================================= */
+  var S_INS = 'Wizz Air Technical Interview Day 2 — Instrumentation';
+
+  INS.push(
+
+    Q('Indicated airspeed (IAS) is:',
+      ['Not a real speed but an indication of dynamic pressure.',
+       'The actual speed of the aircraft through the air mass.',
+       'The speed corrected for position and instrument error.',
+       'The ratio of true airspeed to the local speed of sound.'], 0,
+      E('The ASI is a pressure instrument: what it really displays is dynamic pressure, presented in knots.',
+        'That is why IAS is the speed that matters for handling — lift depends on dynamic pressure, so the same IAS produces the same aerodynamic behaviour regardless of altitude.'),
+      S_INS + ', \u00a7 105: IAS'),
+
+    Q('Calibrated airspeed (CAS) is IAS corrected for:',
+      ['Position and instrument error.',
+       'Compressibility.',
+       'Density.',
+       'Temperature and altitude.'], 0,
+      E('CAS = IAS corrected for position and instrument error.',
+        'On larger modern aircraft the air data computers remove those errors, so the speed displayed is already CAS. Almost all the V speeds used in performance — V<sub>1</sub> and V<sub>R</sub> among them — are CAS.'),
+      S_INS + ', \u00a7 106: CAS'),
+
+    Q('Equivalent airspeed (EAS) is:',
+      ['CAS corrected for compressibility, and the most accurate of the indicated airspeed family.',
+       'CAS corrected for density.',
+       'TAS corrected for temperature.',
+       'IAS corrected for position error only.'], 0,
+      E('EAS = CAS corrected for compressibility.',
+        'IAS, CAS and EAS are all measures of dynamic pressure — the corrections just make each one a better measure than the last. V<sub>MO</sub>, being a high speed where the air is compressing, is an EAS.'),
+      S_INS + ', \u00a7 107: EAS'),
+
+    Q('True airspeed is:',
+      ['The actual speed of the aircraft relative to the air mass in which it is flying.',
+       'A measure of dynamic pressure at the pitot head.',
+       'The speed shown on the airspeed indicator.',
+       'The speed corrected for wind.'], 0,
+      E('TAS is a real speed, not a dynamic pressure.',
+        'It is the value used in aircraft specifications, manuals, performance comparisons and pilot reports, and it is the speed normally listed on the flight plan. Correct it for wind and you get groundspeed.'),
+      S_INS + ', \u00a7 108: TAS'),
+
+    Q('If an aeroplane climbs at a constant Mach number, its TAS will:',
+      ['Decrease, because the local speed of sound decreases as temperature falls.',
+       'Increase, because the air density decreases.',
+       'Remain constant, since Mach number is a fixed ratio.',
+       'Increase up to the tropopause and then decrease.'], 0,
+      E('Mach number is TAS divided by the local speed of sound, and the LSS falls as temperature falls with altitude.',
+        'Hold the ratio constant while the denominator shrinks and the numerator must shrink too — so TAS decreases in a constant-Mach climb. The formula is LSS = 38.94 \u00d7 \u221aT in kelvin, with 0 \u00b0C = 273 K.'),
+      S_INS + ', \u00a7 109: M \u2014 Mach Number'),
+
+    Q('The airspeed indicator measures dynamic pressure as the difference between:',
+      ['The total pitot pressure in the instrument capsule and the static pressure in the case.',
+       'The static pressure in the capsule and the total pressure in the case.',
+       'Two static sources on opposite sides of the fuselage.',
+       'The pitot pressure and the cabin pressure.'], 0,
+      E('Total inside the capsule, static inside the case; the difference is dynamic pressure.',
+        'The ASI is calibrated to ISA at mean sea level, and suffers from instrument, pressure, density, compressibility and manoeuvre errors, plus the effects of a blocked pitot-static system.'),
+      S_INS + ', \u00a7 110: ASI'),
+
+    Q('With the STATIC port blocked, the airspeed indicator will:',
+      ['Read correctly at constant altitude, over-read in the descent and under-read in the climb.',
+       'Read correctly at constant altitude, under-read in the descent and over-read in the climb.',
+       'Freeze at the value it held when the blockage occurred.',
+       'Read zero at all altitudes.'], 0,
+      E('Blocked static: correct at constant altitude, over-reads descending, under-reads climbing.',
+        'Trapped static pressure is too high in the climb, so the pitot-minus-static difference shrinks and the ASI under-reads; in the descent the trapped value is too low, the difference grows, and it over-reads. The notebook heads both of its ASI failure lists "If the static probe becomes blocked" — the second list (no change at constant altitude, under-read descending, over-read climbing) is the blocked <b>pitot</b> case, and the repeated heading is a typo.'),
+      S_INS + ', \u00a7 110: ASI \u2014 blockage effects'),
+
+    Q('With the PITOT tube blocked, the airspeed indicator will:',
+      ['Not change at constant altitude, under-read in the descent and over-read in the climb.',
+       'Read correctly at constant altitude, over-read in the descent and under-read in the climb.',
+       'Read zero immediately.',
+       'Behave normally, since the static source is unaffected.'], 0,
+      E('Blocked pitot: the trapped total pressure makes the ASI behave like an altimeter — over-reading as you climb, under-reading as you descend.',
+        'At constant altitude the indication simply stops responding to genuine speed changes, which is the trap: the needle looks plausible while it means nothing. Compare with the blocked static case, where the reading stays correct in level flight and errs in the opposite sense.'),
+      S_INS + ', \u00a7 110: ASI \u2014 blockage effects (heading mislabelled in the source)'),
+
+    Q('As the aircraft climbs, the altimeter works because the static pressure in the instrument case:',
+      ['Decreases, allowing the enclosed capsule to expand and drive the needle.',
+       'Increases, compressing the capsule and driving the needle.',
+       'Remains constant while the capsule pressure falls.',
+       'Is compared with pitot pressure in the capsule.'], 0,
+      E('Falling case pressure lets the sealed capsule expand; the expansion is converted into an altitude indication.',
+        'The reverse happens in the descent. Altimeter errors are instrument, pressure, time lag, barometric, density, temperature and blocked static port. With the static port blocked the indication is simply stuck.'),
+      S_INS + ', \u00a7 111: Altimeter'),
+
+    Q('The vertical speed indicator works by:',
+      ['Feeding static pressure directly to the capsule while restricting the static feed to the case through a metering unit.',
+       'Feeding pitot pressure to the capsule and static pressure to the case.',
+       'Comparing two static sources at different points on the fuselage.',
+       'Measuring the rate of change of dynamic pressure.'], 0,
+      E('The capsule sees the change immediately; the case sees it late, and the difference between them is the rate.',
+        'As long as the aircraft continues to climb or descend, that differential persists and the VSI keeps indicating. Its errors are instrument time lag, pressure and manoeuvre. If the static probe becomes blocked, the indication slowly moves back to zero and stays there.'),
+      S_INS + ', \u00a7 112: VSI'),
+
+    Q('The gyroscopic property that allows an instrument to remain stable in space while the aircraft moves around it is:',
+      ['Rigidity.',
+       'Precession.',
+       'Gimballing.',
+       'Erection.'], 0,
+      E('Rigidity in space is what makes the gyro a usable reference.',
+        'The rotor is suspended in a system of frames called gimbals, arranged at right angles to each other, which transfer the force experienced by the rotor to a displayed measurement on the instrument face. Any force applied as a result of the aircraft changing direction or attitude around the gyro will precess it.'),
+      S_INS + ', \u00a7 113: Gyroscope'),
+
+    Q('In the turn and slip indicator, a slip and a skid are respectively:',
+      ['A lateral force into the turn and a lateral force out of the turn.',
+       'A lateral force out of the turn and a lateral force into the turn.',
+       'A yaw without roll and a roll without yaw.',
+       'An over-banked turn and an under-banked turn.'], 0,
+      E('Slip is into the turn; skid is out of it.',
+        'The instrument combines two: one measures turn — movement about the yaw axis producing a change of direction — and the other measures slip or skid. The rate gyroscope rotates about a horizontal axis with one gimbal pivoted about the fore-and-aft axis, giving two planes of freedom, and its spin axis is aligned with the aircraft\u2019s lateral axis.'),
+      S_INS + ', \u00a7 114: Turn and slip Indicator'),
+
+    Q('The magnetic compass acceleration error in the northern hemisphere is remembered as ANDS, meaning:',
+      ['Accelerate North, Decelerate South, on an east\u2013west heading.',
+       'Accelerate North, Descend South, on a north\u2013south heading.',
+       'Accelerate North, Decelerate South, on a north\u2013south heading.',
+       'Align North, Deviate South, on any heading.'], 0,
+      E('Accelerate North, Decelerate South — and it only shows up on an easterly or westerly heading.',
+        'The heading qualifier is the part usually forgotten: accelerating on a north or south heading produces no error. The turning error is UNOS — Undershoot North, Overshoot South — also in the northern hemisphere.'),
+      S_INS + ', \u00a7 115: Magnetic compass'),
+
+    Q('The magnetic compass turning error in the northern hemisphere is remembered as UNOS, meaning:',
+      ['Undershoot North, Overshoot South.',
+       'Overshoot North, Undershoot South.',
+       'Undershoot North, Overshoot South, in the southern hemisphere only.',
+       'Undershoot on all headings when turning through east or west.'], 0,
+      E('Undershoot North, Overshoot South.',
+        'Both compass errors — ANDS for acceleration and UNOS for turning — arise from the same cause: the vertical component of the earth\u2019s magnetic field acting on a magnet that is free to tilt.'),
+      S_INS + ', \u00a7 115: Magnetic compass'),
+
+    Q('An automatic landing system is fail-passive if, in the event of a failure:',
+      ['There is no significant out-of-trim condition or deviation of flight path or attitude, but the landing is not completed automatically.',
+       'The approach, flare and landing can be completed by the remaining part of the automatic system.',
+       'The autopilot disconnects without warning and the aircraft reverts to manual control.',
+       'A secondary independent guidance system takes over the landing automatically.'], 0,
+      E('Fail-passive: the failure is safe but the automatic landing does not continue.',
+        'Typical arrangements are a monitored autopilot with automatic monitors providing failure detection and protection, or two autopilots with automatic comparison. Fail-operational, by contrast, completes the approach, flare and landing on what remains of the system.'),
+      S_INS + ', \u00a7 116: Autopilot Landing Systems'),
+
+    Q('A fail-operational automatic landing system is typically arranged as:',
+      ['Two monitored autopilots with one remaining operative after a failure, or three autopilots with two remaining operative.',
+       'One monitored autopilot with automatic failure detection.',
+       'Two autopilots with automatic comparison but no redundancy after failure.',
+       'One autopilot plus an independent manual guidance display.'], 0,
+      E('Fail-operational needs something left over after the failure: one of two, or two of three.',
+        'The last arrangement described — one autopilot plus an independent guidance display for a manual landing — is the fail-operational <b>hybrid</b> system: a primary fail-passive automatic landing system with a secondary independent guidance system enabling the pilot to complete the landing manually after failure of the primary.'),
+      S_INS + ', \u00a7 116: Autopilot Landing Systems'),
+
+    Q('The VHF communications band is:',
+      ['118.000 to 136.975 MHz.',
+       '108.000 to 117.975 MHz.',
+       '108.000 to 111.975 MHz.',
+       '112.000 to 117.975 MHz.'], 0,
+      E('COM occupies 118.000–136.975 MHz; NAV occupies 108.000–117.975 MHz.',
+        'Within the NAV band, ILS localisers use 108.000–111.975 MHz on odd decimals and VORs use the same range on even decimals. En-route navaids in the 112.000–117.975 MHz range have 200–300 NM coverage; terminal aids are below 100 NM.'),
+      S_INS + ', \u00a7 117: Frequency Ranges'),
+
+    Q('Within 108.000 to 111.975 MHz, the ILS localiser and the VOR are distinguished by:',
+      ['The ILS using odd decimals and the VOR using even decimals.',
+       'The ILS using even decimals and the VOR using odd decimals.',
+       'The ILS using the lower half and the VOR the upper half of the band.',
+       'Their Morse identifiers only.'], 0,
+      E('ILS on odd decimals, VOR on even decimals, within the shared 108.000–111.975 MHz range.',
+        'This is why a localiser frequency such as 110.3 is recognisable at a glance, and why selecting an ILS frequency automatically tunes the glide path receiver to its paired UHF channel.'),
+      S_INS + ', \u00a7 117: Frequency Ranges'),
+
+    Q('The formula for the local speed of sound quoted in the notebook is:',
+      ['38.94 \u00d7 \u221aT, with T in kelvin.',
+       '38.94 \u00d7 T, with T in kelvin.',
+       '38.94 \u00d7 \u221aT, with T in degrees Celsius.',
+       '661 \u00d7 \u221aT, with T in kelvin.'], 0,
+      E('LSS = 38.94 \u00d7 \u221aT (kelvin), remembering that 0 \u00b0C = 273 K.',
+        'At ISA sea level, T = 288 K, so LSS \u2248 38.94 \u00d7 16.97 \u2248 661 kt — the familiar figure. Since LSS depends only on temperature, it falls with altitude until the tropopause and is then constant.'),
+      S_INS + ', \u00a7 109: M \u2014 Mach Number'),
+
+    Q('Which set of instruments works from static pressure alone?',
+      ['The altimeter and the vertical speed indicator.',
+       'The airspeed indicator and the Mach indicator.',
+       'The altimeter and the airspeed indicator.',
+       'The vertical speed indicator and the Mach indicator.'], 0,
+      E('Altimeter and VSI need static only; ASI and Mach indicator need both pitot and static.',
+        'The rule of thumb is worth keeping: if the instrument measures a change of height it needs static alone, and if it measures speed it needs the difference between two pressures and therefore needs both.'),
+      S_INS + ', \u00a7 110\u2013112: ASI, Altimeter, VSI')
+  );
+
+  /* =======================================================================
+     5. HUMAN PERFORMANCE
+     ======================================================================= */
+  var S_HPL = 'Wizz Air Technical Interview Day 2 — Human Performance';
+
+  HPL.push(
+
+    Q('Airmanship is the ability to operate an aeroplane with competence both on the ground and in the air. Its three fundamental principles are:',
+      ['Skill, proficiency and discipline.',
+       'Knowledge, experience and judgement.',
+       'Communication, teamwork and leadership.',
+       'Situational awareness, judgement and decision making.'], 0,
+      E('Skill, proficiency and discipline are the foundation stones of the airmanship model.',
+        'Tony Kern\u2019s analogy is a building: those three form the foundation, five pillars of knowledge rise from them, and situational awareness and judgement are the capstones on top.'),
+      S_HPL + ', \u00a7 119: Airmanship'),
+
+    Q('In Tony Kern\u2019s airmanship model, the five "pillars of knowledge" are knowledge of:',
+      ['Self, aircraft, team, environment and risk.',
+       'Self, aircraft, company, regulations and weather.',
+       'Skill, proficiency, discipline, judgement and awareness.',
+       'Procedures, systems, performance, navigation and law.'], 0,
+      E('Self, aircraft, team, environment and risk.',
+        'The pillars sit on the foundation of discipline, skill and proficiency, and support the capstones of situational awareness and judgement. Kern set the model out across the "Plane of Excellence" trilogy: Redefining Airmanship, Flight Discipline and Darker Shades of Blue.'),
+      S_HPL + ', \u00a7 119: Airmanship'),
+
+    Q('The capstones of the airmanship model are:',
+      ['Situational awareness and judgement.',
+       'Discipline and skill.',
+       'Knowledge of self and knowledge of risk.',
+       'Communication and decision making.'], 0,
+      E('Situational awareness and judgement sit at the top, resting on everything below.',
+        'The structure carries a message: you cannot have reliable judgement without the knowledge pillars, and you cannot have those without discipline, skill and proficiency underneath.'),
+      S_HPL + ', \u00a7 119: Airmanship'),
+
+    Q('CRM is best defined as:',
+      ['The effective use of all available resources for flight crew personnel to assure a safe and efficient operation.',
+       'The technical knowledge and skills required to fly and operate an aircraft.',
+       'The set of standard operating procedures published by the operator.',
+       'The training required before a pilot may act as commander.'], 0,
+      E('CRM is a management system making optimum use of all available resources — equipment, procedures and people.',
+        'It encompasses communications, loss of situational awareness, problem solving, decision making and teamwork. The elements are not new: they were previously recognised under headings such as airmanship, captaincy and crew co-operation.'),
+      S_HPL + ', \u00a7 118: CRM \u2014 Crew Resource Management'),
+
+    Q('CRM is concerned primarily with:',
+      ['The cognitive and interpersonal skills needed to manage the flight within an organised aviation system.',
+       'The technical knowledge and manipulative skills required to fly the aircraft.',
+       'Compliance with the operations manual.',
+       'The company\u2019s reporting and just culture policy.'], 0,
+      E('Cognitive and interpersonal skills, rather than technical ones — although in practice all three overlap.',
+        'Cognitive skills are the mental processes used for gaining and maintaining situational awareness, solving problems and taking decisions. Interpersonal skills are communications and the range of behavioural activities associated with teamwork.'),
+      S_HPL + ', \u00a7 118: CRM \u2014 Crew Resource Management'),
+
+    Q('Situational awareness is:',
+      ['Keeping track of what is going on around you in a complex environment, in order to understand what will happen in the near future.',
+       'The ability to fly the aircraft accurately on instruments.',
+       'The systematic mental process used to choose the best course of action.',
+       'The effective use of all available resources.'], 0,
+      E('It is about the near future as much as the present: awareness exists to support prediction.',
+        'The crew has to be aware of what is happening in the vicinity in order to understand what will happen next, which is why it is described as essential for correct decision making rather than as an end in itself.'),
+      S_HPL + ', \u00a7 120: Situational awareness'),
+
+    Q('In the DODAR decision-making model, the letters stand for:',
+      ['Diagnose, Options, Decide, Act/Assign, Review.',
+       'Detect, Options, Decide, Act, Review.',
+       'Diagnose, Observe, Decide, Assign, Report.',
+       'Decide, Options, Diagnose, Act, Review.'], 0,
+      E('Diagnose \u2013 Options \u2013 Decide \u2013 Act or Assign \u2013 Review.',
+        'Diagnose asks what the problem is; Options might be hold, divert or immediate landing; Decide selects one; Act carries it out and assigns the tasks; Review takes in new information and the ongoing results of the option chosen.'),
+      S_HPL + ', \u00a7 121: Decision making \u2014 DODAR Model'),
+
+    Q('In the FORDEC model, the "R" stands for:',
+      ['Risks — the downside and upside of each option.',
+       'Review — the ongoing result of the decision.',
+       'Resources — what is available to the crew.',
+       'Report — informing ATC and the company.'], 0,
+      E('FORDEC: Facts and Fuel, Options, Risks, Decision, Execute, Check.',
+        'Risks means assessing the potential downsides and benefits of each viable option — a runway further away but longer, for instance. The notebook adds that when all options are equally safe, an airport with maintenance or company support has greater benefit.'),
+      S_HPL + ', \u00a7 122: Decision making \u2014 FORDEC Model'),
+
+    Q('In FORDEC, the "Facts" stage carries a specific warning that the crew must:',
+      ['Confirm the fault rather than accept the computer diagnosis, in order to avoid confirmation bias.',
+       'Complete the ECAM actions before discussing anything.',
+       'Inform the company before analysing the problem.',
+       'Assume the worst case in every failure.'], 0,
+      E('The aircraft computers (EICAS on Boeing, ECAM on Airbus) will diagnose the fault, but the crew must confirm it and avoid confirmation bias.',
+        'The Facts stage is about determining and confirming what has actually happened, what is wrong and if possible what caused it — before any option is considered. The final "Check" is described as a constant process, not something done only when the actions are complete.'),
+      S_HPL + ', \u00a7 122: Decision making \u2014 FORDEC Model'),
+
+    Q('In the DECIDE model, the steps in order are:',
+      ['Detect, Estimate, Choose, Identify, Do, Evaluate.',
+       'Diagnose, Estimate, Choose, Identify, Do, Execute.',
+       'Detect, Evaluate, Choose, Identify, Decide, Execute.',
+       'Decide, Estimate, Check, Identify, Do, Evaluate.'], 0,
+      E('Detect \u2013 Estimate \u2013 Choose \u2013 Identify \u2013 Do \u2013 Evaluate.',
+        'Detect is noticing that something requiring attention has happened; Estimate is judging the significance of the change to the flight; Choose is selecting a safe outcome; Identify is finding the action that will control the change; Do is carrying it out; Evaluate is reviewing the effect.'),
+      S_HPL + ', \u00a7 123: Decision making \u2014 DECIDE model')
+  );
+
+  /* =======================================================================
+     REPARTO DE LA CLAVE
+     -----------------------------------------------------------------------
+     Las preguntas se escriben con la respuesta correcta en la posición 0.
+     Aquí se rota cada juego de opciones una cantidad derivada de un hash
+     del enunciado: el reparto queda uniforme y, sobre todo, ESTABLE — el
+     mismo enunciado produce siempre el mismo orden, en cualquier navegador
+     y tras cualquier recarga. Eso es imprescindible porque `estado` guarda
+     las respuestas como índices: si el orden cambiara entre sesiones, el
+     progreso ya guardado pasaría a apuntar a la opción equivocada.
+     ======================================================================= */
+  function hashEnunciado(s) {
+    var h = 5381, i;
+    for (i = 0; i < s.length; i++) { h = ((h << 5) + h + s.charCodeAt(i)) | 0; }
+    return Math.abs(h);
+  }
+  function repartirClave(preguntas) {
+    preguntas.forEach(function (p) {
+      var n = p.ops.length;
+      var k = hashEnunciado(p.q) % n;          // desplazamiento estable
+      if (k === 0) return;
+      p.ops = p.ops.slice(n - k).concat(p.ops.slice(0, n - k));
+      p.correct = (p.correct + k) % n;
+    });
+    return preguntas;
+  }
+  [POF, MAB, OPS, INS, HPL].forEach(repartirClave);
+
+  /* =======================================================================
+     REGISTRO DEL BANCO
+     ======================================================================= */
+  bancos.wizz = {
+    key: 'wizz',
+    nombre: 'WIZZ',
+    nombreLargo: 'Wizz Air Technical Interview \u2014 Day 2',
+    codigos: {
+      'Principles of Flight':    'POF',
+      'Mass and Balance':        'MAB',
+      'Operational Procedures':  'OPS',
+      'Instrumentation':         'INS',
+      'Human Performance':       'HPL'
+    },
+    temas: [
+      { nombre: 'Principles of Flight',   preguntas: POF },
+      { nombre: 'Mass and Balance',       preguntas: MAB },
+      { nombre: 'Operational Procedures', preguntas: OPS },
+      { nombre: 'Instrumentation',        preguntas: INS },
+      { nombre: 'Human Performance',      preguntas: HPL }
+    ]
+  };
+
+  /* =======================================================================
+     ENGANCHES AL MOTOR
+     -----------------------------------------------------------------------
+     El motor crea `estado` sólo para hvi/pca en cuatro sitios. En vez de
+     tocarlos, envolvemos las funciones implicadas para que cualquier banco
+     registrado (presente o futuro) tenga su estado creado.
+     ======================================================================= */
+  function asegurarEstado() {
+    if (typeof estado === 'undefined' || !estado) return;
+    Object.keys(bancos).forEach(function (bk) {
+      if (!Array.isArray(estado[bk]) || estado[bk].length !== bancos[bk].temas.length) {
+        estado[bk] = crearEstadoBanco(bk);
+      }
+    });
+  }
+
+  function envolver(nombre, despues) {
+    var f = (typeof window !== 'undefined') ? window[nombre] : null;
+    if (typeof f !== 'function') return false;
+    window[nombre] = function () {
+      var r = f.apply(this, arguments);
+      return despues ? despues(r) : r;
+    };
+    return true;
+  }
+
+  // migrarEstado devuelve un objeto nuevo: completamos los bancos que falten.
+  if (typeof window !== 'undefined' && typeof window.migrarEstado === 'function') {
+    var _migrar = window.migrarEstado;
+    window.migrarEstado = function (prog) {
+      var out = _migrar(prog) || {};
+      Object.keys(bancos).forEach(function (bk) {
+        if (Array.isArray(out[bk]) && out[bk].length === bancos[bk].temas.length) return;
+        var base = crearEstadoBanco(bk);
+        var guardado = (prog && prog[bk]) || [];
+        out[bk] = base.map(function (def, i) {
+          var g = guardado[i];
+          if (g && Array.isArray(g.respuestas) && g.respuestas.length === def.respuestas.length) {
+            return Object.assign({}, def, g);
+          }
+          return def;
+        });
+      });
+      return out;
+    };
+  }
+
+  // Estos reasignan `estado` a un objeto sólo con hvi/pca: lo completamos después.
+  envolver('entrarInvitado',  function (r) { asegurarEstado(); if (typeof renderBancos === 'function') renderBancos(); return r; });
+  envolver('reiniciarPerfil', function (r) { asegurarEstado(); if (typeof renderBancos === 'function') renderBancos(); return r; });
+  envolver('entrarABancos',   function (r) { return r; });
+
+  // Red de seguridad: antes de pintar la pantalla de bancos, el estado existe.
+  if (typeof window !== 'undefined' && typeof window.renderBancos === 'function') {
+    var _render = window.renderBancos;
+    window.renderBancos = function () { asegurarEstado(); return _render.apply(this, arguments); };
+  }
+
+  asegurarEstado();
+
+  var _total = bancos.wizz.temas.reduce(function (a, t) { return a + t.preguntas.length; }, 0);
+  console.log('[banco wizz] instalado: ' + bancos.wizz.temas.length + ' materias, ' + _total + ' preguntas.');
+
+})();
 </script>
 </body>
 </html>

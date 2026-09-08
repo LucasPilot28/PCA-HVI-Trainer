@@ -323,6 +323,352 @@ body.modo-examen #screen-quiz [class*="xplan"],
 body.modo-examen #screen-quiz [data-tab*="xplan"],
 body.modo-examen #screen-quiz .ex-gate{ display:none !important; 
 }
+    /* ============================================================
+   A320 MEMORY ITEMS — módulo autónomo
+   Todas las reglas van prefijadas .a320 / #a320* para no
+   contaminar los estilos existentes del trainer.
+   ============================================================ */
+
+.a320-scope{
+  --a320-navy:#0f1d31;
+  --a320-navy-2:#16263f;
+  --a320-panel:rgba(255,255,255,.045);
+  --a320-panel-2:#242c3a;
+  --a320-amber:#efb61f;
+  --a320-white:#f2f5f9;
+  --a320-grey:#8e9bb0;
+  --a320-hair:rgba(255,255,255,.10);
+}
+
+/* ---------- tile en la pantalla de bancos ---------- */
+.bancotile.a320-tile:hover{ border-color:rgba(239,182,31,.5); }
+.bancotile.a320-tile .btag{ background:rgba(239,182,31,.15); color:#efb61f; }
+
+/* ---------- pantalla índice ---------- */
+#screen-a320 .a320-modes{
+  display:flex; gap:10px; margin:0 0 20px; flex-wrap:wrap;
+}
+#screen-a320 .a320-modes .btn{ flex:1 1 200px; }
+
+.a320-grid{
+  display:grid; gap:12px;
+  grid-template-columns:repeat(auto-fill, minmax(210px,1fr));
+}
+.a320-card{
+  background:var(--panel); border:1px solid var(--hair); border-radius:var(--radius);
+  padding:16px; cursor:pointer; text-align:left; color:var(--text);
+  font-family:inherit; display:flex; flex-direction:column; gap:9px;
+  transition:border-color .15s ease, transform .1s ease;
+}
+.a320-card:hover{ border-color:rgba(239,182,31,.45); transform:translateY(-2px); }
+.a320-card:active{ transform:scale(.985); }
+.a320-card .r1{ display:flex; justify-content:space-between; align-items:flex-start; gap:8px; }
+.a320-card .cat{
+  font-family:var(--f-mono); font-size:10.5px; font-weight:700; letter-spacing:.06em;
+  background:rgba(239,182,31,.14); color:#efb61f; padding:3px 7px; border-radius:5px;
+  white-space:nowrap;
+}
+.a320-card .idx{ font-family:var(--f-mono); font-size:11px; color:var(--dim); }
+.a320-card .nm{
+  font-family:var(--f-display); font-weight:700; font-size:20px; text-transform:uppercase;
+  line-height:1.05; overflow-wrap:break-word;
+}
+.a320-card .meta{ font-family:var(--f-mono); font-size:11px; color:var(--dim); }
+.a320-card .meta .ok{ color:var(--green); }
+.a320-card .meta .no{ color:var(--red); }
+
+/* ---------- MODAL (réplica del diseño de referencia) ---------- */
+.a320-overlay{
+  position:fixed; inset:0; z-index:900; display:none;
+  background:rgba(4,8,14,.72); backdrop-filter:blur(2px);
+  padding:16px; overflow-y:auto;
+}
+.a320-overlay.open{ display:flex; align-items:flex-start; justify-content:center; }
+
+.a320-modal{
+  background:var(--a320-navy); border:1px solid rgba(255,255,255,.07);
+  border-radius:22px; width:100%; max-width:560px; margin:auto;
+  display:flex; flex-direction:column; max-height:calc(100vh - 32px);
+  box-shadow:0 26px 70px rgba(0,0,0,.6);
+  animation:a320in .22s ease;
+}
+@keyframes a320in{ from{opacity:0; transform:translateY(10px) scale(.99);} to{opacity:1; transform:none;} }
+
+.a320-head{
+  padding:22px 24px 18px; position:relative; border-bottom:1px solid var(--a320-hair);
+  flex:0 0 auto;
+}
+.a320-head .kicker{
+  font-family:var(--f-mono); font-size:11.5px; font-weight:700; letter-spacing:.16em;
+  color:var(--a320-amber); text-transform:uppercase;
+}
+.a320-head .ttl{
+  font-family:var(--f-body); font-weight:700; text-transform:uppercase;
+  font-size:clamp(25px,6.2vw,32px); line-height:1.06; color:#fff; margin-top:4px;
+  padding-right:44px; letter-spacing:-.01em;
+}
+.a320-x{
+  position:absolute; top:20px; right:18px; width:36px; height:36px; border-radius:10px;
+  background:transparent; border:none; color:#c3ccd9; font-size:24px; line-height:1;
+  cursor:pointer; display:flex; align-items:center; justify-content:center;
+}
+.a320-x:hover{ color:#fff; background:rgba(255,255,255,.07); }
+
+.a320-body{ padding:20px 22px 8px; overflow-y:auto; flex:1 1 auto; }
+
+.a320-sectlbl{
+  font-family:var(--f-mono); font-size:11.5px; font-weight:700; letter-spacing:.15em;
+  color:var(--a320-grey); text-transform:uppercase; margin:0 0 12px;
+}
+.a320-actions{
+  background:var(--a320-panel); border-radius:16px; padding:16px 16px 18px; margin-bottom:22px;
+}
+.a320-actions + .a320-actions{ margin-top:-8px; }
+
+.a320-announce{
+  display:block; width:100%; background:var(--a320-amber); color:#151515;
+  font-family:var(--f-body); font-weight:800; font-size:clamp(15px,3.9vw,18px);
+  text-align:center; border:none; border-radius:14px; padding:15px 14px;
+  margin:6px 0 12px; line-height:1.25;
+}
+.a320-row{
+  display:flex; justify-content:space-between; align-items:baseline; gap:14px;
+  padding:7px 0;
+}
+.a320-row .lbl{ color:var(--a320-white); font-size:clamp(15px,4vw,18px); line-height:1.25; }
+.a320-row .val{
+  color:var(--a320-amber); font-weight:800; font-size:clamp(15px,4vw,18px);
+  text-align:right; white-space:normal;
+}
+.a320-row.ind .lbl{ padding-left:16px; }
+
+.a320-note{
+  color:var(--a320-grey); font-style:italic; font-size:clamp(13.5px,3.5vw,16px);
+  line-height:1.4; padding:4px 0;
+}
+.a320-note.hint{ padding-left:16px; }
+
+.a320-sect{
+  color:var(--a320-amber); font-weight:800; text-transform:uppercase;
+  font-size:clamp(14px,3.7vw,16.5px); line-height:1.25; letter-spacing:.01em;
+  margin:6px 0 8px;
+}
+.a320-hr{ border:none; border-top:1px solid var(--a320-hair); margin:14px 0; }
+
+/* ---------- fases del procedimiento (chunks) ---------- */
+/* VERTICAL (por defecto): idéntico al separador <hr> original */
+.a320-chunk + .a320-chunk{
+  margin-top:14px; padding-top:14px; border-top:1px solid var(--a320-hair);
+}
+
+.a320-callout{
+  background:var(--a320-amber); color:#151515; font-weight:800;
+  font-size:clamp(14px,3.7vw,16.5px); line-height:1.3;
+  border-radius:12px; padding:14px 16px; margin:12px 0 6px;
+}
+
+.a320-group{
+  background:var(--a320-panel); border-radius:14px; padding:14px 16px 8px; margin:0 0 14px;
+}
+.a320-group > .gt{
+  font-weight:700; font-size:clamp(15px,4vw,18px); color:#fff;
+  padding-bottom:10px; margin-bottom:6px; border-bottom:1px solid var(--a320-hair);
+}
+
+/* WHY IT MATTERS */
+.a320-why{ margin:0 0 20px; }
+.a320-why .wh{
+  display:flex; align-items:center; gap:9px; margin-bottom:10px;
+  font-family:var(--f-mono); font-size:11.5px; font-weight:700; letter-spacing:.15em;
+  color:var(--a320-grey); text-transform:uppercase;
+}
+.a320-why .wh svg{ flex:0 0 auto; }
+.a320-why p{
+  margin:0; color:#9aa7ba; font-size:clamp(14px,3.7vw,17px); line-height:1.55;
+}
+
+/* CAPTAIN'S TIP */
+.a320-tip{
+  background:var(--a320-panel-2); border-radius:14px; padding:15px 16px; margin:0 0 20px;
+}
+.a320-tip .th{
+  display:flex; align-items:center; gap:9px; margin-bottom:9px;
+  font-family:var(--f-mono); font-size:11.5px; font-weight:700; letter-spacing:.15em;
+  color:var(--a320-amber); text-transform:uppercase;
+}
+.a320-tip p{
+  margin:0; color:#dfe5ee; font-style:italic; font-size:clamp(14px,3.7vw,17px); line-height:1.5;
+}
+
+/* aviso de captura truncada */
+.a320-trunc{
+  border:1px dashed rgba(239,182,31,.35); border-radius:10px; padding:11px 13px; margin:0 0 20px;
+  color:#9aa7ba; font-size:12.5px; line-height:1.45; font-family:var(--f-mono);
+}
+.a320-trunc b{ color:var(--a320-amber); }
+
+.a320-foot{
+  padding:14px 22px 20px; border-top:1px solid var(--a320-hair); flex:0 0 auto;
+  background:var(--a320-navy); border-radius:0 0 22px 22px;
+}
+.a320-close{
+  display:block; width:100%; background:var(--a320-amber); color:#151515;
+  font-family:var(--f-body); font-weight:800; font-size:17px;
+  border:none; border-radius:16px; padding:17px; cursor:pointer;
+  transition:filter .15s ease, transform .1s ease;
+}
+.a320-close:hover{ filter:brightness(1.06); }
+.a320-close:active{ transform:scale(.985); }
+
+/* ---------- MODO TARJETAS (flashcards) ---------- */
+#screen-a320-flash .a320-fbar{
+  display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:14px;
+}
+#screen-a320-flash .a320-fbar .prog{ font-family:var(--f-mono); font-size:12px; color:var(--dim); }
+#screen-a320-flash .a320-ftape{
+  height:4px; background:rgba(255,255,255,.07); border-radius:99px; overflow:hidden; margin-bottom:20px;
+}
+#screen-a320-flash .a320-ftape > i{
+  display:block; height:100%; background:var(--a320-amber); border-radius:99px;
+  transition:width .3s ease;
+}
+
+.a320-flash{
+  background:var(--a320-navy); border:1px solid rgba(255,255,255,.07); border-radius:22px;
+  min-height:340px; display:flex; flex-direction:column; overflow:hidden;
+}
+.a320-flash .fhead{ padding:26px 24px 20px; border-bottom:1px solid var(--a320-hair); }
+.a320-flash .fhead .kicker{
+  font-family:var(--f-mono); font-size:11.5px; font-weight:700; letter-spacing:.16em;
+  color:var(--a320-amber); text-transform:uppercase;
+}
+.a320-flash .fhead .ttl{
+  font-family:var(--f-body); font-weight:700; text-transform:uppercase;
+  font-size:clamp(26px,6.6vw,34px); line-height:1.06; color:#fff; margin-top:5px;
+  letter-spacing:-.01em;
+}
+.a320-flash .fbody{ padding:20px 22px; flex:1 1 auto; }
+.a320-flash .fprompt{
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  text-align:center; gap:18px; padding:38px 10px; color:var(--a320-grey);
+  font-size:15px; line-height:1.5;
+}
+.a320-flash .ffoot{ padding:0 22px 22px; display:flex; gap:10px; }
+.a320-flash .ffoot .btn{ flex:1; }
+.btn-a320amber{ background:var(--a320-amber); color:#151515; }
+.btn-a320amber:hover{ filter:brightness(1.07); }
+.btn-a320red{ background:rgba(240,100,90,.16); color:var(--red); border:1px solid rgba(240,100,90,.4); }
+.btn-a320green{ background:rgba(67,210,138,.15); color:var(--green); border:1px solid rgba(67,210,138,.4); }
+
+.a320-resume{
+  background:var(--panel); border:1px solid var(--hair); border-radius:var(--radius);
+  padding:26px 22px; text-align:center;
+}
+.a320-resume .big{
+  font-family:var(--f-display); font-weight:800; font-size:54px; line-height:1; color:var(--a320-amber);
+}
+.a320-resume .sub{ color:var(--dim); font-family:var(--f-mono); font-size:12.5px; margin-top:8px; }
+.a320-resume .acts{ display:flex; gap:10px; justify-content:center; margin-top:22px; flex-wrap:wrap; }
+
+@media (max-width:520px){
+  .a320-grid{ grid-template-columns:1fr 1fr; }
+  .a320-overlay{ padding:10px; }
+  .a320-modal{ max-height:calc(100vh - 20px); }
+}
+
+
+/* ============================================================
+   LAYOUT HORIZONTAL — pantallas anchas (escritorio)
+   Se desactiva por completo con body.a320-vert
+   ============================================================ */
+@media (min-width:900px){
+
+  /* --- modal más ancho y menos alto --- */
+  body:not(.a320-vert) .a320-overlay{ padding:32px; align-items:center; }
+  body:not(.a320-vert) .a320-modal{
+    max-width:1240px; max-height:calc(100vh - 64px); border-radius:20px;
+  }
+  body:not(.a320-vert) .a320-head{ padding:24px 32px 20px; }
+  body:not(.a320-vert) .a320-head .ttl{ font-size:34px; }
+  body:not(.a320-vert) .a320-x{ top:22px; right:24px; }
+  body:not(.a320-vert) .a320-body{ padding:24px 32px 10px; }
+
+  /* --- cuerpo en dos zonas: acciones | raíl --- */
+  body:not(.a320-vert) .a320-body.has-rail,
+  body:not(.a320-vert) .fbody.has-rail{
+    display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:0 26px; align-items:start;
+  }
+  body:not(.a320-vert) .a320-main{ min-width:0; }
+  body:not(.a320-vert) .a320-rail{
+    min-width:0; border-left:1px solid var(--a320-hair); padding-left:28px;
+  }
+  body:not(.a320-vert) .a320-rail > *:last-child{ margin-bottom:8px; }
+
+  /* --- cada fase del procedimiento pasa a ser una columna --- */
+  body:not(.a320-vert) .a320-chunks{
+    display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:20px 22px;
+  }
+  body:not(.a320-vert) .a320-chunk{
+    margin-top:0; padding-top:0; border-top:none;
+  }
+  body:not(.a320-vert) .a320-chunk + .a320-chunk{
+    border-left:1px solid var(--a320-hair); padding-left:22px; margin-left:-1px;
+  }
+  /* como máximo hay 3 fases: se fuerzan en una sola fila para que no se parta */
+  body:not(.a320-vert) .a320-chunks.n1{ grid-template-columns:minmax(0,1fr); }
+  body:not(.a320-vert) .a320-chunks.n2{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+  body:not(.a320-vert) .a320-chunks.n3{ grid-template-columns:repeat(3,minmax(0,1fr)); }
+  /* cabecera suelta (avisos aurales, "Always follow RA orders…") a todo el ancho */
+  body:not(.a320-vert) .a320-chunk.lead{
+    grid-column:1/-1; border-left:none; padding-left:0; margin-left:0;
+    border-bottom:1px solid var(--a320-hair); padding-bottom:14px; margin-bottom:2px;
+  }
+  body:not(.a320-vert) .a320-chunk.lead + .a320-chunk{
+    border-left:none; padding-left:0; margin-left:0;
+  }
+
+  /* --- tipografía algo más compacta: etiqueta y valor en una línea --- */
+  body:not(.a320-vert) .a320-row{ padding:6px 0; gap:12px; }
+  body:not(.a320-vert) .a320-row .lbl,
+  body:not(.a320-vert) .a320-row .val{ font-size:16px; }
+  body:not(.a320-vert) .a320-announce{ font-size:16px; padding:13px 12px; }
+  body:not(.a320-vert) .a320-sect{ font-size:15px; }
+  body:not(.a320-vert) .a320-note{ font-size:14.5px; }
+  body:not(.a320-vert) .a320-callout{ font-size:15px; padding:12px 14px; }
+  body:not(.a320-vert) .a320-why p,
+  body:not(.a320-vert) .a320-tip p{ font-size:15px; }
+
+  /* --- pie: botón a la derecha, no a todo el ancho --- */
+  body:not(.a320-vert) .a320-foot{
+    display:flex; justify-content:flex-end; padding:14px 32px 20px;
+  }
+  body:not(.a320-vert) .a320-close{ width:auto; min-width:200px; padding:15px 40px; }
+
+  /* --- modo estudio: se sale del contenedor de 920px del trainer --- */
+  body:not(.a320-vert) #screen-a320-flash{
+    width:min(1240px, calc(100vw - 48px)); max-width:none;
+    margin-left:calc((100% - min(1240px, 100vw - 48px)) / 2);
+  }
+
+  /* --- tarjetas del modo estudio --- */
+  body:not(.a320-vert) .a320-flash .fhead{ padding:24px 30px 20px; }
+  body:not(.a320-vert) .a320-flash .fhead .ttl{ font-size:34px; }
+  body:not(.a320-vert) .a320-flash .fbody{ padding:24px 30px; }
+  body:not(.a320-vert) .a320-flash .ffoot{
+    padding:0 30px 24px; justify-content:flex-end;
+  }
+  body:not(.a320-vert) .a320-flash .ffoot .btn{ flex:0 0 auto; min-width:190px; }
+  body:not(.a320-vert) .a320-flash .fprompt{ padding:60px 10px; font-size:16px; }
+
+  /* --- índice: tarjetas algo más anchas --- */
+  body:not(.a320-vert) .a320-grid{
+    grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  }
+  body:not(.a320-vert) #screen-a320 .a320-modes .btn{ flex:0 1 auto; }
+}
+
+/* Las fases nunca se parten a mitad de columna */
+.a320-chunk{ break-inside:avoid; }
 </style>
 </head>
 <body>
@@ -2274,7 +2620,718 @@ intentarSesionGuardada(); (function () {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', aplicar);
   else aplicar();
 })();
+/* ============================================================
+   A320 MEMORY ITEMS — banco independiente de tarjetas
+   Módulo autónomo (IIFE). No modifica el motor existente:
+   envuelve renderBancos() y migrarEstado() y se inyecta solo.
 
+   Progreso: estado.a320 = { sabidas:{id:n}, falladas:{id:n}, vistas:{id:n} }
+   Viaja dentro de `estado`, por lo que se sincroniza automáticamente
+   a través de /api/progress sin backend nuevo.
+   ============================================================ */
+(function () {
+  'use strict';
+
+  /* ---------------------------------------------------------
+     1. CONTENIDO
+     Transcrito literalmente de las capturas de referencia.
+     `truncado` marca las tarjetas cuya captura se cortaba:
+     ese texto se muestra en la tarjeta para que sepas qué falta
+     completar desde FCOM/QRH. No se ha inventado procedimiento.
+     --------------------------------------------------------- */
+  var ITEMS = [
+    {
+      id: 'stall-recovery',
+      titulo: 'STALL RECOVERY',
+      cat: 'STALL',
+      secciones: [{
+        items: [
+          { t: 'note', x: 'As soon as any stall indication (aural warning, buffet...) is recognised:' },
+          { t: 'announce', x: 'Announce "STALL - I HAVE CONTROL"' },
+          { t: 'row', l: 'NOSE DOWN PITCH CONTROL', v: 'APPLY' },
+          { t: 'row', l: 'BANK', v: 'WINGS LEVEL' },
+          { t: 'hr' },
+          { t: 'sect', x: 'WHEN OUT OF THE STALL (NO STALL INDICATION):' },
+          { t: 'row', l: 'THRUST', v: 'INC SMOOTHLY AS NEEDED' },
+          { t: 'row', l: 'SPEEDBRAKES', v: 'CHECK RETRACTED' },
+          { t: 'row', l: 'FLIGHT PATH', v: 'RECOVER SMOOTHLY' },
+          { t: 'note', hint: true, x: 'If there is a lack of pitch down authority, reducing thrust may be necessary.' },
+          { t: 'hr' },
+          { t: 'sect', x: 'IF IN CLEAN CONFIG AND BELOW 20,000 FT:' },
+          { t: 'row', l: 'FLAP 1', v: 'SELECT' },
+          { t: 'note', hint: true, x: 'Note: If a risk of ground contact exists, once clearly out of stall (no longer stall indications), establish smoothly a positive…' }
+        ]
+      }],
+      truncado: 'La nota final y el bloque WHY IT MATTERS quedaron cortados en la captura.'
+    },
+
+    {
+      id: 'stall-warning-liftoff',
+      titulo: 'STALL WARNING AT LIFT OFF',
+      cat: 'STALL',
+      secciones: [{
+        items: [
+          { t: 'announce', x: 'Announce "STALL - TOGA 15°"' },
+          { t: 'row', l: 'THRUST', v: 'TOGA' },
+          { t: 'row', l: 'PITCH ATTITUDE', v: '15°' },
+          { t: 'row', l: 'BANK', v: 'WINGS LEVEL' }
+        ]
+      }],
+      porque: 'A stall warning during the takeoff phase demands an immediate but controlled response. Reducing pitch too much close to the ground can be disastrous, but ignoring the warning risks an actual stall.',
+      tip: 'As soon as you recognise a stall or hear the warning, set 15° pitch, apply TOGA, and let the aircraft accelerate…',
+      truncado: 'El final del CAPTAIN\'S TIP quedó cortado en la captura.'
+    },
+
+    {
+      id: 'unreliable-speed',
+      titulo: 'UNRELIABLE SPEED',
+      cat: 'SPEED',
+      secciones: [{
+        items: [
+          { t: 'announce', x: 'Announce "UNRELIABLE SPEED"' },
+          { t: 'row', l: 'AP, A/THR, FD', v: 'OFF' },
+          { t: 'note', x: 'Gives blank FMA' },
+          { t: 'hr' },
+          { t: 'sect', x: 'PITCH/THRUST:' },
+          { t: 'row', l: '<THR RED ALT', v: '15°/TOGA' },
+          { t: 'row', l: '>THR RED ALT <FL100', v: '10°/CLB' },
+          { t: 'row', l: '>THR RED ALT >FL100', v: '5°/CLB' },
+          { t: 'row', l: 'FLAPS 0/1/2/3', v: 'MAINTAIN' },
+          { t: 'row', l: 'FLAP FULL', v: 'SELECT CONF 3' },
+          { t: 'row', l: 'SPD BRK', v: 'CHECK RETRACTED' },
+          { t: 'row', l: 'L/G', v: 'UP' },
+          { t: 'note', hint: true, x: 'When above MSA level off for troubleshooting' }
+        ]
+      }],
+      porque: 'Unreliable airspeed indications have…',
+      truncado: 'El bloque WHY IT MATTERS quedó cortado en la captura.'
+    },
+
+    {
+      id: 'emergency-descent',
+      titulo: 'EMERGENCY DESCENT',
+      cat: 'DESCENT',
+      secciones: [
+        { items: [{ t: 'announce', x: 'Announce: "EMERGENCY DESCENT"' }] },
+        {
+          gt: 'Pilot Flying',
+          items: [
+            { t: 'row', l: 'CREW OXY MASKS', v: 'USE' },
+            { t: 'row', l: 'ESTAB COMMS', v: '' },
+            { t: 'row', l: 'EMER DESCENT', v: 'INITIATE' },
+            { t: 'row', ind: true, l: 'ALT', v: 'TURN PULL' },
+            { t: 'row', ind: true, l: 'HDG', v: 'TURN PULL' },
+            { t: 'row', ind: true, l: 'SPD', v: 'PULL' },
+            { t: 'row', l: 'FMA', v: 'ANNOUNCE' },
+            { t: 'note', hint: true, x: 'If A/THR not active' },
+            { t: 'row', ind: true, l: 'THR LEVERS', v: 'IDLE' }
+          ]
+        }
+      ],
+      truncado: 'La captura se cortaba aquí: falta el resto de Pilot Flying, el bloque Pilot Monitoring y WHY IT MATTERS.'
+    },
+
+    {
+      id: 'egpws-warning',
+      titulo: 'EGPWS WARNING',
+      cat: 'TERRAIN',
+      secciones: [{
+        items: [
+          { t: 'note', x: "'PULL UP' · 'TERRAIN AHEAD PULL UP' · 'OBSTACLE AHEAD PULL UP'" },
+          { t: 'announce', x: 'Announce "PULL UP - TOGA"' },
+          { t: 'row', l: 'AP', v: 'OFF' },
+          { t: 'row', l: 'PITCH', v: 'PULL UP' },
+          { t: 'note', x: 'Full back stick and maintain' },
+          { t: 'row', l: 'THRUST LEVERS', v: 'TOGA' },
+          { t: 'row', l: 'SPEED BRAKES', v: 'CHECK RETRACTED' },
+          { t: 'row', l: 'BANK', v: 'WINGS LEVEL or ADJUST' },
+          { t: 'callout', x: 'DO NOT CHANGE CONFIG UNTIL CLEAR OF OBSTACLE.' }
+        ]
+      }],
+      porque: 'EGPWS PULL UP warnings indicate imminent terrain contact. This is the last line of defense against CFIT. Response must be immediate…',
+      truncado: 'El final de WHY IT MATTERS quedó cortado en la captura.'
+    },
+
+    {
+      id: 'egpws-caution',
+      titulo: 'EGPWS CAUTION',
+      cat: 'TERRAIN',
+      secciones: [{
+        items: [
+          { t: 'note', x: "'TERRAIN TERRAIN' · 'TOO LOW TERRAIN' · 'TERRAIN AHEAD' · 'OBSTACLE AHEAD'" },
+          { t: 'hr' },
+          { t: 'sect', x: 'DURING NIGHT OR IMC:' },
+          { t: 'announce', x: 'Announce "PULL UP - TOGA"' },
+          { t: 'row', l: 'AP', v: 'OFF' },
+          { t: 'row', l: 'PITCH', v: 'PULL UP' },
+          { t: 'note', x: 'Full back stick and maintain' },
+          { t: 'row', l: 'THRUST LEVERS', v: 'TOGA' },
+          { t: 'row', l: 'SPEED BRAKES', v: 'CHECK RETRACTED' },
+          { t: 'row', l: 'BANK', v: 'WINGS LEVEL or ADJUST' },
+          { t: 'callout', x: 'DO NOT CHANGE CONFIG UNTIL CLEAR OF OBSTACLE.' },
+          { t: 'hr' },
+          { t: 'sect', x: 'DURING DAYLIGHT OR VMC (CAN SEE OBSTACLE):' },
+          { t: 'row', l: 'FLIGHT PATH', v: 'ADJUST' }
+        ]
+      }],
+      truncado: 'La captura se cortaba tras FLIGHT PATH — ADJUST: falta el resto del bloque VMC y WHY IT MATTERS.'
+    },
+
+    {
+      id: 'tcas-ta',
+      titulo: 'TCAS TA (CAUTION)',
+      cat: 'TCAS',
+      secciones: [{
+        items: [
+          { t: 'sect', x: 'WITH AP/FD TCAS FUNCTION:' },
+          { t: 'note', x: 'If TCAS mode arms' },
+          { t: 'announce', x: "Announce 'TCAS BLUE'" },
+          { t: 'note', x: 'If TCAS mode does not arm' },
+          { t: 'announce', x: "Announce 'TCAS, I HAVE CTRL'" },
+          { t: 'hr' },
+          { t: 'sect', x: 'WITHOUT AP/FD TCAS FUNCTION:' },
+          { t: 'announce', x: 'Announce "TCAS, I HAVE CTRL"' },
+          { t: 'callout', x: 'DO NOT MANOEUVRE BASED ON TA ONLY.' }
+        ]
+      }],
+      porque: 'Traffic Advisories alert you to nearby traffic but do not require evasive action. Proper callouts ensure crew coordination while avoiding unnecessary maneuvers that could conflict with ATC or other traffic.',
+      truncado: 'La captura empezaba ya desplazada: puede faltar una línea inicial antes de "WITH AP/FD TCAS FUNCTION".'
+    },
+
+    {
+      id: 'tcas-ra',
+      titulo: 'TCAS RA (WARNING)',
+      cat: 'TCAS',
+      secciones: [{
+        items: [
+          { t: 'note', x: 'Always follow RA orders as these offer best separation.' },
+          { t: 'hr' },
+          { t: 'sect', x: 'IF AP/FD TCAS MODE AVAIL:' },
+          { t: 'row', l: 'TCAS blue', v: 'TCAS Green' },
+          { t: 'row', l: 'ALL RA (except CLB RA in appr F3/FF)', v: 'Follow FD ± AP' },
+          { t: 'row', l: 'If CLB RA during approach F3/FF', v: 'GO-AROUND' },
+          { t: 'row', l: 'ATC', v: 'NOTIFY' },
+          { t: 'hr' },
+          { t: 'sect', x: 'IF AP/FD TCAS MODE NOT AVAIL:' },
+          { t: 'note', hint: true, x: 'ALL RA (except CLB RA during approach F3/FF):' },
+          { t: 'row', l: 'AP', v: 'OFF' },
+          { t: 'row', l: 'BOTH FDs', v: 'OFF' },
+          { t: 'row', l: 'FLY THE GREEN on VSI', v: '5s initial / 2.5s reversal' },
+          { t: 'row', l: 'If CLB RA during approach F3/FF', v: 'GO-AROUND' }
+        ]
+      }],
+      truncado: 'La captura empezaba desplazada y se cortaba al final: puede faltar el announce inicial, la notificación a ATC y WHY IT MATTERS.'
+    },
+
+    {
+      id: 'windshear-reactive',
+      titulo: 'WINDSHEAR - REACTIVE',
+      cat: 'WINDSHEAR',
+      secciones: [{
+        items: [
+          { t: 'announce', x: 'Announce "WINDSHEAR TOGA"' },
+          { t: 'hr' },
+          { t: 'sect', x: 'AT TAKE OFF (WINDSHEAR X 3 IS INHIBITED):' },
+          { t: 'note', hint: true, x: 'Before V1: If significant spd variations below V1 - reject.' },
+          { t: 'note', hint: true, x: 'After V1:' },
+          { t: 'row', l: 'THR LEVERS', v: 'TOGA' },
+          { t: 'row', l: 'REACHING V1', v: 'ROTATE' },
+          { t: 'row', l: 'SRS', v: 'FOLLOW' },
+          { t: 'note', x: '17.5° and full back stick if needed' },
+          { t: 'hr' },
+          { t: 'sect', x: 'AIRBORNE, INITIAL CLIMB OR LANDING:' },
+          { t: 'row', l: 'THR LEVERS AT TOGA', v: 'SET/CONFIRM' },
+          { t: 'row', l: 'AP (if engaged)', v: 'KEEP' },
+          { t: 'row', l: 'SRS', v: 'FOLLOW' },
+          { t: 'callout', x: 'MAINTAIN CONFIG TILL OUT OF SHEAR' }
+        ]
+      }],
+      truncado: 'La captura empezaba desplazada: puede faltar una línea antes del announce, y el bloque WHY IT MATTERS.'
+    },
+
+    {
+      id: 'eng-fail-cruise',
+      titulo: 'ENG FAIL IN CRUISE',
+      cat: 'ENGINE',
+      secciones: [{
+        items: [
+          { t: 'note', x: 'Standard strategy unless discussed' },
+          { t: 'row', l: 'THR LEVERS', v: 'MCT' },
+          { t: 'row', l: 'A/THR', v: 'DISCONNECT' },
+          { t: 'hr' },
+          { t: 'sect', x: 'IN CRUISE:' },
+          { t: 'note', hint: true, x: 'PF sets appropriate HDG' },
+          { t: 'note', hint: true, x: 'PM determine OEI recovery altitude (MCDU PERF page or FS+)' },
+          { t: 'hr' },
+          { t: 'sect', x: 'WHEN READY FOR DESCENT:' },
+          { t: 'note', hint: true, x: 'Set speed and pull' },
+          { t: 'note', hint: true, x: 'Set OEI recovery altitude and pull for OPEN DES.' },
+          { t: 'row', l: 'Standard Strat', v: 'M0.78/300 kts (Relight)' },
+          { t: 'row', l: 'Obstacle Strat', v: 'Green Dot' }
+        ]
+      }],
+      porque: 'Engine failure in cruise requires an immediate and methodical response. Setting MCT and disconnecting A/THR…',
+      truncado: 'La captura empezaba desplazada y WHY IT MATTERS quedó cortado.'
+    },
+
+    {
+      id: 'loss-of-braking',
+      titulo: 'LOSS OF BRAKING',
+      cat: 'GROUND',
+      secciones: [{
+        items: [
+          { t: 'announce', x: 'Announce "LOSS OF BRAKING"' },
+          { t: 'row', l: 'REVERSE', v: 'MAX' },
+          { t: 'row', l: 'BRAKE PEDALS', v: 'RELEASE' },
+          { t: 'row', l: 'A/SKID & NSW', v: 'OFF' },
+          { t: 'note', x: 'MAX BRK PRESS 1000 psi' },
+          { t: 'hr' },
+          { t: 'sect', x: 'STILL NO BRAKING?' },
+          { t: 'row', l: 'PARK BRK', v: 'USE' },
+          { t: 'note', x: 'Short applications' }
+        ]
+      }],
+      porque: "This memory item is used when the aircraft isn't slowing with brake pedal pressure. If you don't act, you risk a runway or taxiway overrun."
+    }
+  ];
+
+  /* ---------------------------------------------------------
+     2. Estado / progreso
+     --------------------------------------------------------- */
+  function estadoVacio() {
+    return { sabidas: {}, falladas: {}, vistas: {}, layout: 'auto' };
+  }
+
+  function normalizar(raw) {
+    var out = estadoVacio();
+    if (!raw || typeof raw !== 'object') return out;
+    ['sabidas', 'falladas', 'vistas'].forEach(function (k) {
+      var src = raw[k];
+      if (!src || typeof src !== 'object') return;
+      ITEMS.forEach(function (it) {
+        var n = src[it.id];
+        if (typeof n === 'number' && isFinite(n) && n >= 0) out[k][it.id] = n;
+      });
+    });
+    if (raw.layout === 'vert' || raw.layout === 'auto') out.layout = raw.layout;
+    return out;
+  }
+
+  function est() {
+    if (typeof estado === 'undefined' || !estado) return estadoVacio();
+    if (!estado.a320) estado.a320 = estadoVacio();
+    return estado.a320;
+  }
+
+  function bump(bucket, id) {
+    var e = est();
+    e[bucket][id] = (e[bucket][id] || 0) + 1;
+    if (typeof guardarProgreso === 'function') guardarProgreso();
+    else if (typeof guardarProgresoAhora === 'function') guardarProgresoAhora();
+  }
+
+  /* ---------------------------------------------------------
+     3. Utilidades
+     --------------------------------------------------------- */
+  function esc(s) {
+    return String(s == null ? '' : s)
+      .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+  }
+
+  function byId(id) { return document.getElementById(id); }
+
+  var ICON_WHY =
+    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#efb61f" stroke-width="2" ' +
+    'stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v6"/><path d="M12 16.5v.2"/></svg>';
+  var ICON_TIP =
+    '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#efb61f" stroke-width="2" ' +
+    'stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 21h4"/>' +
+    '<path d="M12 3a6 6 0 0 0-3.6 10.8c.6.5.9 1.2.9 1.9V16h5.4v-.3c0-.7.3-1.4.9-1.9A6 6 0 0 0 12 3z"/></svg>';
+
+  /* ---------------------------------------------------------
+     4. Render del contenido de una tarjeta
+     --------------------------------------------------------- */
+  function renderBlocks(items) {
+    return items.map(function (b) {
+      switch (b.t) {
+        case 'announce':
+          return '<div class="a320-announce">' + esc(b.x) + '</div>';
+        case 'row':
+          return '<div class="a320-row' + (b.ind ? ' ind' : '') + '">' +
+            '<span class="lbl">' + esc(b.l) + '</span>' +
+            '<span class="val">' + esc(b.v) + '</span></div>';
+        case 'note':
+          return '<div class="a320-note' + (b.hint ? ' hint' : '') + '">' + esc(b.x) + '</div>';
+        case 'sect':
+          return '<div class="a320-sect">' + esc(b.x) + '</div>';
+        case 'callout':
+          return '<div class="a320-callout">' + esc(b.x) + '</div>';
+        default:
+          return '';
+      }
+    }).join('');
+  }
+
+  // Los 'hr' separan fases del procedimiento. En vertical son una línea;
+  // en horizontal cada fase se convierte en una columna.
+  function renderItems(items) {
+    var chunks = [[]];
+    items.forEach(function (b) {
+      if (b.t === 'hr') chunks.push([]);
+      else chunks[chunks.length - 1].push(b);
+    });
+    chunks = chunks.filter(function (c) { return c.length; });
+
+    if (chunks.length < 2) {
+      return '<div class="a320-chunks n1"><div class="a320-chunk">' +
+        renderBlocks(chunks[0] || []) + '</div></div>';
+    }
+    // ¿la primera fase es solo cabecera (sin acciones)? -> ocupa todo el ancho
+    var hayLead = !chunks[0].some(function (b) { return b.t === 'row' || b.t === 'callout'; });
+    var columnas = chunks.length - (hayLead ? 1 : 0);
+
+    var html = chunks.map(function (c, i) {
+      var lead = (i === 0 && hayLead);
+      return '<div class="a320-chunk' + (lead ? ' lead' : '') + '">' + renderBlocks(c) + '</div>';
+    }).join('');
+    return '<div class="a320-chunks n' + columnas + '">' + html + '</div>';
+  }
+
+  function renderAcciones(item) {
+    var html = '<div class="a320-sectlbl">Actions</div>';
+    item.secciones.forEach(function (sec) {
+      if (sec.gt) {
+        html += '<div class="a320-group"><div class="gt">' + esc(sec.gt) + '</div>' +
+          renderItems(sec.items) + '</div>';
+      } else {
+        html += '<div class="a320-actions">' + renderItems(sec.items) + '</div>';
+      }
+    });
+    return html;
+  }
+
+  function renderExtras(item) {
+    var html = '';
+    if (item.porque) {
+      html += '<div class="a320-why"><div class="wh">' + ICON_WHY + '<span>Why it matters</span></div>' +
+        '<p>' + esc(item.porque) + '</p></div>';
+    }
+    if (item.tip) {
+      html += '<div class="a320-tip"><div class="th">' + ICON_TIP + "<span>Captain's tip</span></div>" +
+        '<p>&ldquo;' + esc(item.tip) + '&rdquo;</p></div>';
+    }
+    if (item.truncado) {
+      html += '<div class="a320-trunc"><b>NOTA DE TRANSCRIPCIÓN — </b>' + esc(item.truncado) +
+        ' Completar desde FCOM/QRH antes de estudiar esta tarjeta como definitiva.</div>';
+    }
+    return html;
+  }
+
+  // Cuerpo completo: columna de acciones + raíl (why / tip / nota)
+  function renderCuerpo(item) {
+    var extras = renderExtras(item);
+    return '<div class="a320-main">' + renderAcciones(item) + '</div>' +
+      (extras ? '<div class="a320-rail">' + extras + '</div>' : '');
+  }
+  function claseCuerpo(item, base) {
+    return base + (renderExtras(item) ? ' has-rail' : '');
+  }
+
+  /* ---------------------------------------------------------
+     5. Inyección del DOM
+     --------------------------------------------------------- */
+  function inyectar() {
+    if (byId('screen-a320')) return;
+    var app = byId('app');
+    if (!app) return;
+
+    var wrap = document.createElement('div');
+    wrap.className = 'a320-scope';
+    wrap.innerHTML =
+      '<section id="screen-a320" class="screen">' +
+        '<div class="subhead">' +
+          '<button class="back" id="a320Back">&larr; Bancos</button>' +
+          '<div class="h1">A320 &mdash; Memory Items</div>' +
+          '<span></span>' +
+        '</div>' +
+        '<div class="a320-modes">' +
+          '<button class="btn btn-a320amber" id="a320StartFlash">Estudiar con tarjetas</button>' +
+          '<button class="btn btn-ghost" id="a320Layout"></button>' +
+          '<button class="btn btn-ghost" id="a320Reset">Reiniciar estadísticas</button>' +
+        '</div>' +
+        '<div class="a320-grid" id="a320Grid"></div>' +
+      '</section>' +
+
+      '<section id="screen-a320-flash" class="screen">' +
+        '<div class="a320-fbar">' +
+          '<button class="back" id="a320FlashExit">&larr; Salir</button>' +
+          '<span class="prog" id="a320FlashProg"></span>' +
+        '</div>' +
+        '<div class="a320-ftape"><i id="a320FlashTape" style="width:0%"></i></div>' +
+        '<div id="a320FlashSlot"></div>' +
+      '</section>' +
+
+      '<div class="a320-overlay" id="a320Overlay" role="dialog" aria-modal="true" aria-labelledby="a320ModalTitle">' +
+        '<div class="a320-modal">' +
+          '<div class="a320-head">' +
+            '<div class="kicker">Memory item</div>' +
+            '<div class="ttl" id="a320ModalTitle"></div>' +
+            '<button class="a320-x" id="a320ModalX" aria-label="Cerrar">&times;</button>' +
+          '</div>' +
+          '<div class="a320-body" id="a320ModalBody"></div>' +
+          '<div class="a320-foot"><button class="a320-close" id="a320ModalClose">Close</button></div>' +
+        '</div>' +
+      '</div>';
+
+    app.appendChild(wrap);
+
+    byId('a320Back').onclick = function () {
+      if (typeof volverABancos === 'function') volverABancos();
+    };
+    byId('a320StartFlash').onclick = iniciarFlash;
+    byId('a320Layout').onclick = function () {
+      var e = est();
+      e.layout = (e.layout === 'vert') ? 'auto' : 'vert';
+      aplicarLayout();
+      if (typeof guardarProgreso === 'function') guardarProgreso();
+      else if (typeof guardarProgresoAhora === 'function') guardarProgresoAhora();
+    };
+    byId('a320Reset').onclick = function () {
+      if (!confirm('¿Reiniciar las estadísticas de los memory items del A320?')) return;
+      if (typeof estado !== 'undefined' && estado) estado.a320 = estadoVacio();
+      if (typeof guardarProgreso === 'function') guardarProgreso();
+      else if (typeof guardarProgresoAhora === 'function') guardarProgresoAhora();
+      renderIndice();
+    };
+    byId('a320ModalX').onclick = cerrarModal;
+    byId('a320ModalClose').onclick = cerrarModal;
+    byId('a320Overlay').addEventListener('click', function (ev) {
+      if (ev.target === this) cerrarModal();
+    });
+    byId('a320FlashExit').onclick = function () {
+      renderIndice();
+      showScreen('screen-a320');
+    };
+    document.addEventListener('keydown', function (ev) {
+      if (ev.key === 'Escape' && byId('a320Overlay').classList.contains('open')) cerrarModal();
+    });
+  }
+
+  // 'auto' = horizontal en pantallas anchas, columna en móvil.
+  // 'vert'  = fuerza siempre una sola columna.
+  function aplicarLayout() {
+    var vert = est().layout === 'vert';
+    document.body.classList.toggle('a320-vert', vert);
+    var b = byId('a320Layout');
+    if (b) b.textContent = vert ? 'Diseño: columna' : 'Diseño: automático';
+  }
+
+  /* ---------------------------------------------------------
+     6. Modal
+     --------------------------------------------------------- */
+  var scrollBloqueado = false;
+
+  function abrirModal(item) {
+    byId('a320ModalTitle').textContent = item.titulo;
+    var body = byId('a320ModalBody');
+    body.className = claseCuerpo(item, 'a320-body');
+    body.innerHTML = renderCuerpo(item);
+    byId('a320Overlay').classList.add('open');
+    byId('a320Overlay').scrollTop = 0;
+    document.body.style.overflow = 'hidden';
+    scrollBloqueado = true;
+    bump('vistas', item.id);
+    renderIndice();
+  }
+
+  function cerrarModal() {
+    byId('a320Overlay').classList.remove('open');
+    if (scrollBloqueado) { document.body.style.overflow = ''; scrollBloqueado = false; }
+  }
+
+  /* ---------------------------------------------------------
+     7. Pantalla índice
+     --------------------------------------------------------- */
+  function renderIndice() {
+    var grid = byId('a320Grid');
+    if (!grid) return;
+    var e = est();
+    grid.innerHTML = '';
+    ITEMS.forEach(function (item, i) {
+      var ok = e.sabidas[item.id] || 0;
+      var no = e.falladas[item.id] || 0;
+      var meta = (ok + no) === 0
+        ? 'sin practicar'
+        : '<span class="ok">' + ok + '&nbsp;ok</span> &middot; <span class="no">' + no + '&nbsp;fallo' + (no === 1 ? '' : 's') + '</span>';
+      var b = document.createElement('button');
+      b.className = 'a320-card';
+      b.innerHTML =
+        '<div class="r1"><span class="cat">' + esc(item.cat) + '</span>' +
+        '<span class="idx">' + String(i + 1).padStart(2, '0') + '</span></div>' +
+        '<div class="nm">' + esc(item.titulo) + '</div>' +
+        '<div class="meta">' + meta + '</div>';
+      b.onclick = function () { abrirModal(item); };
+      grid.appendChild(b);
+    });
+  }
+
+  function entrarA320() {
+    inyectar();
+    aplicarLayout();
+    renderIndice();
+    showScreen('screen-a320');
+  }
+
+  /* ---------------------------------------------------------
+     8. Modo tarjetas
+     --------------------------------------------------------- */
+  var mazo = [], pos = 0, revelada = false, ronda = { ok: 0, no: 0 };
+
+  function barajar(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function iniciarFlash() {
+    mazo = barajar(ITEMS);
+    pos = 0; revelada = false; ronda = { ok: 0, no: 0 };
+    renderFlash();
+    showScreen('screen-a320-flash');
+  }
+
+  function renderFlash() {
+    var slot = byId('a320FlashSlot');
+    var prog = byId('a320FlashProg');
+    var tape = byId('a320FlashTape');
+
+    if (pos >= mazo.length) {
+      prog.textContent = 'Ronda completa';
+      tape.style.width = '100%';
+      var pct = mazo.length ? Math.round(ronda.ok / mazo.length * 100) : 0;
+      slot.innerHTML =
+        '<div class="a320-resume">' +
+          '<div class="big">' + pct + '%</div>' +
+          '<div class="sub">' + ronda.ok + ' sabidas &middot; ' + ronda.no + ' por repasar</div>' +
+          '<div class="acts">' +
+            '<button class="btn btn-a320amber" id="a320Again">Otra ronda</button>' +
+            '<button class="btn btn-ghost" id="a320ToIndex">Ver lista</button>' +
+          '</div>' +
+        '</div>';
+      byId('a320Again').onclick = iniciarFlash;
+      byId('a320ToIndex').onclick = function () { renderIndice(); showScreen('screen-a320'); };
+      return;
+    }
+
+    var item = mazo[pos];
+    prog.textContent = (pos + 1) + ' / ' + mazo.length;
+    tape.style.width = (pos / mazo.length * 100) + '%';
+
+    var cuerpo = revelada
+      ? '<div class="' + claseCuerpo(item, 'fbody') + '">' + renderCuerpo(item) + '</div>' +
+        '<div class="ffoot">' +
+          '<button class="btn btn-a320red" id="a320No">No la sabía</button>' +
+          '<button class="btn btn-a320green" id="a320Ok">La sabía</button>' +
+        '</div>'
+      : '<div class="fbody"><div class="fprompt">' +
+          '<span>Recita en voz alta las acciones de memoria de este ítem.</span>' +
+        '</div></div>' +
+        '<div class="ffoot"><button class="btn btn-a320amber" id="a320Reveal">Ver acciones</button></div>';
+
+    slot.innerHTML =
+      '<div class="a320-flash">' +
+        '<div class="fhead"><div class="kicker">Memory item</div>' +
+        '<div class="ttl">' + esc(item.titulo) + '</div></div>' +
+        cuerpo +
+      '</div>';
+
+    if (revelada) {
+      byId('a320No').onclick = function () { calificar(false); };
+      byId('a320Ok').onclick = function () { calificar(true); };
+    } else {
+      byId('a320Reveal').onclick = function () {
+        revelada = true;
+        bump('vistas', item.id);
+        renderFlash();
+      };
+    }
+    window.scrollTo(0, 0);
+  }
+
+  function calificar(acierto) {
+    var item = mazo[pos];
+    bump(acierto ? 'sabidas' : 'falladas', item.id);
+    if (acierto) ronda.ok++; else ronda.no++;
+    pos++; revelada = false;
+    renderFlash();
+  }
+
+  /* ---------------------------------------------------------
+     9. Enganches al motor existente
+     --------------------------------------------------------- */
+  function tileBanco() {
+    var grid = byId('bancoGrid');
+    if (!grid || grid.querySelector('.a320-tile')) return;
+    var e = est();
+    var practicados = ITEMS.filter(function (it) {
+      return (e.sabidas[it.id] || 0) + (e.falladas[it.id] || 0) > 0;
+    }).length;
+
+    var b = document.createElement('button');
+    b.className = 'bancotile a320-tile a320-scope';
+    b.innerHTML =
+      '<span class="btag">A320</span>' +
+      '<div class="bname">A320</div>' +
+      '<div class="blong">Memory Items &mdash; acciones de memoria</div>' +
+      '<div class="bstats">' +
+        '<div><b>' + ITEMS.length + '</b>tarjetas</div>' +
+        '<div><b>' + practicados + '/' + ITEMS.length + '</b>practicadas</div>' +
+      '</div>';
+    b.onclick = entrarA320;
+    grid.appendChild(b);
+  }
+
+  // renderBancos → añadir el tercer tile
+  if (typeof window.renderBancos === 'function') {
+    var _renderBancos = window.renderBancos;
+    window.renderBancos = function () {
+      var r = _renderBancos.apply(this, arguments);
+      try { est(); tileBanco(); } catch (err) { console.warn('[a320]', err); }
+      return r;
+    };
+  }
+
+  // migrarEstado → conservar estado.a320 al cargar progreso guardado
+  if (typeof window.migrarEstado === 'function') {
+    var _migrar = window.migrarEstado;
+    window.migrarEstado = function (prog) {
+      var out = _migrar.apply(this, arguments);
+      try { out.a320 = normalizar(prog && prog.a320); } catch (err) { out.a320 = estadoVacio(); }
+      return out;
+    };
+  }
+
+  // API mínima por si quieres llamarla desde fuera
+  window.A320Memory = {
+    items: ITEMS,
+    entrar: entrarA320,
+    abrir: function (id) {
+      inyectar();
+      var it = ITEMS.filter(function (x) { return x.id === id; })[0];
+      if (it) abrirModal(it);
+    }
+  };
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', inyectar);
+  } else {
+    inyectar();
+  }
+})();
 </script>
 </body>
 </html>

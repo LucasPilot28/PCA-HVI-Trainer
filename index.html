@@ -5033,7 +5033,748 @@ intentarSesionGuardada(); (function () {
 
   var _total = bancos.wizz.temas.reduce(function (a, t) { return a + t.preguntas.length; }, 0);
   console.log('[banco wizz] instalado: ' + bancos.wizz.temas.length + ' materias, ' + _total + ' preguntas.');
+/* ==========================================================================
+   MÓDULO: BANCO "A320 LIM" (v2 — basado en FCOM/LIM)
+   --------------------------------------------------------------------------
+   Sexto banco, junto a `hvi`, `pca`, `wizz` y `atplatam`. Misma estructura
+   de datos, pero SIN campo `exp`: son preguntas de cifras, para memorizar.
 
+   Instalación: pegar dentro de una etiqueta script nueva, ANTES del cierre
+   de body y DESPUÉS del script principal. También funciona como archivo
+   aparte, cargado con  script src="banco_a320_lim.js"
+
+   FUENTE
+   ------
+   A318/A319/A320/A321 FCOM, capítulo LIMITATIONS (LIM), rev. 23 NOV 21.
+   El PDF de origen es una copia escaneada ("Print to PDF" sin capa de
+   texto); se generó un OCR con Tesseract y CADA cifra usada en este banco
+   se verificó visualmente contra la imagen de la página correspondiente
+   antes de escribirse aquí, porque el OCR confundía dígitos (por ejemplo
+   leyó "38 kt" de crosswind como "88 kt" en una primera pasada). Ninguna
+   cifra de este banco procede del texto OCR sin esa verificación visual.
+
+   Las 14 secciones del capítulo LIM están representadas: Aircraft General,
+   Air Bleed/Cond/Press/Vent, Auto Flight System, APU, Communication,
+   Engines, Flight Controls, Fuel, Ice and Rain Protection, Landing Gear,
+   Navigation, Oxygen, Surveillance. (LIM-INT, la introducción, no contiene
+   cifras y no se ha incluido).
+
+   Donde el capítulo LIM remite a otra sección para una cifra que ya se
+   recoge en otro apartado de este banco (p. ej. LIM-F_CTL remite a
+   LIM-AG-SPD para las velocidades de flaps), la pregunta se hace una sola
+   vez, en el apartado donde el valor está publicado, para no duplicar.
+   ========================================================================== */
+(function () {
+  'use strict';
+
+  if (typeof bancos === 'undefined') {
+    console.warn('[banco a320 lim] no encuentro `bancos`; carga este módulo después del script principal.');
+    return;
+  }
+  if (bancos.a320lim) return;
+
+  function Q(q, ops, correct) { return { q: q, ops: ops, correct: correct }; }
+
+  /* =======================================================================
+     1. AIRCRAFT GENERAL
+     ======================================================================= */
+  var AG = [
+
+    Q("Flight maneuvering load acceleration limits in clean configuration:",
+      ["-1 g to +2.5 g", "0 g to +2 g", "-1.5 g to +3 g", "-1 g to +2 g"], 0),
+
+    Q("Flight maneuvering load acceleration limits in other (non-clean) configurations:",
+      ["0 g to +2 g", "-1 g to +2.5 g", "0 g to +2.5 g", "-0.5 g to +2 g"], 0),
+
+    Q("The environmental envelope's maximum pressure altitude is:",
+      ["39 800 ft", "41 000 ft", "37 000 ft", "35 000 ft"], 0),
+
+    Q("The environmental envelope's minimum pressure altitude is:",
+      ["-1 000 ft", "-2 000 ft", "0 ft", "-500 ft"], 0),
+
+    Q("Within the environmental envelope, the takeoff and landing band is bounded between:",
+      ["-1 000 ft and 9 200 ft", "-1 000 ft and 14 000 ft", "0 ft and 9 200 ft", "-2 000 ft and 9 200 ft"], 0),
+
+    Q("The runway slope limitation (mean) is:",
+      ["±2 %", "±1 %", "±3 %", "±1.5 %"], 0),
+
+    Q("The maximum runway altitude limitation is:",
+      ["9 200 ft", "8 000 ft", "10 000 ft", "9 800 ft"], 0),
+
+    Q("The nominal runway width is:",
+      ["45 m", "40 m", "50 m", "30 m"], 0),
+
+    Q("The minimal runway width is:",
+      ["30 m", "35 m", "25 m", "45 m"], 0),
+
+    Q("The maximum demonstrated crosswind for takeoff and landing (gust included) is:",
+      ["38 kt", "35 kt", "33 kt", "40 kt"], 0),
+
+    Q("Regarding the maximum demonstrated crosswind, the FCOM notes that this value is:",
+      ["Not an AFM limitation — it is the maximum crosswind experienced during the certification campaign", "An AFM limitation that must never be exceeded", "A performance-limited value recalculated for each flight", "Only applicable for landing, not takeoff"], 0),
+
+    Q("The maximum tailwind for takeoff is:",
+      ["10 kt", "15 kt", "5 kt", "20 kt"], 0),
+
+    Q("The maximum tailwind for landing is:",
+      ["10 kt", "15 kt", "5 kt", "20 kt"], 0),
+
+    Q("The maximum wind for passenger door operation is:",
+      ["65 kt", "50 kt", "40 kt", "70 kt"], 0),
+
+    Q("The maximum wind for FWD and AFT cargo door operation is:",
+      ["40 kt (or 50 kt if nose into wind, or doors on leeward side)", "65 kt in all cases", "30 kt (or 40 kt if nose into wind)", "50 kt in all cases"], 0),
+
+    Q("The FWD and AFT cargo doors must be closed before the wind speed exceeds:",
+      ["65 kt", "50 kt", "40 kt", "70 kt"], 0),
+
+    Q("On a runway reported \"Good\" (RWYCC 5), the maximum recommended crosswind for takeoff and landing is:",
+      ["38 kt", "29 kt", "25 kt", "20 kt"], 0),
+
+    Q("On a runway reported \"Good to Medium\" (RWYCC 4) — e.g. compacted snow at or below -15°C — the maximum recommended crosswind is:",
+      ["29 kt", "38 kt", "25 kt", "20 kt"], 0),
+
+    Q("On a runway reported \"Medium\" (RWYCC 3), the maximum recommended crosswind is:",
+      ["25 kt", "29 kt", "20 kt", "15 kt"], 0),
+
+    Q("On a runway reported \"Medium to Poor\" (RWYCC 2) — e.g. standing water more than 3mm up to 13mm — the maximum recommended crosswind is:",
+      ["20 kt", "25 kt", "15 kt", "29 kt"], 0),
+
+    Q("On a runway reported \"Poor\" (RWYCC 1) — ice, cold and dry — the maximum recommended crosswind is:",
+      ["15 kt", "20 kt", "10 kt", "25 kt"], 0)
+  ];
+
+  /* =======================================================================
+     2. SPEEDS
+     ======================================================================= */
+  var SPD = [
+
+    Q("The maximum speed for cockpit window open operation is:",
+      ["200 kt", "250 kt", "180 kt", "220 kt"], 0),
+
+    Q("Maximum flaps/slats speed for CONF 1 (slat/flap display \"1\"), used for holding:",
+      ["230 kt", "215 kt", "200 kt", "185 kt"], 0),
+
+    Q("Maximum flaps/slats speed for CONF 1+F, used for takeoff:",
+      ["215 kt", "230 kt", "200 kt", "185 kt"], 0),
+
+    Q("Maximum flaps/slats speed for CONF 2, used for takeoff/approach:",
+      ["200 kt", "215 kt", "185 kt", "177 kt"], 0),
+
+    Q("Maximum flaps/slats speed for CONF 3, used for takeoff/approach/landing:",
+      ["185 kt", "200 kt", "177 kt", "215 kt"], 0),
+
+    Q("Maximum flaps/slats speed for CONF FULL, used for landing:",
+      ["177 kt", "185 kt", "200 kt", "165 kt"], 0),
+
+    Q("VMO (Maximum Operating Speed) is:",
+      ["350 kt", "340 kt", "330 kt", "360 kt"], 0),
+
+    Q("MMO (Maximum Operating Mach) is:",
+      ["M 0.82", "M 0.80", "M 0.84", "M 0.86"], 0),
+
+    Q("VLE — Maximum speed with the landing gear extended — is:",
+      ["280 kt / M 0.67", "250 kt / M 0.60", "220 kt / M 0.54", "260 kt / M 0.62"], 0),
+
+    Q("VLO extension — Maximum speed at which the landing gear may be extended — is:",
+      ["250 kt / M 0.60", "280 kt / M 0.67", "220 kt / M 0.54", "230 kt / M 0.58"], 0),
+
+    Q("VLO retraction — Maximum speed at which the landing gear may be retracted — is:",
+      ["220 kt / M 0.54", "250 kt / M 0.60", "280 kt / M 0.67", "200 kt / M 0.50"], 0),
+
+    Q("The maximum tire (ground) speed is:",
+      ["195 kt", "180 kt", "210 kt", "170 kt"], 0),
+
+    Q("VMCL — Minimum control speed for landing — is:",
+      ["109 kt", "104 kt", "115 kt", "98 kt"], 0),
+
+    Q("At sea level (0 ft), VMCA (minimum control speed in the air) is:",
+      ["112 kt", "114 kt", "108 kt", "100 kt"], 0),
+
+    Q("At -2 000 ft, VMCA (minimum control speed in the air) is:",
+      ["114 kt", "112 kt", "111 kt", "108 kt"], 0),
+
+    Q("At sea level (0 ft), VMCG in CONF 2 is:",
+      ["110 kt", "112 kt", "109 kt", "108 kt"], 0),
+
+    Q("At sea level (0 ft), VMCG in CONF 3 is:",
+      ["109 kt", "111 kt", "108 kt", "106 kt"], 0),
+
+    Q("For runways with a width of 30 m, the required VMCG increase (ΔVMCG) is:",
+      ["+2.5 kt", "+1.5 kt", "+0 kt", "+3.5 kt"], 0),
+
+    Q("For runways with a width of 35 m, the required VMCG increase (ΔVMCG) is:",
+      ["+1.5 kt", "+2.5 kt", "+0 kt", "+1.0 kt"], 0),
+
+    Q("For runways with a width of 40 m, the required VMCG increase (ΔVMCG) is:",
+      ["+0 kt", "+1.5 kt", "+2.5 kt", "+0.5 kt"], 0),
+
+    Q("When the takeoff weight is higher than 76 000 kg (167 550 lb), the caution is to not exceed a taxi speed during a turn of:",
+      ["20 kt", "15 kt", "25 kt", "10 kt"], 0),
+
+    Q("The wipers maximum operating speed (when sweeping) is:",
+      ["230 kt", "200 kt", "250 kt", "210 kt"], 0)
+  ];
+
+  /* =======================================================================
+     3. WEIGHTS
+     ======================================================================= */
+  var WGT = [
+
+    Q("Maximum taxi weight is:",
+      ["77 400 kg (170 637 lb)", "77 000 kg (169 755 lb)", "78 000 kg (171 961 lb)", "76 500 kg (168 653 lb)"], 0),
+
+    Q("Maximum takeoff weight (brake release) is:",
+      ["77 000 kg (169 755 lb)", "77 400 kg (170 637 lb)", "76 500 kg (168 653 lb)", "78 000 kg (171 961 lb)"], 0),
+
+    Q("Maximum landing weight is:",
+      ["64 500 kg (142 198 lb)", "66 000 kg (145 505 lb)", "63 000 kg (138 891 lb)", "61 000 kg (134 481 lb)"], 0),
+
+    Q("Maximum zero fuel weight is:",
+      ["61 000 kg (134 481 lb)", "64 500 kg (142 198 lb)", "59 000 kg (130 073 lb)", "62 500 kg (137 789 lb)"], 0),
+
+    Q("Minimum weight is:",
+      ["37 230 kg (82 079 lb)", "35 000 kg (77 162 lb)", "39 500 kg (87 082 lb)", "36 000 kg (79 366 lb)"], 0),
+
+    Q("In exceptional cases (in-flight turn back or diversion), an immediate landing above maximum landing weight is permitted provided that:",
+      ["The pilot follows the overweight landing procedure", "The landing weight does not exceed MTOW", "ATC grants a specific waiver", "The fuel jettison system is used first in every case"], 0)
+  ];
+
+  /* =======================================================================
+     4. AIR BLEED / COND / PRESS / VENT
+     ======================================================================= */
+  var AIR = [
+
+    Q("With passengers on board, it is not recommended to exceed how long without air conditioning supply?",
+      ["20 min", "10 min", "30 min", "15 min"], 0),
+
+    Q("During ground operations, with OAT ≤ 49°C, the time limitation on aircraft electric power supply for avionics ventilation is:",
+      ["No limitation", "2 h", "1 h", "0.5 h"], 0),
+
+    Q("During ground operations, with 49°C < OAT ≤ 55°C, the time limitation on aircraft electric power supply for avionics ventilation is:",
+      ["2 h", "No limitation", "1 h", "0.5 h"], 0),
+
+    Q("During ground operations, with 55°C < OAT ≤ 60°C, the time limitation on aircraft electric power supply for avionics ventilation is:",
+      ["1 h", "2 h", "0.5 h", "No limitation"], 0),
+
+    Q("During ground operations, with 60°C < OAT ≤ 64°C, the time limitation on aircraft electric power supply for avionics ventilation is:",
+      ["0.5 h", "1 h", "2 h", "No limitation"], 0),
+
+    Q("Maximum positive cabin differential pressure is:",
+      ["9.0 PSI", "8.6 PSI", "9.5 PSI", "8.0 PSI"], 0),
+
+    Q("Maximum negative cabin differential pressure is:",
+      ["-1.0 PSI", "-0.5 PSI", "-1.5 PSI", "-2.0 PSI"], 0),
+
+    Q("The cabin pressurization safety relief valve setting is:",
+      ["8.6 PSI", "9.0 PSI", "8.0 PSI", "9.5 PSI"], 0),
+
+    Q("On the cabin pressure schedule, the outflow valve closure occurs at a cabin altitude of:",
+      ["15 000 ft", "14 000 ft", "9 550 ft", "8 000 ft"], 0),
+
+    Q("The maximum cabin altitude selection is:",
+      ["14 000 ft", "15 000 ft", "9 550 ft", "12 000 ft"], 0),
+
+    Q("The cabin altitude warning triggers at:",
+      ["9 550 ft (±350 ft)", "14 000 ft", "8 000 ft", "10 000 ft (±350 ft)"], 0),
+
+    Q("The maximum normal cabin altitude (Max Norm Cab Alt) is:",
+      ["8 000 ft", "9 550 ft", "14 000 ft", "6 000 ft"], 0),
+
+    Q("The minimum cabin altitude selection is:",
+      ["-2 000 ft", "-1 000 ft", "0 ft", "-1 500 ft"], 0),
+
+    Q("The maximum operating altitude on the cabin pressure schedule is:",
+      ["39 800 ft", "41 000 ft", "37 000 ft", "35 000 ft"], 0),
+
+    Q("The tolerance on maximum differential pressure and safety valve setting is:",
+      ["± 7 hPa (0.1 PSI)", "± 14 hPa (0.2 PSI)", "± 3.5 hPa (0.05 PSI)", "± 10 hPa (0.15 PSI)"], 0)
+  ];
+
+  /* =======================================================================
+     5. AUTO FLIGHT SYSTEM
+     ======================================================================= */
+  var AFS = [
+
+    Q("The minimum height for autopilot use at takeoff is:",
+      ["100 ft AGL and at least 5 s after liftoff", "50 ft AGL and at least 3 s after liftoff", "200 ft AGL and at least 10 s after liftoff", "150 ft AGL and at least 5 s after liftoff"], 0),
+
+    Q("The minimum height for autopilot use in approach with F-G/S mode is:",
+      ["200 ft AGL", "250 ft AGL", "160 ft AGL", "100 ft AGL"], 0),
+
+    Q("The minimum height for autopilot use in approach with FINAL APP, V/S or FPA mode is:",
+      ["250 ft AGL", "200 ft AGL", "160 ft AGL", "100 ft AGL"], 0),
+
+    Q("The minimum height for autopilot use in a circling approach for aircraft category C is:",
+      ["500 ft AGL", "600 ft AGL", "250 ft AGL", "400 ft AGL"], 0),
+
+    Q("The minimum height for autopilot use in a circling approach for aircraft category D is:",
+      ["600 ft AGL", "500 ft AGL", "700 ft AGL", "450 ft AGL"], 0),
+
+    Q("For an ILS/MLS approach when CAT1 is displayed on the FMA, the minimum height for autopilot use is:",
+      ["160 ft AGL", "200 ft AGL", "100 ft AGL", "250 ft AGL"], 0),
+
+    Q("For an ILS/MLS approach when CAT2 or CAT3 (single or dual) is displayed on the FMA, the minimum height for autopilot use is:",
+      ["0 ft AGL if autoland", "160 ft AGL", "100 ft AGL", "50 ft AGL"], 0),
+
+    Q("The minimum height for autopilot use after a manual go-around is:",
+      ["100 ft AGL", "200 ft AGL", "160 ft AGL", "50 ft AGL"], 0),
+
+    Q("The minimum height for autopilot use in all other flight phases is:",
+      ["500 ft AGL", "400 ft AGL", "300 ft AGL", "600 ft AGL"], 0),
+
+    Q("RNP accuracy with GPS PRIMARY, en route, with AP ON, is:",
+      ["1 NM", "0.5 NM", "0.3 NM", "1.1 NM"], 0),
+
+    Q("RNP accuracy with GPS PRIMARY, in terminal area, with AP ON, is:",
+      ["0.5 NM", "1 NM", "0.3 NM", "0.51 NM"], 0),
+
+    Q("RNP accuracy with GPS PRIMARY, in approach, with AP ON, is:",
+      ["0.3 NM", "0.5 NM", "1 NM", "0.1 NM"], 0),
+
+    Q("RNP accuracy en route with AP OFF and FD OFF is:",
+      ["1.1 NM", "1 NM", "0.5 NM", "1.5 NM"], 0),
+
+    Q("The minimum decision height for ILS CAT II is:",
+      ["100 ft", "50 ft", "25 ft", "200 ft"], 0),
+
+    Q("For CAT II (standard, SA CAT II, and OTS CAT II) the autopilot must be disconnected, for manual landing, no later than:",
+      ["80 ft AGL", "100 ft AGL", "50 ft AGL", "160 ft AGL"], 0),
+
+    Q("The minimum decision height for ILS Category III Fail Passive (Single) is:",
+      ["50 ft", "100 ft", "25 ft", "75 ft"], 0),
+
+    Q("For ILS Category III Fail Operational (Dual), the alert height is:",
+      ["100 ft", "50 ft", "25 ft", "200 ft"], 0),
+
+    Q("For CAT III with DH (fail operational, dual), the minimum decision height is:",
+      ["25 ft", "50 ft", "100 ft", "0 ft"], 0),
+
+    Q("For CAT III without DH (fail operational, dual), the minimum runway visual range is:",
+      ["75 m", "100 m", "50 m", "125 m"], 0),
+
+    Q("CAT II and CAT III fail passive autoland engine-out procedures must be completed before reaching:",
+      ["1 000 ft in approach", "500 ft in approach", "1 500 ft in approach", "800 ft in approach"], 0),
+
+    Q("The maximum headwind for automatic landing (ILS/MLS CAT II/III, GLS CAT I) is:",
+      ["30 kt", "25 kt", "35 kt", "20 kt"], 0),
+
+    Q("The maximum tailwind for automatic landing (ILS/MLS CAT II/III, GLS CAT I) is:",
+      ["10 kt", "15 kt", "5 kt", "20 kt"], 0),
+
+    Q("The maximum crosswind for automatic landing (ILS/MLS CAT II/III, GLS CAT I) is:",
+      ["20 kt", "25 kt", "15 kt", "30 kt"], 0),
+
+    Q("Automatic landing is demonstrated with a glide slope angle between:",
+      ["-2.5° and -3.15°", "-2.0° and -3.0°", "-2.75° and -3.25°", "-3.0° and -3.5°"], 0),
+
+    Q("Automatic landing is demonstrated with an airport elevation at or below:",
+      ["6 500 ft", "8 000 ft", "5 000 ft", "7 500 ft"], 0),
+
+    Q("Automatic landing is not allowed below a pressure altitude of:",
+      ["-1 000 ft", "-500 ft", "0 ft", "-2 000 ft"], 0),
+
+    Q("At which airport is automatic landing not permitted on runways 03R/21L?",
+      ["Johannesburg", "Bogotá", "Mexico City", "La Paz"], 0)
+  ];
+
+  /* =======================================================================
+     6. AUXILIARY POWER UNIT (APU)
+     ======================================================================= */
+  var APU = [
+
+    Q("After three consecutive APU start attempts, the flight crew must wait before a new start attempt:",
+      ["60 min", "30 min", "45 min", "15 min"], 0),
+
+    Q("The APU maximum N (rotor) speed is:",
+      ["107 %", "100 %", "105 %", "110 %"], 0),
+
+    Q("The maximum EGT for APU start is:",
+      ["1 038 °C", "980 °C", "1 100 °C", "900 °C"], 0),
+
+    Q("The maximum EGT for APU running is:",
+      ["725 °C", "635 °C", "800 °C", "700 °C"], 0),
+
+    Q("On the APU operational envelope, the maximum altitude for electric power only is:",
+      ["25 000 ft", "20 000 ft", "22 500 ft", "30 000 ft"], 0),
+
+    Q("On the APU operational envelope, the maximum altitude for bleed air and electric power on the ground is:",
+      ["14 500 ft", "20 000 ft", "22 500 ft", "10 000 ft"], 0),
+
+    Q("The APU battery restart limit (electric emergency configuration) is at a pressure altitude of:",
+      ["25 000 ft", "20 000 ft", "22 500 ft", "14 500 ft"], 0),
+
+    Q("The maximum altitude for APU bleed to assist engine start is:",
+      ["20 000 ft", "22 500 ft", "15 000 ft", "25 000 ft"], 0),
+
+    Q("The maximum altitude for air conditioning and pressurization with single pack operation (APU bleed) is:",
+      ["22 500 ft", "20 000 ft", "15 000 ft", "25 000 ft"], 0),
+
+    Q("The maximum altitude for air conditioning and pressurization with dual pack operation (APU bleed) is:",
+      ["15 000 ft", "22 500 ft", "20 000 ft", "14 500 ft"], 0)
+  ];
+
+  /* =======================================================================
+     7. COMMUNICATION
+     ======================================================================= */
+  var COM = [
+
+    Q("It is prohibited to use the GSM Onboard System below:",
+      ["3 000 m AGL (approximately 10 000 ft)", "1 500 m AGL (approximately 5 000 ft)", "5 000 m AGL (approximately 16 000 ft)", "1 000 m AGL (approximately 3 300 ft)"], 0),
+
+    Q("The use of mobile phones onboard is always prohibited in which two locations?",
+      ["The toilets and the cockpit", "The cockpit and the cabin aisles", "The toilets and the galleys", "The cargo hold and the cockpit"], 0)
+  ];
+
+  /* =======================================================================
+     8. ENGINES
+     ======================================================================= */
+  var ENG = [
+
+    Q("At takeoff and go-around with all engines operative, the time limit and EGT limit are:",
+      ["5 min / 635 °C", "10 min / 635 °C", "5 min / 610 °C", "10 min / 610 °C"], 0),
+
+    Q("At takeoff and go-around with one engine inoperative, the time limit and EGT limit are:",
+      ["10 min / 635 °C", "5 min / 635 °C", "10 min / 610 °C", "15 min / 635 °C"], 0),
+
+    Q("At Maximum Continuous Thrust (MCT), the time limit and EGT limit are:",
+      ["Not limited / 610 °C", "10 min / 610 °C", "Not limited / 635 °C", "5 min / 610 °C"], 0),
+
+    Q("The EGT limit for engine starting (on ground or in flight) is:",
+      ["635 °C", "610 °C", "725 °C", "600 °C"], 0),
+
+    Q("The maximum N1 is:",
+      ["100 %", "105 %", "107 %", "95 %"], 0),
+
+    Q("The maximum N2 is:",
+      ["100 %", "105 %", "107 %", "98 %"], 0),
+
+    Q("Maximum continuous oil temperature is:",
+      ["155 °C", "165 °C", "140 °C", "150 °C"], 0),
+
+    Q("Maximum transient oil temperature (15 min) is:",
+      ["165 °C", "155 °C", "175 °C", "160 °C"], 0),
+
+    Q("Minimum oil starting temperature is:",
+      ["-40 °C", "-30 °C", "-54 °C", "-20 °C"], 0),
+
+    Q("Minimum oil temperature before IDLE is exceeded is:",
+      ["-10 °C", "-20 °C", "0 °C", "-5 °C"], 0),
+
+    Q("Minimum oil temperature before takeoff is:",
+      ["50 °C", "40 °C", "60 °C", "30 °C"], 0),
+
+    Q("Minimum oil quantity is:",
+      ["11 qt + estimated consumption", "8 qt + estimated consumption", "15 qt + estimated consumption", "10 qt, fixed"], 0),
+
+    Q("The average estimated oil consumption used for the minimum oil quantity calculation is:",
+      ["0.3 qt/h", "0.5 qt/h", "0.2 qt/h", "0.1 qt/h"], 0),
+
+    Q("Minimum oil pressure is:",
+      ["60 PSI", "45 PSI", "75 PSI", "50 PSI"], 0),
+
+    Q("For ground starts, the required pause between successive start cycles is:",
+      ["15 s", "30 s", "10 s", "60 s"], 0),
+
+    Q("A 30 min cooling period is required after:",
+      ["Three failed start cycles or 5 min of continuous crank", "Two failed start cycles or 3 min of continuous crank", "Five failed start cycles or 10 min of continuous crank", "One failed start cycle"], 0),
+
+    Q("For manual start, the maximum cycle time is:",
+      ["2 min", "3 min", "1 min", "5 min"], 0),
+
+    Q("For crank, the maximum cycle time is:",
+      ["5 min", "2 min", "10 min", "3 min"], 0),
+
+    Q("The starter must not be run when N2 is above:",
+      ["10 % on-ground and 18 % in-flight", "15 % on-ground and 20 % in-flight", "10 % on-ground and 25 % in-flight", "5 % on-ground and 15 % in-flight"], 0),
+
+    Q("Maximum reverse thrust should not be used below:",
+      ["70 kt", "60 kt", "80 kt", "50 kt"], 0),
+
+    Q("TFLEX (the FLEX temperature) cannot be higher than TMAXFLEX, which is equal to:",
+      ["ISA + 55 °C", "ISA + 45 °C", "ISA + 50 °C", "ISA + 60 °C"], 0),
+
+    Q("The engine is able to start in a crosswind up to:",
+      ["35 kt", "30 kt", "40 kt", "25 kt"], 0)
+  ];
+
+  /* =======================================================================
+     9. FLIGHT CONTROLS
+     ======================================================================= */
+  var FCTL = [
+
+    Q("The maximum operating altitude with slats and/or flaps extended is:",
+      ["20 000 ft", "15 000 ft", "25 000 ft", "18 000 ft"], 0)
+  ];
+
+  /* =======================================================================
+     10. FUEL
+     ======================================================================= */
+  var FUEL = [
+
+    Q("The minimum fuel temperature for Jet A1/JP8/N°3 Jet is:",
+      ["-43 °C", "-36 °C", "-42 °C", "-45 °C"], 0),
+
+    Q("The minimum fuel temperature for Jet A is:",
+      ["-36 °C (monitor if TAT reaches -34 °C)", "-43 °C", "-42 °C", "-45 °C"], 0),
+
+    Q("The minimum fuel temperature for JP5 is:",
+      ["-42 °C", "-43 °C", "-45 °C", "-46 °C"], 0),
+
+    Q("The minimum fuel temperature for RT and TS-1 is:",
+      ["-45 °C", "-43 °C", "-42 °C", "-47 °C"], 0),
+
+    Q("The minimum fuel temperature for Jet B is:",
+      ["-46 °C", "-45 °C", "-43 °C", "-49 °C"], 0),
+
+    Q("The minimum fuel temperature for JP4 is:",
+      ["-54 °C", "-46 °C", "-49 °C", "-50 °C"], 0),
+
+    Q("The maximum fuel temperature for Jet A1/JP8/N°3 Jet/Jet A/JP5/RT/TS-1 is:",
+      ["54 °C", "49 °C", "50 °C", "45 °C"], 0),
+
+    Q("The maximum fuel temperature for Jet B/JP4 is:",
+      ["49 °C", "54 °C", "45 °C", "50 °C"], 0),
+
+    Q("If the wing fuel temperature exceeds 30°C at engine start (with JP4/Jet B), the altitude must be limited to, until the center tank is empty:",
+      ["35 000 ft", "30 000 ft", "25 000 ft", "39 800 ft"], 0),
+
+    Q("If the wing fuel temperature exceeds 40°C at engine start (with JP4/Jet B), the altitude must be limited to, until the center tank is empty:",
+      ["30 000 ft", "35 000 ft", "25 000 ft", "20 000 ft"], 0),
+
+    Q("If the wing fuel temperature exceeds 49°C at engine start (with JP4/Jet B), the altitude must be limited to, until the center tank is empty:",
+      ["25 000 ft", "30 000 ft", "35 000 ft", "20 000 ft"], 0),
+
+    Q("Fuel imbalance at takeoff — inner tanks full (outer tanks balanced) — maximum asymmetry is:",
+      ["500 kg (1 102 lb)", "1 050 kg (2 314 lb)", "1 450 kg (3 196 lb)", "370 kg (815 lb)"], 0),
+
+    Q("Fuel imbalance at takeoff — outer tanks (inner tanks balanced) — maximum asymmetry is:",
+      ["370 kg (815 lb)", "500 kg (1 102 lb)", "690 kg (1 521 lb)", "1 050 kg (2 314 lb)"], 0),
+
+    Q("Fuel imbalance in flight and at landing — inner tanks full (outer tanks balanced) — maximum asymmetry is:",
+      ["1 500 kg (3 306 lb)", "1 600 kg (3 527 lb)", "2 250 kg (4 960 lb)", "1 050 kg (2 314 lb)"], 0),
+
+    Q("Fuel imbalance in flight and at landing — outer tanks — maximum asymmetry is:",
+      ["690 kg (1 521 lb)", "370 kg (815 lb)", "1 500 kg (3 306 lb)", "500 kg (1 102 lb)"], 0),
+
+    Q("Below what heavier-inner-tank quantity is there no limitation on in-flight/landing fuel imbalance?",
+      ["2 250 kg (4 960 lb)", "1 450 kg (3 196 lb)", "3 000 kg (6 613 lb)", "1 600 kg (3 527 lb)"], 0),
+
+    Q("The minimum fuel quantity for takeoff is:",
+      ["1 500 kg (3 307 lb)", "1 000 kg (2 205 lb)", "2 000 kg (4 409 lb)", "1 200 kg (2 646 lb)"], 0)
+  ];
+
+  /* =======================================================================
+     11. ICE AND RAIN PROTECTION
+     ======================================================================= */
+  var ICE = [
+
+    Q("Icing conditions exist when the OAT (ground/after takeoff) or TAT (in flight) is at or below what temperature with visible moisture present?",
+      ["10 °C", "5 °C", "0 °C", "15 °C"], 0),
+
+    Q("Icing conditions exist (regarding visible moisture such as fog) when visibility is:",
+      ["1 sm (1 600 m) or less", "3 sm (5 000 m) or less", "0.5 sm (800 m) or less", "2 sm (3 200 m) or less"], 0),
+
+    Q("Ice accretion is considered severe when the ice accumulation on the airframe reaches approximately:",
+      ["5 mm (0.2 in) thick or more", "2 mm (0.08 in) thick or more", "10 mm (0.4 in) thick or more", "3 mm (0.12 in) thick or more"], 0),
+
+    Q("The rain repellent should only be used by the flight crew in the case of:",
+      ["Moderate to heavy rain", "Any rain, however light", "Freezing rain only", "Heavy rain only, never moderate"], 0)
+  ];
+
+  /* =======================================================================
+     12. LANDING GEAR
+     ======================================================================= */
+  var LG = [
+
+    Q("The maximum brake temperature for takeoff (brake fans off) is:",
+      ["300 °C", "250 °C", "350 °C", "400 °C"], 0),
+
+    Q("The maximum NWS (nosewheel steering) angle for towbarless towing/pushback with an approved vehicle is:",
+      ["±85 °", "±90 °", "±75 °", "±30 °"], 0),
+
+    Q("With one tire deflated on the main landing gear (maximum one tire per gear), the maximum taxi speed during a turn is:",
+      ["7 kt", "3 kt", "10 kt", "5 kt"], 0),
+
+    Q("With two tires deflated on the same main gear, the maximum taxi speed is:",
+      ["3 kt", "7 kt", "10 kt", "5 kt"], 0),
+
+    Q("With deflated tires, the maximum NWS angle is limited to:",
+      ["30 °", "45 °", "20 °", "60 °"], 0)
+  ];
+
+  /* =======================================================================
+     13. NAVIGATION
+     ======================================================================= */
+  var NAV = [
+
+    Q("Ground alignment of the IRS is possible in latitudes between:",
+      ["82° North and 82° South", "85° North and 85° South", "78° North and 78° South", "90° North and 90° South"], 0),
+
+    Q("If all ADIRUs have the same magnetic variation table, in NAV mode flying is prohibited north of:",
+      ["82° North (and north of 73° N between 90°W-120°W, and south of 60° S)", "75° North", "78° North", "80° North"], 0),
+
+    Q("If one ADIRU has a different magnetic variation table, in NAV mode flying is prohibited north of:",
+      ["75° North (and north of 60° N between 30°W-160°W, and south of 55° S)", "82° North", "73° North", "70° North"], 0)
+  ];
+
+  /* =======================================================================
+     14. OXYGEN
+     ======================================================================= */
+  var OXY = [
+
+    Q("At a REF temperature of 0 °C, the minimum bottle pressure for 2 crewmembers is:",
+      ["486 PSI", "468 PSI", "504 PSI", "522 PSI"], 0),
+
+    Q("At a REF temperature of 20 °C, the minimum bottle pressure for 2 crewmembers is:",
+      ["522 PSI", "504 PSI", "540 PSI", "486 PSI"], 0),
+
+    Q("At a REF temperature of 0 °C, the minimum bottle pressure for 2 crewmembers + 1 observer is:",
+      ["629 PSI", "606 PSI", "652 PSI", "675 PSI"], 0),
+
+    Q("At a REF temperature of 0 °C, the minimum bottle pressure for 2 crewmembers + 2 observers is:",
+      ["788 PSI", "759 PSI", "817 PSI", "846 PSI"], 0),
+
+    Q("On the ground, the REF Temperature used for minimum oxygen pressure is:",
+      ["(OAT + Cockpit TEMP) / 2", "OAT directly", "Cockpit TEMP directly", "(OAT + Cockpit TEMP) / 3"], 0),
+
+    Q("In flight, the REF Temperature used for minimum oxygen pressure is:",
+      ["CAB TEMP (°C) - 10 °C", "CAB TEMP (°C) + 10 °C", "CAB TEMP (°C) - 5 °C", "OAT - 10 °C"], 0),
+
+    Q("The minimum bottle pressure must cover, among other things, protection after loss of cabin pressure during emergency descent for all flight crewmembers and observers, for:",
+      ["13 min", "10 min", "15 min", "20 min"], 0),
+
+    Q("The minimum bottle pressure must cover protection after loss of cabin pressure during cruise at FL 100, for two flight crewmembers, for:",
+      ["107 min", "90 min", "120 min", "60 min"], 0),
+
+    Q("The minimum bottle pressure must cover protection against smoke with 100% oxygen for all flight crewmembers and observers during:",
+      ["15 min at 8 000 ft cabin altitude", "10 min at 8 000 ft cabin altitude", "20 min at 10 000 ft cabin altitude", "15 min at 10 000 ft cabin altitude"], 0)
+  ];
+
+  /* =======================================================================
+     15. SURVEILLANCE
+     ======================================================================= */
+  var SURV = [
+
+    Q("The predictive GPWS functions should be inhibited (TERR pb to OFF) when the aircraft position is less than what distance from the airfield, under the specified conditions?",
+      ["15 NM", "10 NM", "20 NM", "25 NM"], 0)
+  ];
+
+  /* =======================================================================
+     REPARTO DE LA CLAVE (mismo método que en los otros módulos: rotación
+     estable derivada de un hash del enunciado).
+     ======================================================================= */
+  function hashEnunciado(s) {
+    var h = 5381, i;
+    for (i = 0; i < s.length; i++) { h = ((h << 5) + h + s.charCodeAt(i)) | 0; }
+    return Math.abs(h);
+  }
+  function repartirClave(preguntas) {
+    preguntas.forEach(function (p) {
+      var n = p.ops.length;
+      var k = hashEnunciado(p.q) % n;
+      if (k === 0) return;
+      p.ops = p.ops.slice(n - k).concat(p.ops.slice(0, n - k));
+      p.correct = (p.correct + k) % n;
+    });
+    return preguntas;
+  }
+  [AG, SPD, WGT, AIR, AFS, APU, COM, ENG, FCTL, FUEL, ICE, LG, NAV, OXY, SURV].forEach(repartirClave);
+
+  /* =======================================================================
+     REGISTRO DEL BANCO
+     ======================================================================= */
+  bancos.a320lim = {
+    key: 'a320lim',
+    nombre: 'A320 LIM',
+    nombreLargo: 'A320 FCOM \u2014 Limitations',
+    codigos: {
+      'Aircraft General':          'AG',
+      'Speeds':                    'SPD',
+      'Weights':                   'WGT',
+      'Air/Press/Vent':            'AIR',
+      'Auto Flight System':        'AFS',
+      'APU':                       'APU',
+      'Communication':             'COM',
+      'Engines':                   'ENG',
+      'Flight Controls':           'FCTL',
+      'Fuel':                      'FUEL',
+      'Ice and Rain Protection':   'ICE',
+      'Landing Gear':              'LG',
+      'Navigation':                'NAV',
+      'Oxygen':                    'OXY',
+      'Surveillance':              'SURV'
+    },
+    temas: [
+      { nombre: 'Aircraft General',        preguntas: AG },
+      { nombre: 'Speeds',                  preguntas: SPD },
+      { nombre: 'Weights',                 preguntas: WGT },
+      { nombre: 'Air/Press/Vent',          preguntas: AIR },
+      { nombre: 'Auto Flight System',      preguntas: AFS },
+      { nombre: 'APU',                     preguntas: APU },
+      { nombre: 'Communication',           preguntas: COM },
+      { nombre: 'Engines',                 preguntas: ENG },
+      { nombre: 'Flight Controls',         preguntas: FCTL },
+      { nombre: 'Fuel',                    preguntas: FUEL },
+      { nombre: 'Ice and Rain Protection', preguntas: ICE },
+      { nombre: 'Landing Gear',            preguntas: LG },
+      { nombre: 'Navigation',              preguntas: NAV },
+      { nombre: 'Oxygen',                  preguntas: OXY },
+      { nombre: 'Surveillance',            preguntas: SURV }
+    ]
+  };
+
+  /* =======================================================================
+     ENGANCHES AL MOTOR (idéntico patrón a los otros módulos)
+     ======================================================================= */
+  function asegurarEstado() {
+    if (typeof estado === 'undefined' || !estado) return;
+    Object.keys(bancos).forEach(function (bk) {
+      if (!Array.isArray(estado[bk]) || estado[bk].length !== bancos[bk].temas.length) {
+        estado[bk] = crearEstadoBanco(bk);
+      }
+    });
+  }
+  function envolver(nombre, despues) {
+    var f = (typeof window !== 'undefined') ? window[nombre] : null;
+    if (typeof f !== 'function') return false;
+    window[nombre] = function () {
+      var r = f.apply(this, arguments);
+      return despues ? despues(r) : r;
+    };
+    return true;
+  }
+  if (typeof window !== 'undefined' && typeof window.migrarEstado === 'function') {
+    var _migrar = window.migrarEstado;
+    window.migrarEstado = function (prog) {
+      var out = _migrar(prog) || {};
+      Object.keys(bancos).forEach(function (bk) {
+        if (Array.isArray(out[bk]) && out[bk].length === bancos[bk].temas.length) return;
+        var base = crearEstadoBanco(bk);
+        var guardado = (prog && prog[bk]) || [];
+        out[bk] = base.map(function (def, i) {
+          var g = guardado[i];
+          if (g && Array.isArray(g.respuestas) && g.respuestas.length === def.respuestas.length) {
+            return Object.assign({}, def, g);
+          }
+          return def;
+        });
+      });
+      return out;
+    };
+  }
+  envolver('entrarInvitado',  function (r) { asegurarEstado(); if (typeof renderBancos === 'function') renderBancos(); return r; });
+  envolver('reiniciarPerfil', function (r) { asegurarEstado(); if (typeof renderBancos === 'function') renderBancos(); return r; });
+  if (typeof window !== 'undefined' && typeof window.renderBancos === 'function') {
+    var _render = window.renderBancos;
+    window.renderBancos = function () { asegurarEstado(); return _render.apply(this, arguments); };
+  }
+  asegurarEstado();
+
+  var _total = bancos.a320lim.temas.reduce(function (a, t) { return a + t.preguntas.length; }, 0);
+  console.log('[banco a320 lim] instalado: ' + bancos.a320lim.temas.length + ' materias, ' + _total + ' preguntas.');
+
+})();
 })();
 </script>
 </body>

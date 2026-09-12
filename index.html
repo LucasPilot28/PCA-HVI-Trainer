@@ -8641,7 +8641,1690 @@ intentarSesionGuardada(); (function () {
 
   var _total = bancos.a320tech.temas.reduce(function (a, t) { return a + t.preguntas.length; }, 0);
   console.log('[banco a320 tech] instalado: ' + bancos.a320tech.temas.length + ' materias, ' + _total + ' preguntas.');
-  
+  (function(){
+  // ATPL question bank sourced from the ATPL section (Q1-162) of the Wizz Air interview prep document.
+  // Q21 (registration-mark question) was omitted: the source gave no stated correct answer for it.
+  // Question text and correct answers are taken from the source's own stated answers; the three
+  // incorrect distractor options on every question were authored for this trainer (the source material
+  // was open-ended Q&A, not already multiple-choice), so they are NOT verbatim from the source.
+  // Option order is shuffled per question (seeded) so the correct answer isn't always in the same slot.
+  if (typeof bancos === 'undefined') {
+    console.error('ATPL Wizz bank: `bancos` global not found - load this after the core trainer script.');
+    return;
+  }
+  bancos['wizzatpl'] = {
+  "key": "wizzatpl",
+  "nombre": "ATPL (Wizz Air Prep)",
+  "nombreLargo": "ATPL - Wizz Air Interview Preparation (Questions 1-162)",
+  "codigos": {
+    "Air Law & Aerodrome Operations": "LAW",
+    "Performance & Mass and Balance": "PERF",
+    "Principles of Flight & Aircraft Systems": "POF",
+    "Meteorology": "MET",
+    "Navigation & Radio Navigation": "NAV",
+    "Human Performance & Limitations (incl. CRM)": "HPL",
+    "Communications": "COM",
+    "General Knowledge": "GEN"
+  },
+  "temas": [
+    {
+      "nombre": "Air Law & Aerodrome Operations",
+      "preguntas": [
+        {
+          "q": "A temporarily displaced runway threshold (where the runway designator has not been moved) applies for a period of:",
+          "ops": [
+            "12 months or less",
+            "Indefinitely, until further notice",
+            "30 days or less",
+            "6 months or less"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "An aeroplane is considered to be in the 'heavy' weight category when its mass is:",
+          "ops": [
+            "136,000 kg or more",
+            "100,000 kg or more",
+            "155,000 kg or more",
+            "120,000 kg or more"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "A runway is considered contaminated with ice/snow when the coverage exceeds:",
+          "ops": [
+            "25%",
+            "33%",
+            "50%",
+            "10%"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "In case of SSR transponder failure occurring after departure on an IFR flight, the pilot shall:",
+          "ops": [
+            "Squawk 7700 and continue as filed",
+            "Return to the departure aerodrome",
+            "Inform the ATC unit immediately",
+            "Continue and only report on landing"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "An aircraft experiencing radio communication failure on an IFR flight in VMC should:",
+          "ops": [
+            "Continue to destination as filed",
+            "Squawk 7700 and orbit until contact is regained",
+            "Divert to the filed alternate only",
+            "Continue in VMC, land at the nearest suitable aerodrome, and report its arrival"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "An aircraft experiencing radio communication failure on an IFR flight in IMC should:",
+          "ops": [
+            "Land at the nearest suitable aerodrome regardless of conditions",
+            "Proceed in accordance with the current flight plan to the navigation aid serving the destination aerodrome",
+            "Climb to the highest usable flight level and orbit",
+            "Return immediately to the departure point"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "A reported braking action of 'Medium' corresponds to a braking coefficient of about:",
+          "ops": [
+            "Exactly 0.20",
+            "Below 0.25 (poor)",
+            "0.40 or above (good)",
+            "0.30 to 0.35"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "ASDA is defined as:",
+          "ops": [
+            "The full paved runway length only",
+            "The length of the TORA plus the clearway",
+            "The length of the TORA plus the stopway (if provided)",
+            "The usable landing length"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "TODA is defined as:",
+          "ops": [
+            "The usable landing length",
+            "The length of the TORA plus the stopway",
+            "The length of the TORA plus the clearway (if provided)",
+            "The runway length minus the displaced threshold"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "LDA is defined as:",
+          "ops": [
+            "The full physical runway length regardless of thresholds",
+            "TORA plus clearway",
+            "TORA plus stopway",
+            "The usable length for landing"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "A 'wet' runway is defined as one where:",
+          "ops": [
+            "Any precipitation is falling, regardless of surface condition",
+            "There is enough moisture on the surface to make it appear reflective, without significant standing water",
+            "The surface is covered by ice or slush",
+            "More than 25% of the surface is covered by water over 3 mm deep"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "The minimum separation time for a departing light/medium aircraft behind a heavy aircraft is:",
+          "ops": [
+            "2 minutes for a full-length takeoff, 3 minutes for an intermediate intersection takeoff",
+            "No time separation is required, only distance",
+            "3 and 4 minutes respectively",
+            "1 and 2 minutes respectively"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "The minimum separation between a light/medium aircraft and a heavy aircraft making a low/missed approach on the opposite runway is:",
+          "ops": [
+            "2 minutes",
+            "3 minutes",
+            "5 minutes",
+            "1 minute"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "ICAO Annex 2 covers:",
+          "ops": [
+            "Aircraft Nationality and Registration Marks",
+            "Meteorological Service for International Air Navigation",
+            "Aeronautical Telecommunications",
+            "Rules of the Air"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "Above 10,000 ft AMSL, the VMC minima for VFR flights in all airspace classes are:",
+          "ops": [
+            "Visibility of 8 km and clear of cloud",
+            "Visibility of 5 km and 1500 m horizontal / 300 m vertical",
+            "Visibility of 5 km and clear of cloud",
+            "Visibility of 8 km and distance from cloud 1500 m horizontally / 1000 ft vertically"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "The ICAO procedure to collect and disseminate bird-strike hazard information is called:",
+          "ops": [
+            "NOTAM Bird Watch",
+            "IBIS (ICAO Bird Strike Information System)",
+            "AVSEC",
+            "BASH (Bird Aircraft Strike Hazard)"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "The separation required between a heavy aircraft and a light aircraft upon landing is:",
+          "ops": [
+            "2 minutes",
+            "3 minutes",
+            "5 minutes",
+            "1 minute"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "Landing in low visibility, after touchdown you see only alternating red and white centreline lights. How much runway remains?",
+          "ops": [
+            "Not more than 1500 m",
+            "Not more than 900 m (last 300 m are solid red)",
+            "Not more than 600 m",
+            "Not more than 300 m"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "When the runway centreline lights turn solid red, how much runway remains?",
+          "ops": [
+            "150 m (500 ft)",
+            "305 m (1000 ft)",
+            "600 m (2000 ft)",
+            "900 m (3000 ft)"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "When the runway centreline lights alternate red and white, how much runway remains?",
+          "ops": [
+            "915 m (3000 ft)",
+            "600 m (2000 ft)",
+            "305 m (1000 ft)",
+            "1200 m (4000 ft)"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "Runway edge lights, before and after a displaced threshold, are coloured:",
+          "ops": [
+            "Red before the threshold, white after (turning yellow on the last 2000 ft / 600 m)",
+            "Blue before, white after",
+            "White before the threshold, red after",
+            "Yellow before, red after"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "AIRAC stands for a system that provides:",
+          "ops": [
+            "Air interception and reporting for ATC",
+            "A charting standard used only for RNAV procedures",
+            "Advance notification, based on common effective dates, of circumstances requiring significant changes to operating procedures",
+            "Automated in-flight route adjustment coordination"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "Aircraft registration marks (letters and numbers) shall be assigned by:",
+          "ops": [
+            "The operating airline",
+            "The State of registry or its common mark registering authority",
+            "The aircraft manufacturer",
+            "ICAO headquarters directly"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "Which index colour of the AIC contains information about ATS facilities?",
+          "ops": [
+            "Yellow",
+            "Pink (safety)",
+            "Mauve (restrictions)",
+            "White (administration)"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "An aircraft manoeuvring in an airport circuit receives a series of red flashes from the control tower. This means:",
+          "ops": [
+            "Return for landing",
+            "Land and proceed to the apron",
+            "Give way to another aircraft in an emergency",
+            "Do not land - the aerodrome is unsafe/not available for landing"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "At night, an aircraft observes a luminous signal requesting help. How should the pilot acknowledge receipt?",
+          "ops": [
+            "By transmitting blind on 121.5 only",
+            "By rocking the wings",
+            "By flashing the landing lights twice, or navigation lights if landing lights are not fitted",
+            "By squawking 7700 only"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "ATIS broadcasts for departure and arrival should include cloud cover when clouds are:",
+          "ops": [
+            "At or below 10,000 ft always",
+            "At or below 1000 ft only",
+            "Only when the sky is overcast",
+            "At or below 5000 ft or the highest MSA, whichever is greater"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "The primary duty provided by a radar unit is to:",
+          "ops": [
+            "Provide navigation guidance only",
+            "Provide radar separation",
+            "Provide traffic advisories only, with no separation role",
+            "Provide weather avoidance guidance only"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "RESA (Runway End Safety Area) has a minimum length of:",
+          "ops": [
+            "300 m",
+            "60 m",
+            "150 m",
+            "90 m (240 m recommended for longer runways)"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "Search and Rescue (SAR) information can be found in:",
+          "ops": [
+            "The company operations manual only",
+            "The AIP, GEN section",
+            "The AIP, ENR section only",
+            "NOTAMs only"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "Which is more restrictive, the operator's MEL or the manufacturer's MMEL?",
+          "ops": [
+            "Restrictiveness depends solely on aircraft age",
+            "They are always identical",
+            "The MEL (operator's) is usually more restrictive than the MMEL (manufacturer's)",
+            "The MMEL is always more restrictive than the MEL"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "An aircraft making a radar approach with no landing clearance received from the non-radar controller should be directed to execute a missed approach by the time it reaches a distance of:",
+          "ops": [
+            "0.5 NM",
+            "5 NM",
+            "1 NM",
+            "2 NM"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "A PAPI (Precision Approach Path Indicator) consists of:",
+          "ops": [
+            "A wing bar of 4 sharp-transition multi-lamp or paired units, equally spaced",
+            "2 lamp units on each side of the runway",
+            "3 coloured lamp units mounted on the threshold",
+            "6 lamp units in a vertical column"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "The purpose of an ATC clearance is to:",
+          "ops": [
+            "Authorise deviations from company SOPs",
+            "Prevent collisions and expedite/maintain an orderly flow of traffic",
+            "Guarantee an on-time arrival",
+            "Assign the most fuel-efficient routing"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "The validity of a SNOWTAM is:",
+          "ops": [
+            "12 hours",
+            "24 hours",
+            "8 hours",
+            "4 hours"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "If part of a runway is not cleared after contamination, which SNOWTAM sections show extent/type and depth per runway third?",
+          "ops": [
+            "Section A and Section B",
+            "Section C and Section D",
+            "Section H and Section I",
+            "Section F (extent and type) and Section G (depth)"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "Where can crosswind limitations on a contaminated runway be found?",
+          "ops": [
+            "OM Part A only",
+            "OM Part B (operational procedures and limitations specific to the aircraft type)",
+            "OM Part C only",
+            "The AIP GEN section"
+          ],
+          "correct": 1
+        }
+      ]
+    },
+    {
+      "nombre": "Performance & Mass and Balance",
+      "preguntas": [
+        {
+          "q": "During a drift-down procedure, the minimum vertical separation required above obstacles is:",
+          "ops": [
+            "1500 ft",
+            "1000 ft",
+            "500 ft",
+            "2000 ft"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "A 'balanced field' takeoff condition means:",
+          "ops": [
+            "The runway length exactly equals the aircraft's takeoff distance required",
+            "The aircraft's weight is balanced evenly between main and nose gear",
+            "V1 is the speed at which the accelerate-stop distance equals the one-engine-inoperative takeoff distance (OEI ASDR = OEI TODR)",
+            "V1 equals VR"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "A 'balanced V1' is selected when:",
+          "ops": [
+            "V1 equals VMCG",
+            "The stopway equals the clearway",
+            "V1 is the average of VR and V2",
+            "The accelerate-stop distance equals the one-engine-inoperative takeoff distance"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "Compared to a balanced field condition, taking a stopway into account leads to:",
+          "ops": [
+            "A lower takeoff mass and decreased V1",
+            "A higher takeoff mass but a lower V1",
+            "No change to takeoff mass or V1",
+            "A higher takeoff mass and increased V1"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "The minimum climb gradient required with all engines operating is typically:",
+          "ops": [
+            "3.2%",
+            "1.2%",
+            "2.5%",
+            "0.3%"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "If the centre of gravity is placed far aft in flight, the effect on elevator trim is:",
+          "ops": [
+            "Nose-up trim force is increased",
+            "Trim force becomes neutral",
+            "No change in trim force",
+            "Nose-down trim force is increased"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "For an aeroplane departing a high-altitude tropical airport at 1400 local time, with an exceptionally long runway, the most likely limiting factor for takeoff mass is:",
+          "ops": [
+            "Crosswind component",
+            "Obstacle clearance in the climb-out",
+            "Runway length alone",
+            "Altitude and temperature of the departure airfield"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "'Basic empty mass' includes:",
+          "ops": [
+            "Crew and their baggage",
+            "Unusable fuel and fluids (engine/APU oil, fire extinguishers, pyrotechnics, emergency oxygen, supplementary electronic equipment)",
+            "Usable fuel and passenger baggage",
+            "Payload and cargo"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "When you know well in advance that you will need to hold, the best practice is to:",
+          "ops": [
+            "Increase speed to reach the holding fix sooner",
+            "Maintain normal cruise speed and descend only when cleared",
+            "Reduce cruise speed to lower fuel consumption and hold at the minimum clean speed",
+            "Descend early to burn less fuel at low level"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "The correction factor applied to landing distance for a wet runway is an increase of:",
+          "ops": [
+            "7%",
+            "15%",
+            "30%",
+            "25%"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "If last-minute extra cargo is loaded forward of the CG, the trim setting adjustment should be:",
+          "ops": [
+            "Nose-down (trim forward)",
+            "No adjustment is needed",
+            "Nose-up (trim aft), lowering the leading edge of the stabiliser",
+            "Trim to neutral regardless of load position"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "Regarding CG limits, which statement is true?",
+          "ops": [
+            "The manufacturer's limit is always more restrictive than the operator's",
+            "CG limits cannot be set by the operator",
+            "CG limits are identical for every operator by regulation",
+            "An operator's CG limit can be more restrictive than the manufacturer's CG limit"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "VMO and MMO are defined respectively as:",
+          "ops": [
+            "The maximum landing speed and max taxi speed",
+            "The manoeuvring speed and design cruise Mach",
+            "The maximum operating speed and the maximum operating Mach number",
+            "The minimum operating speed and minimum operating Mach number"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "How can you increase your optimum altitude in cruise?",
+          "ops": [
+            "By selecting a lower cost index only",
+            "By increasing weight",
+            "By reducing weight (as fuel burns off)",
+            "By flying slower regardless of weight"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "How does VMCG change with increasing field elevation and temperature?",
+          "ops": [
+            "It remains unchanged",
+            "It increases due to reduced rudder authority",
+            "It increases, because air density decreases",
+            "It decreases, because engine thrust decreases"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "If the CG is near the forward limit, the aircraft will:",
+          "ops": [
+            "Become tail-heavy",
+            "Require less elevator trim, reducing fuel consumption",
+            "Require more elevator trim, increasing fuel consumption",
+            "Have no change in trim requirement"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "What happens to climb time when the CG moves forward?",
+          "ops": [
+            "It becomes unpredictable",
+            "It increases (higher drag and reduced climb performance)",
+            "It decreases",
+            "It stays the same"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "Why do aircraft fly at high altitude?",
+          "ops": [
+            "Only because engines cannot operate efficiently at low altitude",
+            "Only to avoid ATC congestion",
+            "Better fuel efficiency, speed, safety and passenger comfort, while avoiding congestion and weather",
+            "Only for passenger comfort"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "For a turboprop, the landing distance available at an alternate must be at least the landing distance required multiplied by a factor of:",
+          "ops": [
+            "0.8 for both",
+            "0.6 for turboprops and 0.7 for jets",
+            "0.7 (0.6 for jets)",
+            "0.5 for both"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "'Screen height' is defined as:",
+          "ops": [
+            "The height at which flaps must be retracted",
+            "The MDA for a non-precision approach",
+            "The height of the control tower cab",
+            "The height at the end of the takeoff distance required and the beginning of the landing distance required"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "What happens to your glidepath when you experience more headwind than expected?",
+          "ops": [
+            "No change is needed",
+            "You need a shallower descent rate to maintain the glide, because of a slower groundspeed",
+            "Groundspeed increases, requiring a steeper descent",
+            "You need a steeper descent rate"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "What happens if you set more flaps than needed for takeoff?",
+          "ops": [
+            "Increased drag, slower acceleration, longer takeoff distance and reduced climb performance",
+            "Improved climb performance only",
+            "No measurable effect",
+            "Reduced drag and shorter takeoff distance"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "The maximum landing-gear-extended speed is represented by:",
+          "ops": [
+            "VMO",
+            "VFE",
+            "VLE",
+            "VLO"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "Which airspeed gives the greatest gain in altitude in the shortest distance during a climb after takeoff?",
+          "ops": [
+            "VR",
+            "Vy",
+            "V2",
+            "Vx"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "Which airspeed gives the greatest gain in altitude per unit of time?",
+          "ops": [
+            "Vy",
+            "Vx",
+            "VMCA",
+            "VLOF"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "Reducing the flap setting from 20 degrees to 10 degrees for takeoff will have the effect of:",
+          "ops": [
+            "Both VLOF and V2 decreasing",
+            "Both VLOF and V2 increasing",
+            "VLOF increasing but V2 decreasing",
+            "No change to either speed"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "The speed VLO is defined as:",
+          "ops": [
+            "The maximum speed with the gear locked down",
+            "The maximum speed for extending or retracting the landing gear",
+            "The minimum speed for gear retraction",
+            "The reference landing speed with gear extended"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "For runway performance calculations, what percentage of reported headwind and tailwind should be considered?",
+          "ops": [
+            "50% of the headwind and 150% of the tailwind",
+            "100% of headwind and 100% of tailwind",
+            "50% of headwind and 100% of tailwind",
+            "100% of headwind and 150% of tailwind"
+          ],
+          "correct": 0
+        }
+      ]
+    },
+    {
+      "nombre": "Principles of Flight & Aircraft Systems",
+      "preguntas": [
+        {
+          "q": "Which aircraft/situation experiences the largest decrease in induced drag between ground level and one wingspan of altitude?",
+          "ops": [
+            "A high-wing aircraft during takeoff",
+            "A high-wing aircraft during landing",
+            "A low-wing aircraft during landing",
+            "A low-wing aircraft during cruise"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "In a fly-by-wire aircraft, the artificial feel system is linked to the control surfaces:",
+          "ops": [
+            "It is not linked; feel is generated independently",
+            "Directly, via cables in series",
+            "Indirectly, through a flight control computer (irreversible, in parallel)",
+            "Through a hydro-mechanical reversion system only"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "Icing is dangerous on the ground because:",
+          "ops": [
+            "It can occur in places normally free of icing, such as wheel wells, during taxiing (unprotected areas)",
+            "It disables the aircraft's anti-skid system",
+            "It only affects the flight deck windows",
+            "Ground icing always forms faster than in-flight icing"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "During the ground roll for takeoff, the blade pitch of a constant-speed propeller:",
+          "ops": [
+            "Remains constant",
+            "Increases",
+            "Fluctuates randomly",
+            "Decreases"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "With increased altitude, the power-required curve shifts:",
+          "ops": [
+            "Up and to the right (higher power required at higher TAS)",
+            "Down and to the right",
+            "It stays in the same position",
+            "Down and to the left"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "When entering ground effect, the downwash angle and induced angle of attack:",
+          "ops": [
+            "Both reduce",
+            "Both increase",
+            "Downwash reduces but induced AoA increases",
+            "Both remain unchanged"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "The tire/brake limitations to observe are:",
+          "ops": [
+            "Tire pressure and anti-skid cycling only",
+            "Turnaround rate and VMBE (maximum brake energy speed)",
+            "Brake temperature and fuel load",
+            "Runway length and wind component"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "In straight flight, as speed is increased while trimming to keep stick forces at zero, what happens to the elevator and trim tab?",
+          "ops": [
+            "Neither moves further",
+            "The elevator deflects further upward and the trim tab further downward",
+            "Both move in the same direction",
+            "The elevator deflects further downward and the trim tab further upward"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "The effect on stall speed when weight is increased is that stall speed:",
+          "ops": [
+            "Becomes unpredictable",
+            "Increases",
+            "Decreases",
+            "Remains unchanged"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "When AC generators are connected in parallel, reactive loads are balanced by means of:",
+          "ops": [
+            "Load-shedding relays",
+            "Excitation current",
+            "Real power sharing bus",
+            "Frequency droop only"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "The primary DC system serves mainly as:",
+          "ops": [
+            "A backup used exclusively during engine start",
+            "A critical back-up to the main AC electrical system, powering essential and emergency systems",
+            "A source of power only for cabin lighting",
+            "The sole source of power for all flight instruments"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "For a symmetrical aerofoil, the coefficient of lift when angle of attack is zero:",
+          "ops": [
+            "Is at its maximum",
+            "Equals the aspect ratio",
+            "Is zero (no lift is produced)",
+            "Is negative regardless of speed"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "Vs1g is defined as:",
+          "ops": [
+            "The stall speed in a 60 degree bank",
+            "The speed at which the stick-shaker activates",
+            "The speed at maximum landing weight only",
+            "The lowest speed at which the aircraft can maintain 1g in level flight"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "A hydraulic system check valve's function is similar to a diode in an electrical circuit because both:",
+          "ops": [
+            "Direct flow and prevent backflow",
+            "Regulate voltage/pressure to a constant level",
+            "Store energy for later release",
+            "Convert one form of energy to another"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "The purpose of baffle check valves in a fuel tank is to:",
+          "ops": [
+            "Prevent fuel from siphoning overboard during refuelling",
+            "Filter contaminants from the fuel",
+            "Prevent movement of fuel toward the wingtips",
+            "Regulate fuel temperature"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "The purpose of hydraulic thermal relief valves is to:",
+          "ops": [
+            "Increase system pressure on demand",
+            "Relieve excess pressure caused by a rise in temperature",
+            "Prevent reverse flow in the system",
+            "Reduce pressure during normal operation"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "Which type of propeller rotation gives less problem in the event of critical engine failure?",
+          "ops": [
+            "Fixed-pitch propellers regardless of rotation",
+            "Counter-clockwise-only rotation on both engines",
+            "Clockwise-only rotation on both engines",
+            "Counter-rotating (or contra-rotating) propellers"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "In an air-cycle type ECS pack, the water separator is fitted:",
+          "ops": [
+            "After the cold air unit (ACM) turbine",
+            "Inside the ram air inlet",
+            "Before the cold air unit turbine",
+            "Before the compressor"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "Which aircraft behaviour is corrected by the yaw damper?",
+          "ops": [
+            "Spiral instability",
+            "Dutch roll, by moving the vertical stabiliser/rudder while the pedals remain fixed",
+            "Phugoid oscillation",
+            "Adverse yaw during aileron input"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "What happens when the Mach trim is inoperative?",
+          "ops": [
+            "The aircraft pitches up uncontrollably at any Mach",
+            "The autopilot compensates automatically without limitation",
+            "The pitch-down tendency at high Mach is not counteracted, so the Mach flown must be reduced",
+            "There is no operational effect"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "On a modern large pressurised transport aircraft, the maximum cabin differential pressure is approximately:",
+          "ops": [
+            "14-16 psi",
+            "7-9 psi (about 8.6 psi on the A320)",
+            "3-5 psi",
+            "10-12 psi"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "A 'wide-cut' fuel is:",
+          "ops": [
+            "Only used in piston engines",
+            "Identical in volatility to kerosene",
+            "More volatile than kerosene-type fuel",
+            "Less volatile than kerosene-type fuel"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "Station numbers and water lines are used as:",
+          "ops": [
+            "A means of locating airframe structure and components (a 3D grid system)",
+            "Fuel tank capacity markers",
+            "Load limits for cargo compartments",
+            "Maintenance interval references"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "The primary purpose of bonding the metallic parts of an aeroplane is to:",
+          "ops": [
+            "Provide safe distribution of electrical charges and currents",
+            "Reduce structural weight",
+            "Improve aerodynamic smoothness",
+            "Increase radio transmission range"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "The Air Data Computer (ADC) function is to:",
+          "ops": [
+            "Generate autopilot pitch commands directly",
+            "Store flight plan waypoints",
+            "Control engine fuel flow",
+            "Transform air data measurements into electrical impulses driving servo motors in instruments"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "The fundamental components of an autopilot control loop are:",
+          "ops": [
+            "Altimeter, VSI, airspeed indicator",
+            "Rate gyro, servomotor, error-signal generator",
+            "Attitude indicator, autothrottle, flight director only",
+            "GPS receiver, FMS, autopilot computer"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "'Fail-safe construction' is a type of construction in which:",
+          "ops": [
+            "The load is carried by other components if part of the structure fails",
+            "All structural loads are carried by a single redundant spar",
+            "Failure automatically triggers an emergency descent",
+            "The structure is designed never to fail under any load"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "Gyro drift typically requires manual realignment every:",
+          "ops": [
+            "10 to 15 minutes",
+            "60 minutes",
+            "30 to 45 minutes",
+            "1 to 2 minutes"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "In the transonic range, CLmax will ___ and the 1g stalling speed will ___:",
+          "ops": [
+            "Increase; increase",
+            "Decrease; decrease",
+            "Decrease; increase",
+            "Increase; decrease"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "Ribs in a wing serve the purpose of:",
+          "ops": [
+            "Storing fuel only",
+            "Giving the wing its cambered shape and transmitting loads from skin/stringers to the spars",
+            "Providing the wing's primary bending strength alone",
+            "Housing the hydraulic lines only"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "The turn coordinator measures:",
+          "ops": [
+            "Only rate of climb",
+            "Only bank angle",
+            "Sideslip only",
+            "Change of heading (rate of turn, plus roll rate)"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "TAT (Total Air Temperature) represents:",
+          "ops": [
+            "The cabin temperature setting",
+            "The outside air temperature including the heating effect of the aircraft's motion (SAT plus ram-rise)",
+            "Static Air Temperature alone, with no ram-rise",
+            "The engine's internal turbine temperature"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "EPR (Engine Pressure Ratio) is a measure of:",
+          "ops": [
+            "The ratio of total turbine outlet pressure to total compressor inlet pressure, used to measure jet-engine thrust",
+            "The ratio of fuel flow to airflow",
+            "The ratio of fan speed to core speed",
+            "The ratio of EGT to N1"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "EGT (Exhaust Gas Temperature), also called Turbine Outlet Temperature, is measured:",
+          "ops": [
+            "At the fan face",
+            "At the combustor inlet",
+            "At the turbine exhaust stage of the engine",
+            "At the compressor inlet"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "Vortex generators work by:",
+          "ops": [
+            "Increasing wing camber mechanically",
+            "Creating a pressure seal at the wingtip",
+            "Reducing local air density over the wing",
+            "Transferring energy from the free airflow into the boundary layer"
+          ],
+          "correct": 3
+        }
+      ]
+    },
+    {
+      "nombre": "Meteorology",
+      "preguntas": [
+        {
+          "q": "The clouds typically encountered in a cold front are:",
+          "ops": [
+            "Broken to overcast, low but rising base - Cu, Cb, and sometimes Ns",
+            "Solid Ns with no convective activity",
+            "Scattered Ci and Cc only",
+            "Clear skies with isolated Ac"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "By volume, water vapour typically makes up what percentage of the air in the lower troposphere?",
+          "ops": [
+            "Under 1%",
+            "20-25%",
+            "10-15%",
+            "0-5%"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "The main factor contributing to the formation of very low clouds ahead of a warm front is:",
+          "ops": [
+            "Radiative cooling of the surface overnight",
+            "Convective instability in the warm sector",
+            "Saturation of the cold air by rain falling into it and evaporating",
+            "Orographic lifting ahead of the front"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "On a weather radar display, the colour indicating heavy rain is typically:",
+          "ops": [
+            "Red",
+            "Yellow",
+            "Green",
+            "Orange"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "If windshear due to microbursts is expected during takeoff, the best course of action is to:",
+          "ops": [
+            "Delay departure",
+            "Increase takeoff flap setting and proceed",
+            "Take off at maximum thrust immediately",
+            "Depart and climb steeply through the shear layer"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "Flying from warm air into cold air, the possibility of icing is:",
+          "ops": [
+            "Eliminated, since warm air carries no moisture into cold air",
+            "Only possible above the freezing level",
+            "Only relevant for propeller aircraft",
+            "Present (there is a possibility of icing)"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "The coalescence process in mid-latitudes typically produces:",
+          "ops": [
+            "Hail",
+            "Snow exclusively",
+            "Drizzle or very light rain",
+            "Heavy convective downpours only"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "Which statement about the coalescence process is true?",
+          "ops": [
+            "It always produces hail in mid-latitudes",
+            "In the mid-latitudes it produces only drizzle or very light rain",
+            "It occurs only in tropical cumulonimbus",
+            "It requires sub-zero cloud temperatures throughout"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "Where are the troposphere and stratosphere located?",
+          "ops": [
+            "Troposphere 0-20 km; stratosphere 20-50 km",
+            "Troposphere 0-5 km; stratosphere 5-20 km",
+            "Troposphere 0-11 km; stratosphere 11-100 km",
+            "Troposphere 0-11 km; stratosphere 11-50 km"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "When isobars on a surface chart are close together, this indicates:",
+          "ops": [
+            "Strong winds",
+            "Fog formation",
+            "Stable high-pressure conditions",
+            "Calm conditions"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "At a warm front, air masses move such that:",
+          "ops": [
+            "Warm air undercuts the cold air mass",
+            "Cold air overrides the warm air mass",
+            "The two air masses mix uniformly",
+            "Warm air overrides the cold air mass"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "'Whiteout' effect is a condition where:",
+          "ops": [
+            "Fog forms only at ground level with clear skies above",
+            "The visible horizon cannot be seen due to snow-covered terrain blending with a white/overcast sky, causing disorientation and low visibility",
+            "Windscreen frosting blocks all forward visibility",
+            "Sun glare on water reflects into the cockpit"
+          ],
+          "correct": 1
+        }
+      ]
+    },
+    {
+      "nombre": "Navigation & Radio Navigation",
+      "preguntas": [
+        {
+          "q": "Why should a VFR chart be kept oriented with 'up' matching the direction of flight (map pointing up)?",
+          "ops": [
+            "To keep the compass rose aligned with magnetic north",
+            "Because most charts are only legible in that orientation",
+            "To simplify navigation, keep visual references aligned, and reduce disorientation",
+            "To comply with ICAO chart-folding regulations"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "GBAS (Ground-Based Augmentation System) provides:",
+          "ops": [
+            "Satellite-based wide-area corrections only",
+            "Radar-derived vertical guidance",
+            "Data defining the final approach segment, transmitted on VHF with differential GPS position corrections and integrity information",
+            "A UHF glide-path signal like an ILS"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "GBAS transmits its correction data on:",
+          "ops": [
+            "HF",
+            "UHF",
+            "SHF",
+            "VHF"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "Flying with reference to a Directional Indicator (DI), with no wind and no precession, the heading flown is:",
+          "ops": [
+            "A compass heading uncorrected for deviation",
+            "A grid track",
+            "A true track",
+            "A magnetic track (the DI indicates magnetic heading)"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "The time displayed in the Almanac (GPS) is:",
+          "ops": [
+            "Zulu solar time",
+            "UTC",
+            "GPS system time, uncorrected for leap seconds",
+            "Local time"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "NANU messages, released 72 hours in advance, inform users of:",
+          "ops": [
+            "Airspace closures for military exercises",
+            "Upcoming NOTAM changes at major airports",
+            "Changes to the GPS constellation, for planned maintenance",
+            "Scheduled ATC frequency changes"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "High-latitude polar flights present specific problems for a gyro-magnetic compass mainly because:",
+          "ops": [
+            "The compass reads true heading directly at high latitudes",
+            "Magnetic dip disappears entirely near the poles",
+            "VOR reception improves, making the compass redundant",
+            "The magnetic field is weaker, magnetic variation changes rapidly, and meridian convergence increases"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "'Mountain effect', caused by diffraction bending a radio signal's path, primarily affects which instrument?",
+          "ops": [
+            "The VOR",
+            "The ILS localizer",
+            "The DME",
+            "The ADF/NDB"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "The outbound time for a holding pattern above 14,000 ft in still air is:",
+          "ops": [
+            "1 minute",
+            "2 minutes",
+            "45 seconds",
+            "1 minute 30 seconds"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "FANS (Future Air Navigation System) is used to:",
+          "ops": [
+            "Connect pilots and ATC via datalink (satellite) for smoother traffic flow in remote/limited radar and VHF coverage areas",
+            "Provide GPS-based terrain awareness",
+            "Automate weather radar tilt management",
+            "Replace the transponder in oceanic airspace"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "Path Definition Error (PDE) refers to:",
+          "ops": [
+            "A GPS satellite geometry error only",
+            "The aircraft deviating from a correctly defined path",
+            "The path defined by the RNAV system not corresponding to the desired path",
+            "A database currency error only"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "How does FMS-calculated ETA change with a headwind?",
+          "ops": [
+            "Headwind has no effect on FMS ETA",
+            "Headwind reduces the ETA",
+            "Headwind reduces groundspeed, so the FMS increases the ETA",
+            "The FMS ignores wind for ETA calculations"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "When crossing the International Date Line on a westerly heading, what happens to the date?",
+          "ops": [
+            "The date changes only if crossing at midnight UTC",
+            "The date goes back one day",
+            "The date remains unchanged",
+            "The date advances (increases) by one day"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "An RNP approach with GNSS and APV can use which types of vertical guidance?",
+          "ops": [
+            "Baro-VNAV and SBAS",
+            "INS and DME/DME only",
+            "ILS and MLS only",
+            "GBAS and radar only"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "Instrument error causing drift in a conventional gyroscope is known as:",
+          "ops": [
+            "Apparent wander",
+            "Real wander (actual spin-axis movement from friction/imbalance)",
+            "Transport wander",
+            "Precession error only"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "The FMS-calculated optimum altitude:",
+          "ops": [
+            "Only accounts for fuel weight",
+            "Is fixed at the aircraft's service ceiling",
+            "Is manually entered by the crew with no computation",
+            "Helps optimise the flight by incorporating multiple inputs to give the most efficient and safe altitude for each phase"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "Which combination provides the best visual landmarks for a VFR flight?",
+          "ops": [
+            "A small pond, a low fence, and a dirt road",
+            "A cloud shadow and a river bend",
+            "A single tree and a farmhouse",
+            "A large water reservoir, an excessively high mast, and a high-tension power line"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "The CDI for a VOR is selected to 090 degrees, indicating 'TO', and the needle is deflected halfway to the right. On what radial is the aircraft?",
+          "ops": [
+            "Radial 265",
+            "Radial 275",
+            "Radial 090",
+            "Radial 095"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "A waypoint is:",
+          "ops": [
+            "A mandatory VOR reporting point only",
+            "A fixed altitude restriction point",
+            "A radar vector issued by ATC",
+            "A geographical location relating to RNAV"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "The Mach number formula is:",
+          "ops": [
+            "M = TAS x LSS",
+            "M = TAS / LSS",
+            "M = IAS / LSS",
+            "M = GS / LSS"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "The transponder transmits using:",
+          "ops": [
+            "Frequency modulation on 1030 MHz only",
+            "Pulse modulation on 108 MHz",
+            "Amplitude modulation on 121.5 MHz",
+            "Pulse modulation on a fixed frequency of 1090 MHz, receiving on 1030 MHz"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "STD (Standard Time) is:",
+          "ops": [
+            "Always identical to UTC",
+            "A time reference only for satellite navigation",
+            "The time set by legal authorities for a part of a country (e.g. US, Canada, Russia)",
+            "A time zone used only at sea"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "Isogonic lines connect positions that have the same:",
+          "ops": [
+            "Magnetic dip",
+            "Magnetic variation",
+            "True heading",
+            "Compass deviation"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "Compass deviation is defined as the angle between:",
+          "ops": [
+            "True North and Magnetic North",
+            "Grid North and Magnetic North",
+            "Magnetic North and Compass North",
+            "True North and Compass North"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "The seasons are caused by:",
+          "ops": [
+            "Ocean current cycles",
+            "The changing distance between Earth and the Sun",
+            "The inclination of the polar axis relative to the ecliptic plane",
+            "Solar flare activity"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "'Mountain effect' mainly affects which navaid, and by which phenomenon?",
+          "ops": [
+            "NDBs, by diffraction (VORs are more prone to shadowing/reflection)",
+            "NDBs, by reflection",
+            "VORs, by diffraction",
+            "DMEs, by refraction"
+          ],
+          "correct": 0
+        }
+      ]
+    },
+    {
+      "nombre": "Human Performance & Limitations (incl. CRM)",
+      "preguntas": [
+        {
+          "q": "Hyperventilation can be triggered by:",
+          "ops": [
+            "Low cabin altitude",
+            "Overhydration",
+            "Fear, anxiety and distress",
+            "Excess cabin humidity"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "Supplemental oxygen requirements begin, respectively for crew and passengers, above:",
+          "ops": [
+            "10,000 ft for both",
+            "8,000 ft for crew and 10,000 ft for passengers",
+            "12,500 ft for crew and 14,000 ft for passengers",
+            "15,000 ft for crew and 18,000 ft for passengers"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "Which of the following is a psychological stressor?",
+          "ops": [
+            "Loss of a spouse/partner, loss of one's job, credit card debt",
+            "High cabin humidity",
+            "Turbulence",
+            "Caffeine intake"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "A good captain should above all keep:",
+          "ops": [
+            "Cohesion (crew cohesion)",
+            "Sole control of all decisions",
+            "Strict silence in the cockpit",
+            "Maximum workload on the first officer"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "Safety is often improved by applying CRM principles, such as:",
+          "ops": [
+            "Expression of doubts or a different opinion",
+            "Delegating all decisions to the captain",
+            "Strict adherence to hierarchy without question",
+            "Minimizing communication to reduce workload"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "The semicircular canals form part of the:",
+          "ops": [
+            "Outer ear",
+            "Inner ear",
+            "Optic nerve",
+            "Middle ear"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "Rods and cones in the eye serve the purpose of:",
+          "ops": [
+            "Rods give peripheral, low-light black-and-white vision; cones give central, colour vision",
+            "Rods only function in daylight",
+            "Both give identical function",
+            "Rods give colour vision; cones give peripheral vision"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "Peripheral vision is especially important for:",
+          "ops": [
+            "Reading fine print",
+            "Detecting moving objects",
+            "Judging colour accurately",
+            "Estimating exact distance"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "After a cabin pressure loss at approximately 35,000 ft, the Time of Useful Consciousness (TUC) will be approximately:",
+          "ops": [
+            "5 to 10 minutes",
+            "3 to 5 minutes",
+            "30 to 90 seconds",
+            "10 to 15 seconds"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "Susceptibility to carbon monoxide poisoning (e.g. from smoking):",
+          "ops": [
+            "Decreases as altitude increases",
+            "Only occurs below 5,000 ft",
+            "Is unaffected by altitude",
+            "Increases as altitude increases"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "Noise-induced hearing loss (NIHL) can occur at sound levels of about:",
+          "ops": [
+            "85 dB",
+            "60 dB",
+            "40 dB",
+            "100 dB only"
+          ],
+          "correct": 0
+        }
+      ]
+    },
+    {
+      "nombre": "Communications",
+      "preguntas": [
+        {
+          "q": "The term 'fading' in radio reception refers to:",
+          "ops": [
+            "The interference of the ground wave and the sky wave",
+            "Loss of signal due to transmitter power failure",
+            "Attenuation caused by precipitation static",
+            "The Doppler shift of a moving station"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "An abbreviated aircraft callsign is normally used:",
+          "ops": [
+            "From the very first call of the flight",
+            "Whenever the pilot chooses, regardless of ATC usage",
+            "Only during emergencies",
+            "After initial contact, once ATC has used it first"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "Setting 7600 on the transponder indicates:",
+          "ops": [
+            "Loss of cabin pressure",
+            "General emergency",
+            "Communications/radio failure",
+            "Hijacking"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "A general call addressed to all aircraft in an area should begin with:",
+          "ops": [
+            "'General broadcast'",
+            "'All stations'",
+            "'Any aircraft this frequency'",
+            "'Attention all aircraft'"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "VHF propagation can best be described as:",
+          "ops": [
+            "Propagation unaffected by terrain or the curvature of the earth",
+            "Sky-wave (ionospheric) propagation",
+            "Line-of-sight propagation",
+            "Ground-wave propagation only"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "A 'Pan Pan' call indicates:",
+          "ops": [
+            "A routine position report",
+            "A request for priority landing only",
+            "An urgent message concerning safety, with no immediate assistance required (urgency, not distress)",
+            "A distress condition requiring immediate assistance"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "A message taking priority over all other transmissions, declared by an aircraft in distress, is a:",
+          "ops": [
+            "All-stations call",
+            "MAYDAY call",
+            "Pan Pan call",
+            "Security call"
+          ],
+          "correct": 1
+        },
+        {
+          "q": "When ATC instructs all stations to 'standby', it means:",
+          "ops": [
+            "Only the calling aircraft must stop transmitting",
+            "Aircraft should switch to the emergency frequency",
+            "Aircraft may continue routine calls at reduced power",
+            "All aircraft must stop transmitting (or change frequency) and remain silent"
+          ],
+          "correct": 3
+        },
+        {
+          "q": "The priority order of radio messages is:",
+          "ops": [
+            "Flight regularity, distress, urgency, meteorological, direction-finding, flight safety",
+            "Meteorological, distress, urgency, flight safety, direction-finding, flight regularity",
+            "Distress, urgency, direction-finding, flight safety, meteorological, flight regularity",
+            "Urgency, distress, flight safety, direction-finding, meteorological, flight regularity"
+          ],
+          "correct": 2
+        }
+      ]
+    },
+    {
+      "nombre": "General Knowledge",
+      "preguntas": [
+        {
+          "q": "Find the next word in the pattern: happy, frustrated, exhilarated, ___?",
+          "ops": [
+            "Depressing",
+            "Laughable",
+            "Melancholic",
+            "Polluted"
+          ],
+          "correct": 2
+        },
+        {
+          "q": "What does 'km/l' mean?",
+          "ops": [
+            "Kilometres per litre",
+            "Kilometres per land mile",
+            "Knots per litre",
+            "Kilograms per litre"
+          ],
+          "correct": 0
+        },
+        {
+          "q": "The value of gravitational acceleration is approximately:",
+          "ops": [
+            "9.18 m/s2",
+            "9.81 m/s2",
+            "10.81 m/s2",
+            "8.91 m/s2"
+          ],
+          "correct": 1
+        }
+      ]
+    }
+  ]
+};
+
+  // If the trainer exposes a bank-list refresh hook, call it so the new bank shows up without a full reload.
+  if (typeof renderBancos === 'function') {
+    try { renderBancos(); } catch (e) { /* no-op: hook signature may differ in this build */ }
+  }
+})(); 
 })();
   })();
 })();

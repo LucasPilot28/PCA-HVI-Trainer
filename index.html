@@ -12755,46 +12755,8 @@ intentarSesionGuardada(); (function () {
      <script src="banco_a320_tech.js"></script>
      <script src="exp_a320tech_ALL.js"></script>
 
-   This file is 15 independent modules concatenated back to back. Each is
-   its own self-contained IIFE with its own private variables, so they do
-   not interfere with each other — this is exactly equivalent to loading
-   the 15 original files one after another, just in one paste.
-   ============================================================================ */
-
-/* ==========================================================================
-   A320 TECH — EXPLANATIONS: HYDRAULIC SYSTEM (46 questions)
-   --------------------------------------------------------------------------
-   Does NOT replace banco_a320_tech.js. Load it AFTER, and it attaches an
-   `exp` field to each question by matching the normalised question stem, so
-   it is immune to option rotation and question reordering.
-
-   SOURCE — Airbus A318/A319/A320/A321 FCOM, rev. 25 NOV 2024
-     DSC-29-10-10/20  Hydraulic: general, generation, PTU, RAT, accumulators
-     DSC-29-20        Hydraulic: overhead panel, ECAM HYD page
-     DSC-32-10-10/40  Landing gear: description, gravity extension
-     DSC-32-20-20     Steering handwheels
-     DSC-32-30-10     Brakes and antiskid
-
-   No question text, option text or answer key has been altered. Where the
-   FCOM contradicts or refines the marked key, the key is left untouched and
-   the discrepancy is explained inside the explanation. Cases found:
-
-     - Q13 (gear safety valve). Key says "greater than 260 KIAS". The FCOM
-       gives 264 kt as the cut-off and 260 kt as the threshold below which
-       supply stays cut off with the lever up. Two thresholds, not one.
-     - Q3 (LAF accumulators). The FCOM describes the Load Alleviation
-       Function in DSC-27-20-10-40 but never mentions LAF accumulators or
-       which system pressurises them. Said plainly rather than invented.
-     - Q21 and Q29 are the SAME question duplicated in the source (only a
-       full stop and the option order differ). They share one explanation,
-       which says so. Hence 45 map entries for 46 questions.
-     - Q22, Q37 and Q46 carry the author's own footnote glued to the end of
-       the last option. A defect in the source PDF; left untouched.
-
-   INSTALL
      <script src="banco_a320_tech.js"></script>
      <script src="exp_a320tech_hyd.js"></script>
-   ========================================================================== */
 (function () {
   'use strict';
 

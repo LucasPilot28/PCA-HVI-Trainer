@@ -863,8 +863,6 @@ body.modo-examen #screen-quiz .ex-gate{ display:none !important;
 </style>
 </head>
 <body>
-<button id="langToggle" type="button" title="Cambiar idioma / Switch language" style="position:fixed; top:12px; right:14px; z-index:999; font-family:'JetBrains Mono',monospace; font-weight:700; font-size:11.5px; letter-spacing:.06em; color:#e7ecf2; background:#1b212b; border:1px solid rgba(255,255,255,.14); border-radius:20px; padding:7px 12px; cursor:pointer;">ES / EN</button>
-
 <div id="app">
 
   <!-- AUTH -->
@@ -872,21 +870,21 @@ body.modo-examen #screen-quiz .ex-gate{ display:none !important;
     <div class="authwrap"><div style="width:100%; max-width:400px;">
       <div class="authtitle">
         <div class="h1">HVI <span>&middot;</span> PCA <span>TRAINER</span></div>
-        <div class="sub" id="authSubtitle">CUENTA EN LA NUBE &middot; 1212 PREGUNTAS EN 2 BANCOS</div>
+        <div class="sub">CUENTA EN LA NUBE &middot; 1212 PREGUNTAS EN 2 BANCOS</div>
       </div>
       <div class="authcard">
         <h2 id="authHeading">Iniciar sesión</h2>
         <div class="autherr" id="authErr"></div>
         <button class="oauthbtn google" type="button">
           <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.9 29.3 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.1 8 3l6-6C34.5 5.5 29.5 3.5 24 3.5 12.7 3.5 3.5 12.7 3.5 24S12.7 44.5 24 44.5 44.5 35.3 44.5 24c0-1.2-.1-2.4-.3-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.6 15.6 18.9 13 24 13c3.1 0 5.8 1.1 8 3l6-6C34.5 5.5 29.5 3.5 24 3.5c-7.6 0-14.2 4.3-17.7 10.5z"/><path fill="#4CAF50" d="M24 44.5c5.4 0 10.3-1.8 14-5.5l-6.5-5.5c-2 1.4-4.6 2.3-7.5 2.3-5.2 0-9.6-3.1-11.3-7.9l-6.5 5C9.7 40 16.3 44.5 24 44.5z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.3-2.3 4.3-4.3 5.7l6.5 5.5C41.3 36 44.5 30.6 44.5 24c0-1.2-.1-2.4-.3-3.5z"/></svg>
-          <span id="authGoogleTxt">Continuar con Google</span>
+          Continuar con Google
         </button>
         <button class="oauthbtn apple" type="button">
           <svg width="14" height="14" viewBox="0 0 384 512" fill="#fff"><path d="M318.7 268.7c-.2-36.7 16.4-64.4 50-84.8-18.8-26.9-47.2-41.7-84.7-44.6-35.5-2.8-74.3 20.7-88.5 20.7-15 0-49.4-19.7-76.4-19.7C63.3 141 0 184.8 0 273.5c0 26.2 4.8 53.3 14.4 81.2 12.8 37.3 59 128.8 107.2 127.3 25.2-.6 43-17.9 75.8-17.9 31.8 0 48.3 17.9 76.4 17.9 48.6-.7 90.4-83.9 102.6-121.3-65.2-30.7-57.7-90-57.7-91.9zm-56.6-164.2c27.3-32.4 24.8-61.9 24-72.5-24.1 1.4-52 16.4-67.9 34.9-17.5 19.8-27.8 44.3-25.6 71.9 26.1 2 49.9-11.4 69.5-34.3z"/></svg>
-          <span id="authAppleTxt">Continuar con Apple</span>
+          Continuar con Apple
         </button>
-        <div class="oauthnote" id="oauthNote">Requieren un servidor propio &mdash; no disponibles en este archivo. Usa nombre y clave locales abajo.</div>
-        <div class="divider" id="authDivider">o</div>
+        <div class="oauthnote">Requieren un servidor propio &mdash; no disponibles en este archivo. Usa nombre y clave locales abajo.</div>
+        <div class="divider">o</div>
         <div class="field"><input type="text" id="authNombre" placeholder="Nombre de usuario" autocomplete="username"></div>
         <div class="field"><input type="password" id="authClave" placeholder="Contraseña" autocomplete="current-password">
           <div class="fieldhint" id="claveHint">Tu contraseña se guarda cifrada (hash) en el servidor, nunca en texto plano.</div>
@@ -894,7 +892,7 @@ body.modo-examen #screen-quiz .ex-gate{ display:none !important;
         <div class="field" id="confirmField" style="display:none;"><input type="password" id="authClave2" placeholder="Confirmar contraseña"></div>
         <button class="authsubmit" id="authSubmitBtn" onclick="enviarAuth()">Iniciar sesión</button>
         <div class="authswitch" id="authSwitch">¿No tienes cuenta? <button onclick="cambiarModoAuth()">Crear una</button></div>
-        <div class="authguest"><button id="authGuestBtn" onclick="entrarInvitado()">Continuar sin cuenta (no se guarda progreso)</button></div>
+        <div class="authguest"><button onclick="entrarInvitado()">Continuar sin cuenta (no se guarda progreso)</button></div>
       </div>
     </div></div>
   </section>
@@ -902,21 +900,21 @@ body.modo-examen #screen-quiz .ex-gate{ display:none !important;
   <!-- BANCOS -->
   <section id="screen-bancos" class="screen">
     <div class="profbar">
-      <div class="who" id="profBarWho">SESIÓN: <b id="profNombre"></b></div>
-      <button id="logoutBtn" onclick="cerrarSesion()">Cerrar sesión</button>
+      <div class="who">SESIÓN: <b id="profNombre"></b></div>
+      <button onclick="cerrarSesion()">Cerrar sesión</button>
     </div>
     <div class="brand">
       <div class="h1">HVI <span>&middot;</span> PCA <span>TRAINER</span></div>
-      <div class="sub" id="bancosSub">Elige el banco de preguntas con el que quieres practicar.</div>
+      <div class="sub">Elige el banco de preguntas con el que quieres practicar.</div>
     </div>
     <div class="bancogrid" id="bancoGrid"></div>
-    <div class="footerlink"><button id="resetBtn" onclick="reiniciarPerfil()">Reiniciar todo mi progreso</button></div>
+    <div class="footerlink"><button onclick="reiniciarPerfil()">Reiniciar todo mi progreso</button></div>
   </section>
 
   <!-- MATERIAS -->
   <section id="screen-materias" class="screen">
     <div class="subhead">
-      <button class="back" id="backToBancosBtn" onclick="volverABancos()">&larr; Bancos</button>
+      <button class="back" onclick="volverABancos()">&larr; Bancos</button>
       <div class="h1" id="materiasTitle"></div>
       <span></span>
     </div>
@@ -927,7 +925,7 @@ body.modo-examen #screen-quiz .ex-gate{ display:none !important;
   <!-- QUIZ -->
   <section id="screen-quiz" class="screen">
     <div class="quizhead">
-      <button class="back" id="exitQuizBtn" onclick="volverAMaterias()">&larr; Salir</button>
+      <button class="back" onclick="volverAMaterias()">&larr; Salir</button>
       <div class="subj" id="quizSubj"></div>
       <div class="score" id="quizScore"></div>
     </div>
@@ -943,11 +941,11 @@ body.modo-examen #screen-quiz .ex-gate{ display:none !important;
     <div class="quizfoot"><button class="btn btn-cyan" id="nextBtn" style="visibility:hidden" onclick="siguientePregunta()">Siguiente &rarr;</button></div>
     <div class="navwrap">
       <div class="navlabel">
-        <span class="t" id="navGoLabel">Ir a pregunta</span>
-        <span class="navlegend" id="navLegend">
-          <span><i style="background:var(--green)"></i><span class="lg" data-k="correcta">Correcta</span></span>
-          <span><i style="background:var(--red)"></i><span class="lg" data-k="incorrecta">Incorrecta</span></span>
-          <span><i style="background:var(--panel2);border:1px solid var(--hair)"></i><span class="lg" data-k="sinresponder">Sin responder</span></span>
+        <span class="t">Ir a pregunta</span>
+        <span class="navlegend">
+          <span><i style="background:var(--green)"></i>Correcta</span>
+          <span><i style="background:var(--red)"></i>Incorrecta</span>
+          <span><i style="background:var(--panel2);border:1px solid var(--hair)"></i>Sin responder</span>
         </span>
       </div>
       <div class="navgrid" id="navGrid"></div>
@@ -957,19 +955,19 @@ body.modo-examen #screen-quiz .ex-gate{ display:none !important;
   <!-- RESULTS -->
   <section id="screen-results" class="screen">
     <div class="reshead">
-      <div class="sub" id="resHeadSub">INFORME DE DESEMPEÑO</div>
+      <div class="sub">INFORME DE DESEMPEÑO</div>
       <div class="h1" id="resSubjName"></div>
     </div>
     <div class="gaugewrap"><svg id="gaugeSvg" width="220" height="130" viewBox="0 0 220 130"></svg></div>
     <div class="statgrid">
-      <div class="box ok"><div class="lbl" id="lblCorrect">Aciertos</div><div class="val" id="statCorrect"></div></div>
-      <div class="box time"><div class="lbl" id="lblTime">Tiempo</div><div class="val" id="statTime"></div></div>
-      <div class="box"><div class="lbl" id="lblAvg">Prom. / pregunta</div><div class="val" id="statAvg"></div></div>
+      <div class="box ok"><div class="lbl">Aciertos</div><div class="val" id="statCorrect"></div></div>
+      <div class="box time"><div class="lbl">Tiempo</div><div class="val" id="statTime"></div></div>
+      <div class="box"><div class="lbl">Prom. / pregunta</div><div class="val" id="statAvg"></div></div>
     </div>
     <div class="resbtns">
-      <button class="btn btn-amber" id="retryBtn" onclick="repetirMateria()">&#8635; Repetir materia</button>
-      <button class="btn btn-ghost" id="reviewToggle" onclick="toggleRepaso()"><span id="reviewLabelTxt">Revisar falladas</span> <span id="reviewCount" class="rcount">0</span></button>
-      <button class="btn btn-ghost" id="backToSubjBtn" onclick="volverAMaterias()">Volver a materias</button>
+      <button class="btn btn-amber" onclick="repetirMateria()">&#8635; Repetir materia</button>
+      <button class="btn btn-ghost" id="reviewToggle" onclick="toggleRepaso()">Revisar falladas <span id="reviewCount" class="rcount">0</span></button>
+      <button class="btn btn-ghost" onclick="volverAMaterias()">Volver a materias</button>
     </div>
     <div class="review" id="reviewBox" hidden><div id="reviewList"></div></div>
   </section>
@@ -15326,8 +15324,42 @@ intentarSesionGuardada(); (function () {
   }
 
   /* ---------------------------------------------------------------- */
-  /* progreso: estado.techint = { vistas:{}, sabidas:{}, falladas:{} }    */
-  function estadoVacio() { return { vistas: {}, sabidas: {}, falladas: {} }; }
+  /* progreso: estado.techint = {                                       */
+  /*   vistas:{}, sabidas:{}, falladas:{},                              */
+  /*   sesiones: { <materiaKey>: { orden:[n,n,...], pos, revelada,      */
+  /*                                ok, no } }                          */
+  /* }                                                                   */
+  /* `sesiones` guarda, por materia, una ronda de tarjetas a medio       */
+  /* terminar (el orden barajado exacto + dónde ibas), para poder salir  */
+  /* de "Estudiar con tarjetas" y retomarla más tarde en el mismo punto. */
+  function estadoVacio() { return { vistas: {}, sabidas: {}, falladas: {}, sesiones: {} }; }
+
+  function itemsPorMateriaKey(key) {
+    var m = MATERIAS.filter(function (x) { return x.key === key; })[0];
+    return m ? m.items : null;
+  }
+
+  function normalizarSesion(key, raw) {
+    var items = itemsPorMateriaKey(key);
+    if (!items || !raw || typeof raw !== 'object') return null;
+    var validNs = {};
+    items.forEach(function (it) { validNs[it.n] = true; });
+    var orden = Array.isArray(raw.orden) ? raw.orden.filter(function (n) {
+      return typeof n === 'number' && validNs[n];
+    }) : [];
+    // una sesión guardada solo tiene sentido si conserva el mazo completo de
+    // esa materia (mismo número de preguntas) — si el banco cambió de tamaño
+    // entre visitas, se descarta en vez de arriesgar un mazo incompleto/roto
+    if (orden.length !== items.length) return null;
+    var pos = raw.pos;
+    if (typeof pos !== 'number' || !isFinite(pos) || pos < 0 || pos > orden.length) pos = 0;
+    var ok = (typeof raw.ok === 'number' && isFinite(raw.ok) && raw.ok >= 0) ? raw.ok : 0;
+    var no = (typeof raw.no === 'number' && isFinite(raw.no) && raw.no >= 0) ? raw.no : 0;
+    // una ronda ya terminada no es una sesión "para retomar"
+    if (pos >= orden.length) return null;
+    return { orden: orden, pos: pos, revelada: !!raw.revelada, ok: ok, no: no };
+  }
+
   function normalizar(raw) {
     var out = estadoVacio();
     if (!raw || typeof raw !== 'object') return out;
@@ -15339,11 +15371,20 @@ intentarSesionGuardada(); (function () {
         if (typeof n === 'number' && isFinite(n) && n >= 0) out[k][id] = n;
       });
     });
+    var srcSes = raw.sesiones;
+    if (srcSes && typeof srcSes === 'object') {
+      Object.keys(srcSes).forEach(function (key) {
+        var s = normalizarSesion(key, srcSes[key]);
+        if (s) out.sesiones[key] = s;
+      });
+    }
     return out;
   }
   function est() {
     if (typeof estado === 'undefined' || !estado) return estadoVacio();
     if (!estado.techint) estado.techint = estadoVacio();
+    // por si el objeto viene de una versión anterior del módulo, sin 'sesiones'
+    if (!estado.techint.sesiones) estado.techint.sesiones = {};
     return estado.techint;
   }
   function guardar() {
@@ -15377,10 +15418,7 @@ intentarSesionGuardada(); (function () {
           '<div class="h1" id="tiListTitle">&nbsp;</div>' +
           '<span></span>' +
         '</div>' +
-        '<div class="ti-modes">' +
-          '<button class="btn btn-ti" id="tiStartFlash">Estudiar con tarjetas</button>' +
-          '<button class="btn btn-ghost" id="tiReset">Reiniciar estadísticas</button>' +
-        '</div>' +
+        '<div class="ti-modes" id="tiModesArea"></div>' +
         '<div class="ti-grid" id="tiGrid"></div>' +
       '</section>' +
 
@@ -15417,19 +15455,47 @@ intentarSesionGuardada(); (function () {
     document.addEventListener('keydown', function (ev) {
       if (ev.key === 'Escape' && byId('tiOverlay').classList.contains('open')) cerrarModal();
     });
-    byId('tiStartFlash').onclick = function () { iniciarFlash(materiaActiva); };
-    byId('tiReset').onclick = function () {
-      if (!materiaActiva) return;
-      if (!confirm('¿Reiniciar las estadísticas de "' + materiaActiva.nombre + '"?')) return;
-      var e = est();
-      materiaActiva.items.forEach(function (it) {
-        var id = idOf(materiaActiva.key, it.n);
-        delete e.vistas[id]; delete e.sabidas[id]; delete e.falladas[id];
-      });
-      guardar();
+    byId('tiFlashExit').onclick = function () {
+      guardarSesion(); // conserva el punto exacto de la ronda para retomarla luego
+      materiaActiva = materiaFlash;
       renderGrid();
+      showScreen('screen-ti-list');
     };
-    byId('tiFlashExit').onclick = function () { renderGrid(); showScreen('screen-ti-list'); };
+  }
+
+  function resetEstadisticas(m) {
+    if (!m) return;
+    if (!confirm('¿Reiniciar las estadísticas de "' + m.nombre + '"? Esto también borra la ronda de tarjetas a medio terminar, si hay una.')) return;
+    var e = est();
+    m.items.forEach(function (it) {
+      var id = idOf(m.key, it.n);
+      delete e.vistas[id]; delete e.sabidas[id]; delete e.falladas[id];
+    });
+    delete e.sesiones[m.key];
+    guardar();
+    renderGrid();
+  }
+
+  /* Botonera de la pantalla-lista: si hay una ronda de tarjetas a medio
+     terminar para la materia activa, ofrece "Continuar" (por defecto) y
+     "Empezar de nuevo" por separado; si no hay ninguna, un solo botón. */
+  function renderModes() {
+    var area = byId('tiModesArea');
+    if (!area || !materiaActiva) return;
+    var s = sesionGuardada(materiaActiva.key);
+    if (s) {
+      area.innerHTML =
+        '<button class="btn btn-ti" id="tiResume">Continuar (' + s.pos + '/' + s.orden.length + ')</button>' +
+        '<button class="btn btn-ghost" id="tiStartFlash">Empezar de nuevo</button>' +
+        '<button class="btn btn-ghost" id="tiReset">Reiniciar estadísticas</button>';
+      byId('tiResume').onclick = function () { reanudarFlash(materiaActiva); };
+    } else {
+      area.innerHTML =
+        '<button class="btn btn-ti" id="tiStartFlash">Estudiar con tarjetas</button>' +
+        '<button class="btn btn-ghost" id="tiReset">Reiniciar estadísticas</button>';
+    }
+    byId('tiStartFlash').onclick = function () { iniciarFlash(materiaActiva); };
+    byId('tiReset').onclick = function () { resetEstadisticas(materiaActiva); };
   }
 
   /* ---------------------------------------------------------------- */
@@ -15464,6 +15530,7 @@ intentarSesionGuardada(); (function () {
   function renderGrid() {
     var grid = byId('tiGrid');
     if (!grid || !materiaActiva) return;
+    renderModes();
     var e = est();
     grid.innerHTML = '';
     materiaActiva.items.forEach(function (it) {
@@ -15524,11 +15591,54 @@ intentarSesionGuardada(); (function () {
     return a;
   }
 
+  /* Guarda el punto exacto de la ronda en curso (orden barajado + posición +
+     aciertos/fallos) para poder salir de "Estudiar con tarjetas" y volver
+     más tarde exactamente donde se dejó. Se llama tras revelar, tras
+     calificar, y al pulsar "Salir". Una ronda ya completa no se guarda. */
+  function guardarSesion() {
+    if (!materiaFlash) return;
+    var e = est();
+    if (pos >= mazo.length) {
+      delete e.sesiones[materiaFlash.key];
+    } else {
+      e.sesiones[materiaFlash.key] = {
+        orden: mazo.map(function (it) { return it.n; }),
+        pos: pos, revelada: revelada, ok: ronda.ok, no: ronda.no
+      };
+    }
+    guardar();
+  }
+
+  function sesionGuardada(materiaKey) {
+    return est().sesiones[materiaKey] || null;
+  }
+
+  /* iniciarFlash(m): siempre empieza una ronda nueva (mazo recién barajado)
+     y descarta cualquier sesión anterior de esa materia.
+     reanudarFlash(m): reconstruye el mazo EXACTO (mismo orden) de la sesión
+     guardada, en el punto donde se dejó. */
   function iniciarFlash(m) {
     if (!m) return;
     materiaFlash = m;
     mazo = barajar(m.items);
     pos = 0; revelada = false; ronda = { ok: 0, no: 0 };
+    var e = est();
+    delete e.sesiones[m.key];
+    guardar();
+    renderFlash();
+    showScreen('screen-ti-flash');
+  }
+
+  function reanudarFlash(m) {
+    if (!m) return;
+    var s = sesionGuardada(m.key);
+    if (!s) { iniciarFlash(m); return; }
+    materiaFlash = m;
+    var porN = {};
+    m.items.forEach(function (it) { porN[it.n] = it; });
+    mazo = s.orden.map(function (n) { return porN[n]; }).filter(Boolean);
+    if (mazo.length !== m.items.length) { iniciarFlash(m); return; } // sesión inconsistente: empezar de nuevo
+    pos = s.pos; revelada = s.revelada; ronda = { ok: s.ok, no: s.no };
     renderFlash();
     showScreen('screen-ti-flash');
   }
@@ -15539,6 +15649,7 @@ intentarSesionGuardada(); (function () {
     var tape = byId('tiFlashTape');
 
     if (pos >= mazo.length) {
+      guardarSesion(); // ronda ya completa: esto borra cualquier sesión pendiente de esta materia
       prog.textContent = 'Ronda completa';
       tape.style.width = '100%';
       var pct = mazo.length ? Math.round(ronda.ok / mazo.length * 100) : 0;
@@ -15586,7 +15697,8 @@ intentarSesionGuardada(); (function () {
       byId('tiReveal').onclick = function () {
         revelada = true;
         var e = est();
-        if (!e.vistas[id]) { e.vistas[id] = 1; guardar(); }
+        if (!e.vistas[id]) e.vistas[id] = 1;
+        guardarSesion(); // guarda vistas + el punto exacto de la sesión en un solo guardado
         renderFlash();
       };
     }
@@ -15599,8 +15711,8 @@ intentarSesionGuardada(); (function () {
     var id = idOf(materiaFlash.key, it.n);
     e[acierto ? 'sabidas' : 'falladas'][id] = (e[acierto ? 'sabidas' : 'falladas'][id] || 0) + 1;
     if (acierto) ronda.ok++; else ronda.no++;
-    guardar();
     pos++; revelada = false;
+    guardarSesion(); // renderFlash() más abajo vuelve a guardar si la ronda ya terminó (la limpia)
     renderFlash();
   }
 
@@ -19767,569 +19879,5 @@ intentarSesionGuardada(); (function () {
 })();
 })();
 })();</script>
-
-<!-- ==========================================================================
-     MÓDULO: SELECTOR DE IDIOMA DE LA INTERFAZ (ES / EN)
-     --------------------------------------------------------------------------
-     Traduce el CHROME de la interfaz (botones, pestañas, mensajes de panel,
-     paneles de notas/comentarios, modo simulacro, repaso de falladas). El
-     CONTENIDO de las preguntas y explicaciones permanece en español — está
-     fuera del alcance de este selector. El idioma elegido se recuerda entre
-     sesiones (localStorage).
-
-     Este archivo ya tiene varias capas de "parcheo" sobre las funciones de
-     render (repaso de falladas, modo simulacro). Para no romper ninguna,
-     este módulo NUNCA reemplaza esas funciones: las envuelve (guarda la
-     versión ya parcheada, la llama primero, y solo después aplica una
-     pasada de traducción sobre el HTML ya generado).
-     ========================================================================== -->
-<script>
-(function () {
-  'use strict';
-
-  var I18N = {
-    es: {
-      auth_subtitle: 'CUENTA EN LA NUBE &middot; 1212 PREGUNTAS EN 2 BANCOS',
-      login_heading: 'Iniciar sesión',
-      register_heading: 'Crear cuenta',
-      google_btn: 'Continuar con Google',
-      apple_btn: 'Continuar con Apple',
-      oauth_note: 'Requieren un servidor propio &mdash; no disponibles en este archivo. Usa nombre y clave locales abajo.',
-      divider: 'o',
-      nombre_ph: 'Nombre de usuario',
-      clave_ph: 'Contraseña',
-      clave_hint: 'Tu contraseña se guarda cifrada (hash) en el servidor, nunca en texto plano.',
-      clave2_ph: 'Confirmar contraseña',
-      switch_to_register: '¿No tienes cuenta? <button onclick="cambiarModoAuth()">Crear una</button>',
-      switch_to_login: '¿Ya tienes cuenta? <button onclick="cambiarModoAuth()">Inicia sesión</button>',
-      guest_btn: 'Continuar sin cuenta (no se guarda progreso)',
-      err_completa: 'Completa nombre y contraseña.',
-      err_claves_no_coinciden: 'Las contraseñas no coinciden.',
-      err_sin_conexion: 'No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.',
-      sesion_lbl: 'SESIÓN:',
-      invitado_sufijo: '  (sin guardar)',
-      invitado_nombre: 'Invitado',
-      logout_btn: 'Cerrar sesión',
-      bancos_sub: 'Elige el banco de preguntas con el que quieres practicar.',
-      reset_btn: 'Reiniciar todo mi progreso',
-      reset_confirm: '¿Reiniciar todo tu progreso guardado (HVI y PCA)?',
-      preguntas: 'preguntas',
-      materias: 'materias',
-      completadas: 'completadas',
-      back_bancos: '&larr; Bancos',
-      preguntas_totales: 'Preguntas totales',
-      materias_completadas: 'Materias completadas',
-      promedio_general: 'Promedio general',
-      ult: 'ÚLT.',
-      en_curso: 'EN CURSO',
-      repetir_icon: 'Repetir &#8635;',
-      continuar_icon: 'Continuar &rarr;',
-      comenzar_icon: 'Comenzar &rarr;',
-      falladas_sufijo: 'falladas',
-      practicar_falladas_title: 'Practicar solo las {n} preguntas erradas en este test',
-      practicar_falladas_btn: '&#8635; Practicar falladas',
-      simulacro_txt: 'Simulacro',
-      examen_title: 'Examen de {n} preguntas al azar, sin corrección hasta el final',
-      salir_btn: '&larr; Salir',
-      aciertos_lbl: 'ACIERTOS',
-      respondidas_lbl: 'RESPONDIDAS',
-      pregunta_lbl: 'PREGUNTA',
-      sim_lbl: 'SIM',
-      siguiente_btn: 'Siguiente &rarr;',
-      ir_a_pregunta: 'Ir a pregunta',
-      correcta: 'Correcta',
-      incorrecta: 'Incorrecta',
-      sin_responder: 'Sin responder',
-      tag_correcta: 'CORRECTA',
-      tag_turespuesta: 'TU RESPUESTA',
-      pregunta_titulo: 'Pregunta ',
-      tab_pregunta: 'Pregunta',
-      tab_explicacion: 'Explicación',
-      tab_nota: 'Nota',
-      tab_comentarios: 'Comentarios',
-      exp_locked: 'Responde la pregunta para ver la explicación.',
-      exp_none: 'Todavía no hay explicación para esta pregunta.',
-      nota_placeholder: 'Tus apuntes sobre esta pregunta. Se guardan solo en este navegador.',
-      nota_guardada: 'Guardada',
-      nota_vacia: 'Vacía',
-      nota_escribiendo: 'Escribiendo…',
-      borrar_nota: 'Borrar nota',
-      mas_votados: 'Más votados',
-      recientes: 'Recientes',
-      compartido: 'Compartido',
-      solo_navegador: 'Solo en este navegador',
-      cmt_vacio: 'Nadie ha comentado esta pregunta.<br>Escribe el primer apunte abajo.',
-      cmt_placeholder: 'Aporta una regla mnemotécnica, una corrección o el porqué de la alternativa correcta.',
-      publicar_btn: 'Publicar',
-      reportar_btn: 'Reportar',
-      borrar_btn: 'Borrar',
-      tu_badge: 'TÚ',
-      informe_desempeno: 'INFORME DE DESEMPEÑO',
-      aciertos: 'Aciertos',
-      tiempo: 'Tiempo',
-      prom_pregunta: 'Prom. / pregunta',
-      revisar_falladas: 'Revisar falladas',
-      sin_errores: 'Sin errores — 100% de acierto en esta materia.',
-      turespuesta_colon: 'TU RESPUESTA:',
-      correcta_colon: 'CORRECTA:',
-      repetir_materia_btn: '&#8635; Repetir materia',
-      nuevo_simulacro_btn: '&#8635; Nuevo simulacro',
-      volver_materias_btn: 'Volver a materias',
-      progreso_guardado: 'Progreso guardado',
-      exam_bar_txt: 'Modo simulacro — sin corrección hasta terminar',
-      exam_end_btn: 'Terminar examen',
-      exam_review_btn: 'Revisar simulacro',
-      exam_legend: 'Respondida &nbsp;·&nbsp; sin corregir'
-    },
-    en: {
-      auth_subtitle: 'CLOUD ACCOUNT &middot; 1212 QUESTIONS IN 2 BANKS',
-      login_heading: 'Sign in',
-      register_heading: 'Create account',
-      google_btn: 'Continue with Google',
-      apple_btn: 'Continue with Apple',
-      oauth_note: 'These require your own server &mdash; not available in this file. Use a local name and password below.',
-      divider: 'or',
-      nombre_ph: 'Username',
-      clave_ph: 'Password',
-      clave_hint: 'Your password is stored hashed on the server, never in plain text.',
-      clave2_ph: 'Confirm password',
-      switch_to_register: "Don't have an account? <button onclick=\"cambiarModoAuth()\">Create one</button>",
-      switch_to_login: 'Already have an account? <button onclick="cambiarModoAuth()">Sign in</button>',
-      guest_btn: "Continue without an account (progress won't be saved)",
-      err_completa: 'Enter a username and password.',
-      err_claves_no_coinciden: "Passwords don't match.",
-      err_sin_conexion: 'Could not connect to the server. Check your connection and try again.',
-      sesion_lbl: 'SESSION:',
-      invitado_sufijo: '  (not saved)',
-      invitado_nombre: 'Guest',
-      logout_btn: 'Log out',
-      bancos_sub: 'Choose the question bank you want to practice with.',
-      reset_btn: 'Reset all my progress',
-      reset_confirm: 'Reset all your saved progress (HVI and PCA)?',
-      preguntas: 'questions',
-      materias: 'subjects',
-      completadas: 'completed',
-      back_bancos: '&larr; Banks',
-      preguntas_totales: 'Total questions',
-      materias_completadas: 'Subjects completed',
-      promedio_general: 'Overall average',
-      ult: 'LAST',
-      en_curso: 'IN PROGRESS',
-      repetir_icon: 'Retry &#8635;',
-      continuar_icon: 'Continue &rarr;',
-      comenzar_icon: 'Start &rarr;',
-      falladas_sufijo: 'missed',
-      practicar_falladas_title: 'Practice only the {n} missed questions from this test',
-      practicar_falladas_btn: '&#8635; Practice missed',
-      simulacro_txt: 'Mock exam',
-      examen_title: 'Random {n}-question exam, ungraded until the end',
-      salir_btn: '&larr; Exit',
-      aciertos_lbl: 'CORRECT',
-      respondidas_lbl: 'ANSWERED',
-      pregunta_lbl: 'QUESTION',
-      sim_lbl: 'EXAM',
-      siguiente_btn: 'Next &rarr;',
-      ir_a_pregunta: 'Go to question',
-      correcta: 'Correct',
-      incorrecta: 'Incorrect',
-      sin_responder: 'Unanswered',
-      tag_correcta: 'CORRECT',
-      tag_turespuesta: 'YOUR ANSWER',
-      pregunta_titulo: 'Question ',
-      tab_pregunta: 'Question',
-      tab_explicacion: 'Explanation',
-      tab_nota: 'Note',
-      tab_comentarios: 'Comments',
-      exp_locked: 'Answer the question to see the explanation.',
-      exp_none: 'There is no explanation for this question yet.',
-      nota_placeholder: 'Your notes on this question. Saved only in this browser.',
-      nota_guardada: 'Saved',
-      nota_vacia: 'Empty',
-      nota_escribiendo: 'Typing…',
-      borrar_nota: 'Delete note',
-      mas_votados: 'Most voted',
-      recientes: 'Recent',
-      compartido: 'Shared',
-      solo_navegador: 'This browser only',
-      cmt_vacio: 'No one has commented on this question yet.<br>Write the first note below.',
-      cmt_placeholder: 'Add a mnemonic, a correction, or why the correct option is right.',
-      publicar_btn: 'Post',
-      reportar_btn: 'Report',
-      borrar_btn: 'Delete',
-      tu_badge: 'YOU',
-      informe_desempeno: 'PERFORMANCE REPORT',
-      aciertos: 'Correct',
-      tiempo: 'Time',
-      prom_pregunta: 'Avg. / question',
-      revisar_falladas: 'Review missed',
-      sin_errores: 'No mistakes — 100% correct in this subject.',
-      turespuesta_colon: 'YOUR ANSWER:',
-      correcta_colon: 'CORRECT:',
-      repetir_materia_btn: '&#8635; Retry subject',
-      nuevo_simulacro_btn: '&#8635; New mock exam',
-      volver_materias_btn: 'Back to subjects',
-      progreso_guardado: 'Progress saved',
-      exam_bar_txt: 'Mock exam mode — ungraded until you finish',
-      exam_end_btn: 'End exam',
-      exam_review_btn: 'Review exam',
-      exam_legend: 'Answered &nbsp;·&nbsp; ungraded'
-    }
-  };
-
-  var idioma = 'es';
-  try {
-    var guardado = localStorage.getItem('hvipca_idioma');
-    if (guardado === 'es' || guardado === 'en') idioma = guardado;
-  } catch (e) { /* localStorage no disponible: se queda en español por defecto */ }
-
-  function t(key) { return (I18N[idioma] && I18N[idioma][key]) || I18N.es[key] || key; }
-  function guardarIdioma() { try { localStorage.setItem('hvipca_idioma', idioma); } catch (e) {} }
-  function enInglés() { return idioma === 'en'; }
-
-  /* ---------- Parcheo de textos ESTÁTICOS del HTML (por id) ---------- */
-  function aplicarIdiomaEstatico() {
-    var byId = function (id) { return document.getElementById(id); };
-    var setHTML = function (id, html) { var el = byId(id); if (el) el.innerHTML = html; };
-    var setText = function (id, txt) { var el = byId(id); if (el) el.textContent = txt; };
-    var setPh   = function (id, txt) { var el = byId(id); if (el) el.placeholder = txt; };
-
-    setHTML('authSubtitle', t('auth_subtitle'));
-    setHTML('authGoogleTxt', t('google_btn'));
-    setHTML('authAppleTxt', t('apple_btn'));
-    setHTML('oauthNote', t('oauth_note'));
-    setText('authDivider', t('divider'));
-    setPh('authNombre', t('nombre_ph'));
-    setPh('authClave', t('clave_ph'));
-    setHTML('claveHint', t('clave_hint'));
-    setPh('authClave2', t('clave2_ph'));
-    setHTML('authGuestBtn', t('guest_btn'));
-
-    if (typeof authModo !== 'undefined') {
-      var loginMode = (authModo === 'login');
-      setText('authHeading', loginMode ? t('login_heading') : t('register_heading'));
-      setText('authSubmitBtn', loginMode ? t('login_heading') : t('register_heading'));
-      setHTML('authSwitch', loginMode ? t('switch_to_register') : t('switch_to_login'));
-    }
-
-    var profNombreEl = byId('profNombre');
-    setHTML('profBarWho', t('sesion_lbl') + ' <b id="profNombre">' + (profNombreEl ? profNombreEl.textContent : '') + '</b>');
-    setText('logoutBtn', t('logout_btn'));
-    setText('bancosSub', t('bancos_sub'));
-    setText('resetBtn', t('reset_btn'));
-    setHTML('backToBancosBtn', t('back_bancos'));
-    setHTML('exitQuizBtn', t('salir_btn'));
-    setHTML('nextBtn', t('siguiente_btn'));
-    setText('navGoLabel', t('ir_a_pregunta'));
-    setText('resHeadSub', t('informe_desempeno'));
-    setText('lblCorrect', t('aciertos'));
-    setText('lblTime', t('tiempo'));
-    setText('lblAvg', t('prom_pregunta'));
-    setText('reviewLabelTxt', t('revisar_falladas'));
-    setHTML('retryBtn', t('repetir_materia_btn'));
-    setText('backToSubjBtn', t('volver_materias_btn'));
-    setText('saveIndicator', t('progreso_guardado'));
-
-    var legend = byId('navLegend');
-    if (legend) {
-      var spans = legend.querySelectorAll('.lg');
-      if (spans[0]) spans[0].textContent = t('correcta');
-      if (spans[1]) spans[1].textContent = t('incorrecta');
-      if (spans[2]) spans[2].textContent = t('sin_responder');
-    }
-
-    /* botones/franjas del modo simulacro: se crean una sola vez por montarUI() */
-    var examBar = byId('examBar');
-    if (examBar && examBar.firstElementChild) examBar.firstElementChild.innerHTML = '&#9992; ' + t('exam_bar_txt');
-    setText('examEndBtn', t('exam_end_btn'));
-    setText('examReviewBtn', t('exam_review_btn'));
-    var examLegend = document.querySelector('#screen-quiz .examlegend');
-    if (examLegend) examLegend.innerHTML = '<i></i>' + t('exam_legend');
-  }
-
-  /* ---------- Traducción de fragmentos generados dinámicamente ---------- */
-  function traducirBancos() {
-    if (!enInglés()) return;
-    document.querySelectorAll('#bancoGrid .bancotile .bstats > div').forEach(function (div, i) {
-      var b = div.querySelector('b');
-      if (!b) return;
-      var label = [t('preguntas'), t('materias'), t('completadas')][i];
-      div.innerHTML = '<b>' + b.textContent + '</b>' + (label || '');
-    });
-  }
-
-  function traducirMaterias() {
-    if (!enInglés()) return;
-    document.querySelectorAll('#statusrow .stat').forEach(function (div, i) {
-      var lbl = div.querySelector('.lbl');
-      var label = [t('preguntas_totales'), t('materias_completadas'), t('promedio_general')][i];
-      if (lbl && label) lbl.textContent = label;
-    });
-    document.querySelectorAll('#tilesGrid .tile').forEach(function (tile) {
-      var count = tile.querySelector('.count');
-      if (count) count.textContent = count.textContent.replace(/preguntas\s*$/, t('preguntas'));
-      var last = tile.querySelector('.last');
-      if (last) {
-        last.innerHTML = last.innerHTML
-          .replace(/^ÚLT\./, t('ult'))
-          .replace(/^EN CURSO/, t('en_curso'));
-      }
-      var go = tile.querySelector('.go');
-      if (go) {
-        var txt = go.textContent.trim();
-        if (txt.indexOf('Repetir') === 0) go.innerHTML = t('repetir_icon');
-        else if (txt.indexOf('Continuar') === 0) go.innerHTML = t('continuar_icon');
-        else if (txt.indexOf('Comenzar') === 0) go.innerHTML = t('comenzar_icon');
-      }
-      var goFall = tile.querySelector('.goFall');
-      if (goFall) {
-        var m1 = goFall.textContent.match(/(\d+)/);
-        if (m1) {
-          goFall.textContent = '\u27F3 ' + m1[1] + ' ' + t('falladas_sufijo');
-          goFall.title = t('practicar_falladas_title').replace('{n}', m1[1]);
-        }
-      }
-      var goExam = tile.querySelector('.goExam');
-      if (goExam) {
-        var m2 = goExam.textContent.match(/(\d+)/);
-        if (m2) {
-          goExam.textContent = '\u2708 ' + t('simulacro_txt') + ' ' + m2[1];
-          goExam.title = t('examen_title').replace('{n}', m2[1]);
-        }
-      }
-    });
-  }
-
-  function traducirTabs() {
-    if (!enInglés()) return;
-    var tabs = document.querySelectorAll('#qTabs .qtab');
-    var labels = [t('tab_pregunta'), t('tab_explicacion'), t('tab_nota'), t('tab_comentarios')];
-    tabs.forEach(function (btn, i) {
-      var extra = btn.querySelector('.lock, .badge');
-      var extraHTML = extra ? extra.outerHTML : '';
-      if (labels[i]) btn.innerHTML = labels[i] + extraHTML;
-    });
-  }
-
-  function traducirPanelExp() {
-    if (!enInglés()) return;
-    var box = document.getElementById('panel-exp');
-    if (!box) return;
-    var msg = box.querySelector('.panelmsg');
-    if (!msg) return;
-    if (msg.innerHTML.indexOf('Responde la pregunta') !== -1) msg.innerHTML = '<span class="big">🔒</span>' + t('exp_locked');
-    else if (msg.innerHTML.indexOf('Todavía no hay explicación') !== -1) msg.innerHTML = '<span class="big">—</span>' + t('exp_none');
-  }
-
-  function traducirPanelNota() {
-    if (!enInglés()) return;
-    var box = document.getElementById('panel-nota');
-    if (!box) return;
-    var ta = box.querySelector('.notebox');
-    if (ta) ta.placeholder = t('nota_placeholder');
-    var estadoEl = document.getElementById('notaEstado');
-    if (estadoEl) {
-      var txt = estadoEl.textContent.trim();
-      if (txt === 'Guardada') estadoEl.textContent = t('nota_guardada');
-      else if (txt === 'Vacía') estadoEl.textContent = t('nota_vacia');
-      else if (txt === 'Escribiendo…') estadoEl.textContent = t('nota_escribiendo');
-    }
-    var delBtn = box.querySelector('.notefoot button');
-    if (delBtn && delBtn.textContent.trim() === 'Borrar nota') delBtn.textContent = t('borrar_nota');
-    /* el listener de guardado escribe 'Guardada'/'Vacía'/'Escribiendo…' de nuevo
-       tras cada tecla; re-traducimos en cada input mientras dure este panel. */
-    if (ta && !ta._i18nBound) {
-      ta._i18nBound = true;
-      ta.addEventListener('input', function () { setTimeout(traducirPanelNota, 460); });
-    }
-  }
-
-  function traducirPanelCmt() {
-    if (!enInglés()) return;
-    var box = document.getElementById('panel-cmt');
-    if (!box) return;
-    var sortBtns = box.querySelectorAll('.cmtsort button');
-    if (sortBtns[0]) sortBtns[0].textContent = t('mas_votados');
-    if (sortBtns[1]) sortBtns[1].textContent = t('recientes');
-    var scope = box.querySelector('.cmtscope');
-    if (scope) {
-      var isShared = scope.textContent.indexOf('Compartido') !== -1;
-      scope.innerHTML = '<i style="' + (isShared ? 'background:var(--green)' : '') + '"></i>' + (isShared ? t('compartido') : t('solo_navegador'));
-    }
-    var empty = box.querySelector('.panelmsg');
-    if (empty && empty.innerHTML.indexOf('Nadie ha comentado') !== -1) {
-      empty.innerHTML = '<span class="big">💬</span>' + t('cmt_vacio');
-    }
-    box.querySelectorAll('.who + .mine').forEach(function (b) { b.textContent = t('tu_badge'); });
-    box.querySelectorAll('.rep').forEach(function (b) { if (b.textContent.trim() === 'Reportar') b.textContent = t('reportar_btn'); });
-    box.querySelectorAll('.cmtdel').forEach(function (b) { if (b.textContent.trim() === 'Borrar') b.textContent = t('borrar_btn'); });
-    var ta = box.querySelector('#cmtTxt');
-    if (ta) ta.placeholder = t('cmt_placeholder');
-    var pubBtn = box.querySelector('.cmtform .btn-cyan');
-    if (pubBtn && pubBtn.textContent.trim() === 'Publicar') pubBtn.textContent = t('publicar_btn');
-  }
-
-  function traducirQuizTags() {
-    if (!enInglés()) return;
-    document.querySelectorAll('#qOpts .tag').forEach(function (tg) {
-      var txt = tg.textContent.trim();
-      if (txt === 'CORRECTA') tg.textContent = t('tag_correcta');
-      else if (txt === 'TU RESPUESTA') tg.textContent = t('tag_turespuesta');
-    });
-    var score = document.getElementById('quizScore');
-    if (score) {
-      score.textContent = score.textContent
-        .replace(/^ACIERTOS/, t('aciertos_lbl'))
-        .replace(/^RESPONDIDAS/, t('respondidas_lbl'));
-    }
-    var tapeLabel = document.getElementById('tapeLabel');
-    if (tapeLabel) tapeLabel.textContent = tapeLabel.textContent.replace(/^PREGUNTA/, t('pregunta_lbl'));
-    var tapeLabel2 = document.getElementById('tapeLabel2');
-    if (tapeLabel2) tapeLabel2.textContent = tapeLabel2.textContent.replace(/^SIM /, t('sim_lbl') + ' ');
-    document.querySelectorAll('#navGrid .navbtn').forEach(function (btn) {
-      if (btn.title) btn.title = btn.title.replace(/^Pregunta /, t('pregunta_titulo'));
-    });
-    var examCounterParent = document.getElementById('examBar');
-    if (examCounterParent && examCounterParent.firstElementChild) {
-      examCounterParent.firstElementChild.innerHTML = '&#9992; ' + t('exam_bar_txt');
-    }
-  }
-
-  function traducirResultados() {
-    if (!enInglés()) return;
-    var noneWrong = document.querySelector('#reviewList .noneWrong');
-    if (noneWrong && noneWrong.textContent.indexOf('Sin errores') !== -1) noneWrong.textContent = t('sin_errores');
-    document.querySelectorAll('#reviewList .ryour').forEach(function (el) {
-      el.innerHTML = el.innerHTML.replace('TU RESPUESTA:', t('turespuesta_colon'));
-    });
-    document.querySelectorAll('#reviewList .rcorrect').forEach(function (el) {
-      el.innerHTML = el.innerHTML.replace('CORRECTA:', t('correcta_colon'));
-    });
-    var repasoBtn = document.getElementById('btnRepasoFalladas');
-    if (repasoBtn) {
-      var m = repasoBtn.textContent.match(/(\d+)/);
-      if (m) repasoBtn.innerHTML = t('practicar_falladas_btn') + ' (' + m[1] + ')';
-    }
-    var retryBtnEl = document.getElementById('retryBtn');
-    if (retryBtnEl && retryBtnEl.innerHTML.indexOf('Nuevo simulacro') !== -1) retryBtnEl.innerHTML = t('nuevo_simulacro_btn');
-  }
-
-  /* ---------- cambiarModoAuth / mostrarErrorAuth / reiniciarPerfil ---------- */
-  if (typeof window.cambiarModoAuth === 'function') {
-    var _cambiarModoAuth = window.cambiarModoAuth;
-    window.cambiarModoAuth = function () {
-      var r = _cambiarModoAuth.apply(this, arguments);
-      aplicarIdiomaEstatico();
-      return r;
-    };
-  }
-  if (typeof window.mostrarErrorAuth === 'function') {
-    var _mostrarErrorAuth = window.mostrarErrorAuth;
-    window.mostrarErrorAuth = function (msg) {
-      if (msg === 'Completa nombre y contraseña.') msg = t('err_completa');
-      else if (msg === 'Las contraseñas no coinciden.') msg = t('err_claves_no_coinciden');
-      else if (msg === 'No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.') msg = t('err_sin_conexion');
-      return _mostrarErrorAuth.call(this, msg);
-    };
-  }
-  window.reiniciarPerfil = function () {
-    if (!confirm(t('reset_confirm'))) return;
-    estado = { hvi: crearEstadoBanco('hvi'), pca: crearEstadoBanco('pca') };
-    guardarProgresoAhora();
-    renderBancos();
-  };
-  var _entrarABancos = window.entrarABancos;
-  if (typeof _entrarABancos === 'function') {
-    window.entrarABancos = function () {
-      var r = _entrarABancos.apply(this, arguments);
-      if (perfilActual && !perfilActual.persistente) {
-        document.getElementById('profNombre').textContent = t('invitado_nombre') + t('invitado_sufijo');
-      }
-      return r;
-    };
-  }
-  var _entrarInvitado = window.entrarInvitado;
-  if (typeof _entrarInvitado === 'function') {
-    window.entrarInvitado = function () {
-      var r = _entrarInvitado.apply(this, arguments);
-      perfilActual.nombre = t('invitado_nombre');
-      return r;
-    };
-  }
-
-  /* ---------- envolver los renders finales (después de TODOS los parches) ---------- */
-  function envolver(nombre, despues) {
-    var f = window[nombre];
-    if (typeof f !== 'function') return;
-    window[nombre] = function () {
-      var r = f.apply(this, arguments);
-      despues();
-      return r;
-    };
-  }
-  envolver('renderBancos', traducirBancos);
-  envolver('renderMaterias', traducirMaterias);
-  envolver('renderResultados', traducirResultados);
-  envolver('renderPregunta', function () {
-    traducirTabs();
-    traducirPanelExp();
-    traducirPanelNota();
-    traducirPanelCmt();
-    traducirQuizTags();
-  });
-  /* renderTabs se regenera también desde fuera de renderPregunta (al guardar
-     una nota, al borrarla, al terminar de cargar comentarios) a través de
-     refrescarTabs(). Envolvemos esa función directamente para no depender
-     de conocer cada punto de llamada. */
-  if (typeof window.refrescarTabs === 'function') {
-    var _refrescarTabs = window.refrescarTabs;
-    window.refrescarTabs = function () {
-      var r = _refrescarTabs.apply(this, arguments);
-      traducirTabs();
-      return r;
-    };
-  }
-  /* renderComentarios es async y se llama también fuera de renderPregunta
-     (votar, publicar, ordenar): la envolvemos aparte para no perder esas
-     actualizaciones. */
-  if (typeof window.renderComentarios === 'function') {
-    var _renderComentarios = window.renderComentarios;
-    window.renderComentarios = async function () {
-      var r = await _renderComentarios.apply(this, arguments);
-      traducirPanelCmt();
-      return r;
-    };
-  }
-  if (typeof window.renderNota === 'function') {
-    var _renderNota = window.renderNota;
-    window.renderNota = function () {
-      var r = _renderNota.apply(this, arguments);
-      traducirPanelNota();
-      return r;
-    };
-  }
-
-  /* ---------- idioma inicial + botón ---------- */
-  window.cambiarIdioma = function () {
-    idioma = (idioma === 'es') ? 'en' : 'es';
-    guardarIdioma();
-    aplicarIdiomaEstatico();
-    var activa = document.querySelector('.screen.active');
-    if (!activa) return;
-    if (activa.id === 'screen-bancos' && typeof renderBancos === 'function') renderBancos();
-    else if (activa.id === 'screen-materias' && typeof renderMaterias === 'function') renderMaterias();
-    else if (activa.id === 'screen-quiz' && typeof renderPregunta === 'function') renderPregunta();
-    else if (activa.id === 'screen-results' && typeof renderResultados === 'function') renderResultados();
-  };
-
-  function init() {
-    var btn = document.getElementById('langToggle');
-    if (btn) btn.addEventListener('click', window.cambiarIdioma);
-    aplicarIdiomaEstatico();
-  }
-  if (document.readyState !== 'loading') init();
-  else document.addEventListener('DOMContentLoaded', init);
-
-})();
-</script>
 </body>
 </html>

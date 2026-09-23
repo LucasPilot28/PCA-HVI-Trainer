@@ -860,6 +860,114 @@ body.modo-examen #screen-quiz .ex-gate{ display:none !important;
   .ti-grid{ grid-template-columns:1fr; }
 }
 
+
+
+/* ===== A320 MEMORY ITEMS v2 — additions (role selector, task sharing, session resume) ===== */
+.a320-scope .a320-modes{ display:flex; gap:10px; flex-wrap:wrap; margin-bottom:12px; }
+.a320-scope .a320-modes .btn{ flex:1 1 200px; }
+
+.a320-scope .a320-rolbar{
+  display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:18px;
+}
+.a320-scope .a320-rollbl{
+  font-family:var(--f-mono); font-size:11px; color:var(--a320-grey); text-transform:uppercase; letter-spacing:.06em;
+}
+.a320-scope .a320-rolseg{
+  display:inline-flex; border:1px solid var(--a320-hair); border-radius:10px; overflow:hidden;
+}
+.a320-scope .a320-rolseg button{
+  background:transparent; border:none; color:var(--a320-grey); font-family:var(--f-mono);
+  font-size:12px; font-weight:700; padding:7px 14px; cursor:pointer; transition:background .15s ease, color .15s ease;
+}
+.a320-scope .a320-rolseg button + button{ border-left:1px solid var(--a320-hair); }
+.a320-scope .a320-rolseg button.on{ background:var(--a320-amber); color:#151515; }
+.a320-scope .a320-rolseg button:not(.on):hover{ background:rgba(255,255,255,.06); color:#fff; }
+.a320-scope .a320-small{ flex:0 0 auto; padding:8px 14px; font-size:12.5px; }
+
+/* tarjeta índice: distintivo de categoría SOP (no es memory item oficial) */
+.a320-scope .a320-card.sop{ border-style:dashed; }
+.a320-scope .a320-badge{
+  font-family:var(--f-mono); font-size:9.5px; font-weight:700; letter-spacing:.04em;
+  color:var(--a320-amber); background:rgba(239,182,31,.14); border-radius:6px; padding:2px 6px; margin-left:6px;
+}
+
+/* pantalla lista: botón de repaso de falladas, en rojo, junto a los demás */
+.a320-scope .a320-modes .btn-a320red{ flex:1 1 200px; }
+
+/* resumen de ronda: acciones pueden ser 2 o 3 botones */
+.a320-scope .a320-resume .acts{ flex-wrap:wrap; }
+.a320-scope .a320-resume .acts .btn{ flex:1 1 160px; }
+
+/* ---- task sharing ---- */
+.a320-scope .a320-ts{ margin-top:22px; }
+.a320-scope .a320-tstabs{ display:flex; gap:6px; flex-wrap:wrap; margin-bottom:10px; }
+.a320-scope .a320-tstabs.solo{ margin-bottom:8px; }
+.a320-scope button.a320-tstab{
+  background:var(--a320-panel-2); border:1px solid var(--a320-hair); color:var(--a320-grey);
+  font-family:var(--f-mono); font-size:11px; font-weight:600; padding:6px 11px; border-radius:8px;
+  cursor:pointer; transition:border-color .15s ease, color .15s ease;
+}
+.a320-scope button.a320-tstab:hover{ color:#fff; border-color:rgba(255,255,255,.25); }
+.a320-scope button.a320-tstab.on{ color:#fff; border-color:var(--a320-amber); }
+.a320-scope button.a320-tstab.fctm.on{ background:rgba(239,182,31,.14); }
+.a320-scope span.a320-tstab{
+  display:inline-block; font-family:var(--f-mono); font-size:11px; font-weight:600; color:var(--a320-grey);
+  border:1px solid var(--a320-hair); border-radius:8px; padding:6px 11px;
+}
+.a320-scope span.a320-tstab.fctm{ color:var(--a320-amber); border-color:rgba(239,182,31,.35); }
+
+.a320-scope table.a320-tstable{
+  width:100%; border-collapse:collapse; font-size:12.5px; margin-bottom:10px;
+  background:var(--a320-panel-2); border-radius:10px; overflow:hidden;
+}
+.a320-scope table.a320-tstable th, .a320-scope table.a320-tstable td{
+  padding:8px 10px; border:1px solid var(--a320-hair); text-align:left; vertical-align:top; color:var(--a320-white);
+}
+.a320-scope table.a320-tstable th{
+  font-family:var(--f-mono); font-size:10.5px; letter-spacing:.05em; text-transform:uppercase; color:var(--a320-grey);
+  background:rgba(255,255,255,.03);
+}
+.a320-scope table.a320-tstable th em{ color:var(--a320-amber); font-style:normal; }
+.a320-scope table.a320-tstable td.vacia{ color:rgba(255,255,255,.18); }
+.a320-scope table.a320-tstable tr.trig td{
+  font-family:var(--f-mono); font-size:10.5px; letter-spacing:.03em; text-transform:uppercase;
+  color:var(--a320-amber); background:rgba(239,182,31,.08); border-color:rgba(239,182,31,.2);
+}
+.a320-scope table.a320-tstable.foco-0 td.c0{ background:rgba(239,182,31,.10); }
+.a320-scope table.a320-tstable.foco-1 td.c1{ background:rgba(239,182,31,.10); }
+
+.a320-scope .a320-tsnote{
+  font-family:var(--f-mono); font-size:11px; color:var(--a320-grey); margin:-2px 0 10px;
+}
+.a320-scope ul.a320-tsnotas{
+  margin:0 0 10px; padding-left:18px; color:var(--a320-grey); font-size:12px; line-height:1.55;
+}
+.a320-scope ul.a320-tsnotas li{ margin-bottom:5px; }
+
+.a320-scope .a320-tsavisos{
+  border:1px dashed rgba(240,100,90,.4); border-radius:10px; padding:10px 13px; margin:0 0 10px;
+}
+.a320-scope .a320-tsavisos b{
+  display:block; font-family:var(--f-mono); font-size:10.5px; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--red); margin-bottom:6px;
+}
+.a320-scope .a320-tsavisos ul{ margin:0; padding-left:18px; color:var(--a320-grey); font-size:12px; line-height:1.55; }
+.a320-scope .a320-tsavisos li{ margin-bottom:5px; }
+
+.a320-scope .a320-tssrc{
+  font-family:var(--f-mono); font-size:10.5px; color:rgba(255,255,255,.28); margin-top:2px;
+}
+
+.a320-scope .a320-fuente{
+  font-family:var(--f-mono); font-size:10.5px; color:rgba(255,255,255,.28); margin-top:14px;
+  padding-top:12px; border-top:1px solid var(--a320-hair);
+}
+
+@media (max-width:520px){
+  .a320-scope table.a320-tstable{ font-size:11.5px; }
+  .a320-scope table.a320-tstable th, .a320-scope table.a320-tstable td{ padding:7px 8px; }
+}
+
 </style>
 </head>
 <body>
@@ -2812,285 +2920,850 @@ intentarSesionGuardada(); (function () {
   else aplicar();
 })();
 /* ============================================================
-   A320 MEMORY ITEMS — banco independiente de tarjetas
+   A320 MEMORY ITEMS — banco independiente de tarjetas (v2)
    Módulo autónomo (IIFE). No modifica el motor existente:
    envuelve renderBancos() y migrarEstado() y se inyecta solo.
 
-   Progreso: estado.a320 = { sabidas:{id:n}, falladas:{id:n}, vistas:{id:n} }
-   Viaja dentro de `estado`, por lo que se sincroniza automáticamente
-   a través de /api/progress sin backend nuevo.
+   v2 — reconstruido a partir de MEM_ITEMS.pdf (notas de task
+   sharing del operador) contrastado con el FCOM y el FCTM A320,
+   25 NOV 2024:
+   - Las 10 tarjetas de memory items del FCOM se completan al 100%.
+     La versión previamente desplegada tenía 8 de 11 tarjetas
+     truncadas (transcritas de una captura de pantalla incompleta,
+     con avisos "truncado" pendientes de completar); aquí se
+     completan con el texto íntegro del FCOM PRO-ABN-* y, donde el
+     FCOM no da racional, con el FCTM PR-AEP-*.
+   - CORRECCIÓN: WINDSHEAR REACTIVE decía "REACHING V1 — ROTATE";
+     el FCOM dice "REACHING VR — ROTATE" (V1 no es un punto de
+     rotación). Ya corregido.
+   - Se renombran "EGPWS WARNING"/"EGPWS CAUTION" a "TAWS WARNING"/
+     "TAWS CAUTION" (terminología actual del FCOM); mismo id, así
+     que tu progreso guardado no se pierde.
+   - TAWS CAUTION ahora incluye las 5 alertas del FCOM (antes solo
+     cubría la primera): TERRAIN, SINK RATE, DON'T SINK, TOO LOW
+     GEAR/FLAPS, GLIDESLOPE.
+   - Task sharing PF/PM en cada tarjeta: variante oficial del FCTM
+     cuando existe (EMER DESCENT, TCAS, RTO) y las notas de
+     entrenamiento de MEM_ITEMS.pdf, con las diferencias señaladas
+     explícitamente — nunca se corrige en silencio.
+   - Tarjetas nuevas (maniobras FCTM, no memory items del FCOM):
+     REJECTED TAKEOFF y ENG FAIL AFTER V1; ENG FAIL IN CRUISE
+     contrastada con el FCTM.
+   - Practicar como PF / PM / ambos: resalta tu columna en la tabla
+     de task sharing y ajusta el enunciado del modo tarjetas.
+   - La ronda de tarjetas se guarda al salir (o al revelar/calificar
+     cada tarjeta) y se puede continuar más tarde, incluso tras
+     cerrar el navegador — viaja dentro de estado.a320.sesion.
+   - "Repasar falladas": ronda solo con las tarjetas falladas más
+     veces de las que se han sabido.
+
+   Progreso: estado.a320 = { sabidas, falladas, vistas, layout, rol, sesion }
+   Los ids de tarjeta no cambian, así que el progreso anterior se conserva.
    ============================================================ */
 (function () {
   'use strict';
 
   /* ---------------------------------------------------------
-     1. CONTENIDO
-     Transcrito literalmente de las capturas de referencia.
-     `truncado` marca las tarjetas cuya captura se cortaba:
-     ese texto se muestra en la tarjeta para que sepas qué falta
-     completar desde FCOM/QRH. No se ha inventado procedimiento.
+     1. CONTENIDO — acciones (FCOM PRO-ABN, 25 NOV 2024)
      --------------------------------------------------------- */
   var ITEMS = [
     {
       id: 'stall-recovery',
       titulo: 'STALL RECOVERY',
       cat: 'STALL',
+      fuente: 'A320 FCOM 25 NOV 2024 · PRO-ABN-MISC-00013768 · [MEM] STALL RECOVERY',
       secciones: [{
         items: [
-          { t: 'note', x: 'As soon as any stall indication (aural warning, buffet...) is recognised:' },
-          { t: 'announce', x: 'Announce "STALL - I HAVE CONTROL"' },
+          { t: 'note', x: 'As soon as any stall indication (aural warning, "STALL STALL" red message on PFD, buffet, etc.) is recognized:' },
+          { t: 'announce', x: 'Announce "STALL, I have control"' },
           { t: 'row', l: 'NOSE DOWN PITCH CONTROL', v: 'APPLY' },
+          { t: 'note', hint: true, x: 'This will reduce angle of attack. If there is a lack of pitch down authority, reducing thrust may be necessary.' },
           { t: 'row', l: 'BANK', v: 'WINGS LEVEL' },
           { t: 'hr' },
-          { t: 'sect', x: 'WHEN OUT OF THE STALL (NO STALL INDICATION):' },
-          { t: 'row', l: 'THRUST', v: 'INC SMOOTHLY AS NEEDED' },
+          { t: 'sect', x: 'WHEN OUT OF STALL (NO LONGER STALL INDICATIONS):' },
+          { t: 'row', l: 'THRUST', v: 'INCREASE SMOOTHLY AS NEEDED' },
+          { t: 'note', hint: true, x: 'One engine inoperative: progressively compensate the thrust asymmetry with rudder.' },
           { t: 'row', l: 'SPEEDBRAKES', v: 'CHECK RETRACTED' },
           { t: 'row', l: 'FLIGHT PATH', v: 'RECOVER SMOOTHLY' },
-          { t: 'note', hint: true, x: 'If there is a lack of pitch down authority, reducing thrust may be necessary.' },
+          { t: 'note', hint: true, x: 'If a risk of ground contact exists, once clearly out of stall, establish smoothly a positive climb gradient.' },
           { t: 'hr' },
-          { t: 'sect', x: 'IF IN CLEAN CONFIG AND BELOW 20,000 FT:' },
-          { t: 'row', l: 'FLAP 1', v: 'SELECT' },
-          { t: 'note', hint: true, x: 'Note: If a risk of ground contact exists, once clearly out of stall (no longer stall indications), establish smoothly a positive…' }
+          { t: 'sect', x: 'IF IN CLEAN CONFIG AND BELOW 20 000 FT:' },
+          { t: 'row', l: 'FLAPS 1', v: 'SELECT' }
         ]
       }],
-      truncado: 'La nota final y el bloque WHY IT MATTERS quedaron cortados en la captura.'
+      porque: 'Loss of lift depends only on angle of attack (AOA), not on airspeed. The immediate priority is always to reduce AOA — minimizing altitude loss is secondary to regaining lift. Immediate maximum thrust is not appropriate on its own: engine spool-up is slow and, on underslung engines, a thrust increase raises the nose and can increase AOA further. FLAPS 1 in clean configuration increases the margin to AOAstall.',
+      nota: 'Contenido completo del FCOM PRO-ABN-MISC (acciones) y FCTM PR-AEP-MISC (racional). Corrige la versión anterior de esta tarjeta, que se cortaba tras "establish smoothly a positive…".'
     },
 
     {
       id: 'stall-warning-liftoff',
-      titulo: 'STALL WARNING AT LIFT OFF',
+      titulo: 'STALL WARNING AT LIFTOFF',
       cat: 'STALL',
+      fuente: 'A320 FCOM 25 NOV 2024 · PRO-ABN-MISC-00013769 · [MEM] STALL WARNING AT LIFTOFF',
       secciones: [{
         items: [
-          { t: 'announce', x: 'Announce "STALL - TOGA 15°"' },
+          { t: 'note', x: 'If stall warnings trigger at liftoff, apply the following immediate actions:' },
+          { t: 'announce', x: 'Announce "STALL, TOGA 15°"' },
           { t: 'row', l: 'THRUST', v: 'TOGA' },
+          { t: 'note', hint: true, x: 'At the same time:' },
           { t: 'row', l: 'PITCH ATTITUDE', v: '15°' },
           { t: 'row', l: 'BANK', v: 'WINGS LEVEL' }
         ]
       }],
-      porque: 'A stall warning during the takeoff phase demands an immediate but controlled response. Reducing pitch too much close to the ground can be disastrous, but ignoring the warning risks an actual stall.',
-      tip: 'As soon as you recognise a stall or hear the warning, set 15° pitch, apply TOGA, and let the aircraft accelerate…',
-      truncado: 'El final del CAPTAIN\'S TIP quedó cortado en la captura.'
+      porque: 'The flight crew flies the appropriate thrust and pitch for takeoff to ensure a safe flight path and stop the warnings. TOGA gives maximum available thrust; 15° and wings level ensure a safe climb. Once a safe flight path and speed are achieved, if the warnings are still active they must be treated as spurious.',
+      tip: 'As soon as you recognise a stall warning at liftoff, TOGA and 15° — then let the aircraft accelerate. If the warning keeps sounding once you have a safe speed and flight path established, it\'s almost certainly spurious: damaged AOA probes, ice ridges on the pitot/AOA sensors, or wake vortex are the usual causes.',
+      nota: 'Completa la versión anterior de esta tarjeta, que se cortaba a mitad del CAPTAIN\'S TIP. Racional y causas de aviso espurio: FCTM PR-AEP-MISC.'
     },
 
     {
       id: 'unreliable-speed',
-      titulo: 'UNRELIABLE SPEED',
+      titulo: 'UNRELIABLE SPEED INDICATION',
       cat: 'SPEED',
+      fuente: 'A320 FCOM 25 NOV 2024 · PRO-ABN-NAV-AM-00017720 · [MEM] UNRELIABLE SPEED INDICATION',
       secciones: [{
         items: [
+          { t: 'note', x: 'If the safe conduct of the flight is impacted:' },
           { t: 'announce', x: 'Announce "UNRELIABLE SPEED"' },
-          { t: 'row', l: 'AP, A/THR, FD', v: 'OFF' },
-          { t: 'note', x: 'Gives blank FMA' },
-          { t: 'hr' },
-          { t: 'sect', x: 'PITCH/THRUST:' },
-          { t: 'row', l: '<THR RED ALT', v: '15°/TOGA' },
-          { t: 'row', l: '>THR RED ALT <FL100', v: '10°/CLB' },
-          { t: 'row', l: '>THR RED ALT >FL100', v: '5°/CLB' },
-          { t: 'row', l: 'FLAPS 0/1/2/3', v: 'MAINTAIN' },
-          { t: 'row', l: 'FLAP FULL', v: 'SELECT CONF 3' },
-          { t: 'row', l: 'SPD BRK', v: 'CHECK RETRACTED' },
+          { t: 'row', l: 'AP', v: 'OFF' },
+          { t: 'row', l: 'A/THR', v: 'OFF' },
+          { t: 'row', l: 'FD', v: 'OFF' },
+          { t: 'note', hint: true, x: 'Gives blank FMA.' },
+          { t: 'sect', x: 'PITCH / THRUST:' },
+          { t: 'row', l: 'Below THR RED ALT', v: '15° / TOGA' },
+          { t: 'row', l: 'Above THR RED ALT, below FL100', v: '10° / CLB' },
+          { t: 'row', l: 'Above THR RED ALT, above FL100', v: '5° / CLB' },
+          { t: 'row', l: 'FLAPS (if CONF 0/1/2/3)', v: 'MAINTAIN CURRENT CONF' },
+          { t: 'row', l: 'FLAPS (if CONF FULL)', v: 'SELECT CONF 3 AND MAINTAIN' },
+          { t: 'row', l: 'SPEEDBRAKES', v: 'CHECK RETRACTED' },
           { t: 'row', l: 'L/G', v: 'UP' },
-          { t: 'note', hint: true, x: 'When above MSA level off for troubleshooting' }
+          { t: 'note', hint: true, x: 'When at or above MSA or circuit altitude: level off for troubleshooting.' }
         ]
       }],
-      porque: 'Unreliable airspeed indications have…',
-      truncado: 'El bloque WHY IT MATTERS quedó cortado en la captura.'
+      porque: 'Erroneous airspeed/altitude data almost never affects every probe identically, so the first symptom is usually a discrepancy between the CAPT PFD, F/O PFD and standby instruments rather than an obvious failure flag. Every anemometric system on board (flight controls, flight guidance) uses a voting logic between the three ADRs, automatically rejecting a source that disagrees with the other two — which is exactly why AP/A-THR/FD are switched off here: to stop the automation from silently trusting a bad source.',
+      nota: 'Completa la versión anterior de esta tarjeta (WHY IT MATTERS se cortaba en "Unreliable airspeed indications have…"). El FCOM continúa, tras el nivelado, con una tabla de pitch/thrust y velocidad resultante por configuración y peso para el nivelado (PRO-ABN-NAV P 2/88) — no se reproduce aquí por ser material de QRH, no de memoria; consúltala en el FCOM/QRH si necesitas los valores exactos.'
     },
 
     {
       id: 'emergency-descent',
-      titulo: 'EMERGENCY DESCENT',
+      titulo: 'EMER DESCENT',
       cat: 'DESCENT',
+      fuente: 'A320 FCOM 25 NOV 2024 · PRO-ABN-MISC-00012092 · [MEM] EMER DESCENT',
       secciones: [
-        { items: [{ t: 'announce', x: 'Announce: "EMERGENCY DESCENT"' }] },
+        { items: [{ t: 'announce', x: 'Announce "EMERGENCY DESCENT"' }] },
         {
-          gt: 'Pilot Flying',
+          gt: 'Memory items (first step)',
           items: [
             { t: 'row', l: 'CREW OXY MASKS', v: 'USE' },
-            { t: 'row', l: 'ESTAB COMMS', v: '' },
+            { t: 'row', l: 'SIGNS', v: 'ON' },
             { t: 'row', l: 'EMER DESCENT', v: 'INITIATE' },
-            { t: 'row', ind: true, l: 'ALT', v: 'TURN PULL' },
-            { t: 'row', ind: true, l: 'HDG', v: 'TURN PULL' },
+            { t: 'row', ind: true, l: 'ALT', v: 'TURN, PULL' },
+            { t: 'row', ind: true, l: 'HDG', v: 'TURN, PULL' },
             { t: 'row', ind: true, l: 'SPD', v: 'PULL' },
-            { t: 'row', l: 'FMA', v: 'ANNOUNCE' },
-            { t: 'note', hint: true, x: 'If A/THR not active' },
-            { t: 'row', ind: true, l: 'THR LEVERS', v: 'IDLE' }
+            { t: 'row', l: 'FMA', v: 'ANNOUNCE / CHECK' },
+            { t: 'note', hint: true, x: 'If A/THR not active:' },
+            { t: 'row', ind: true, l: 'THR LEVERS', v: 'IDLE' },
+            { t: 'row', l: 'SPD BRK', v: 'FULL' }
+          ]
+        },
+        {
+          gt: 'Read & do (second step — when descent established)',
+          items: [
+            { t: 'row', l: 'SPEED', v: 'MAX / APPROPRIATE' },
+            { t: 'note', hint: true, x: 'If structural damage suspected: maneuver with care, consider L/G extension.' },
+            { t: 'row', l: 'ENG MODE SEL', v: 'IGN' },
+            { t: 'row', l: 'ATC', v: 'NOTIFY' },
+            { t: 'row', l: 'EMER DESCENT (PA)', v: 'ANNOUNCE' },
+            { t: 'row', l: 'ATC XPDR 7700', v: 'CONSIDER' },
+            { t: 'row', l: 'CREW OXY MASKS DILUTION', v: 'NORM' },
+            { t: 'note', hint: true, x: 'To save oxygen. If it stays at 100%, quantity may be insufficient for the whole profile. Keep crew comms established with masks on — avoid continuous interphone use.' },
+            { t: 'row', l: 'MAX FL', v: '100 / MEA-MORA' },
+            { t: 'note', hint: true, x: 'If CAB ALT above 14 000 ft: press OXYGEN PAX MASK MAN ON.' }
           ]
         }
       ],
-      truncado: 'La captura se cortaba aquí: falta el resto de Pilot Flying, el bloque Pilot Monitoring y WHY IT MATTERS.'
+      porque: 'Initiate an emergency descent if cabin altitude and rate of climb are confirmed excessive and not controllable — or for any other reason of urgency. At high level, extend the speed brakes while monitoring VLS to avoid triggering the AOA protection, which would retract the speed brakes and disconnect the AP. In IDLE thrust with speed brakes extended the rate of descent is about 7 000 ft/min — FL390 to FL100 takes roughly 4 minutes and 40 NM. Keep TCAS in TA/RA throughout: avoiding a collision takes priority even over the descent itself.',
+      nota: 'Acciones y racional: FCOM PRO-ABN-MISC + FCTM PR-AEP-MISC (25 NOV 24). El FCTM divide expresamente el procedimiento en dos pasos: primero los memory items (hasta SPD BRK FULL), después el read & do del ECAM/QRH — durante el primer paso el PM se centra en vigilar el FMA. Ver la pestaña Task sharing para el reparto PF/PM exacto de la figura del FCTM.'
     },
 
     {
       id: 'egpws-warning',
-      titulo: 'EGPWS WARNING',
+      titulo: 'TAWS WARNING',
       cat: 'TERRAIN',
+      fuente: 'A320 FCOM 25 NOV 2024 · PRO-ABN-SURV-00028349 · [MEM] TAWS WARNING',
       secciones: [{
         items: [
-          { t: 'note', x: "'PULL UP' · 'TERRAIN AHEAD PULL UP' · 'OBSTACLE AHEAD PULL UP'" },
+          { t: 'note', x: 'If the TAWS triggers one of the PULL UP alerts: "PULL UP" · "TERRAIN AHEAD PULL UP" · "TERRAIN TERRAIN PULL UP" · "OBSTACLE AHEAD PULL UP" · "OBSTACLE OBSTACLE PULL UP"' },
           { t: 'announce', x: 'Announce "PULL UP - TOGA"' },
+          { t: 'note', hint: true, x: 'Simultaneously:' },
           { t: 'row', l: 'AP', v: 'OFF' },
           { t: 'row', l: 'PITCH', v: 'PULL UP' },
-          { t: 'note', x: 'Full back stick and maintain' },
+          { t: 'note', hint: true, x: 'Full backstick and maintain in that position.' },
           { t: 'row', l: 'THRUST LEVERS', v: 'TOGA' },
-          { t: 'row', l: 'SPEED BRAKES', v: 'CHECK RETRACTED' },
+          { t: 'row', l: 'SPEED BRAKE LEVER', v: 'CHECK RETRACTED' },
           { t: 'row', l: 'BANK', v: 'WINGS LEVEL or ADJUST' },
-          { t: 'callout', x: 'DO NOT CHANGE CONFIG UNTIL CLEAR OF OBSTACLE.' }
+          { t: 'note', hint: true, x: 'Best climb performance is with wings as level as possible. Bank may be adjusted while climbing only if turning is the safest action. Some PULL UP alerts may be followed by "AVOID TERRAIN" / "AVOID OBSTACLE" — adjust bank as necessary.' },
+          { t: 'callout', x: 'DO NOT CHANGE CONFIGURATION (SLATS/FLAPS, GEAR) UNTIL CLEAR OF OBSTACLE.' }
         ]
       }],
-      porque: 'EGPWS PULL UP warnings indicate imminent terrain contact. This is the last line of defense against CFIT. Response must be immediate…',
-      truncado: 'El final de WHY IT MATTERS quedó cortado en la captura.'
+      porque: 'TAWS PULL UP warnings indicate imminent terrain or obstacle contact. This is the last line of defense against CFIT (Controlled Flight Into Terrain) and the response must be immediate and maximal — full backstick, full thrust, wings level for best climb gradient — with no attempt to first identify or confirm the threat visually.',
+      nota: 'Completa la versión anterior (WHY IT MATTERS se cortaba). Se renombra de "EGPWS WARNING" a "TAWS WARNING" para coincidir con la terminología actual del FCOM 25 NOV 2024; se conserva el mismo id para no perder tu progreso guardado.'
     },
 
     {
       id: 'egpws-caution',
-      titulo: 'EGPWS CAUTION',
+      titulo: 'TAWS CAUTION',
       cat: 'TERRAIN',
-      secciones: [{
-        items: [
-          { t: 'note', x: "'TERRAIN TERRAIN' · 'TOO LOW TERRAIN' · 'TERRAIN AHEAD' · 'OBSTACLE AHEAD'" },
-          { t: 'hr' },
-          { t: 'sect', x: 'DURING NIGHT OR IMC:' },
-          { t: 'announce', x: 'Announce "PULL UP - TOGA"' },
-          { t: 'row', l: 'AP', v: 'OFF' },
-          { t: 'row', l: 'PITCH', v: 'PULL UP' },
-          { t: 'note', x: 'Full back stick and maintain' },
-          { t: 'row', l: 'THRUST LEVERS', v: 'TOGA' },
-          { t: 'row', l: 'SPEED BRAKES', v: 'CHECK RETRACTED' },
-          { t: 'row', l: 'BANK', v: 'WINGS LEVEL or ADJUST' },
-          { t: 'callout', x: 'DO NOT CHANGE CONFIG UNTIL CLEAR OF OBSTACLE.' },
-          { t: 'hr' },
-          { t: 'sect', x: 'DURING DAYLIGHT OR VMC (CAN SEE OBSTACLE):' },
-          { t: 'row', l: 'FLIGHT PATH', v: 'ADJUST' }
-        ]
-      }],
-      truncado: 'La captura se cortaba tras FLIGHT PATH — ADJUST: falta el resto del bloque VMC y WHY IT MATTERS.'
+      fuente: 'A320 FCOM 25 NOV 2024 · PRO-ABN-SURV-00028345/46/47/48 · [MEM] TAWS CAUTION',
+      secciones: [
+        {
+          gt: '"TERRAIN TERRAIN" / "TOO LOW TERRAIN" / "TERRAIN AHEAD" / "OBSTACLE AHEAD"',
+          items: [
+            { t: 'sect', x: 'DURING NIGHT OR IMC:' },
+            { t: 'note', hint: true, x: 'Simultaneously:' },
+            { t: 'row', l: 'AP', v: 'OFF' },
+            { t: 'row', l: 'PITCH', v: 'PULL UP' },
+            { t: 'note', hint: true, x: 'Full backstick and maintain in that position.' },
+            { t: 'row', l: 'THRUST LEVERS', v: 'TOGA' },
+            { t: 'row', l: 'SPEED BRAKE LEVER', v: 'CHECK RETRACTED' },
+            { t: 'row', l: 'BANK', v: 'WINGS LEVEL or ADJUST' },
+            { t: 'callout', x: 'DO NOT CHANGE CONFIGURATION (SLATS/FLAPS, GEAR) UNTIL CLEAR OF OBSTACLE.' },
+            { t: 'sect', x: 'DURING DAYLIGHT AND VMC (TERRAIN/OBSTACLE CLEARLY IN SIGHT):' },
+            { t: 'row', l: 'FLIGHT PATH', v: 'ADJUST' },
+            { t: 'note', hint: true, x: 'Adjust pitch, bank and thrust to silence the alert.' }
+          ]
+        },
+        {
+          gt: '"SINK RATE"',
+          items: [
+            { t: 'row', l: 'Above 1000 ft AAL IMC / 500 ft AAL VMC', v: 'FLIGHT PATH — ADJUST' },
+            { t: 'row', l: 'Below 1000 ft AAL IMC / 500 ft AAL VMC', v: 'GO-AROUND — CONSIDER' }
+          ]
+        },
+        {
+          gt: '"DON\'T SINK"',
+          items: [
+            { t: 'row', l: 'FLIGHT PATH', v: 'ADJUST' }
+          ]
+        },
+        {
+          gt: '"TOO LOW GEAR" / "TOO LOW FLAPS"',
+          items: [
+            { t: 'row', l: 'GO-AROUND', v: 'PERFORM' }
+          ]
+        },
+        {
+          gt: '"GLIDESLOPE"',
+          items: [
+            { t: 'row', l: 'Above 1000 ft AAL IMC / 500 ft AAL VMC', v: 'FLIGHT PATH — ADJUST' },
+            { t: 'note', hint: true, x: 'If a deliberate approach below glideslope is required: G/S MODE — OFF.' },
+            { t: 'row', l: 'Below 1000 ft AAL IMC / 500 ft AAL VMC', v: 'GO-AROUND — CONSIDER' }
+          ]
+        }
+      ],
+      porque: 'TAWS CAUTION groups five distinct aural alerts under one memory item, each with its own trigger and response — terrain/obstacle proximity, excessive sink rate, altitude loss straight after takeoff or go-around, an unsafe gear/flap configuration too close to the ground, and an excessive glideslope deviation. Unlike a TAWS WARNING, a caution still leaves room for a measured "flight path adjust" response above defined height gates — below those gates, a go-around is the safer default.',
+      nota: 'Se completa con las cinco alertas del FCOM (la versión anterior solo cubría la primera y se cortaba en el bloque VMC). Se renombra de "EGPWS CAUTION" a "TAWS CAUTION" por terminología actual; mismo id que antes.'
     },
 
     {
       id: 'tcas-ta',
-      titulo: 'TCAS TA (CAUTION)',
+      titulo: 'TCAS CAUTION — TRAFFIC ADVISORY',
       cat: 'TCAS',
+      fuente: 'A320 FCOM 25 NOV 2024 · PRO-ABN-ABN-00 (callouts) + PRO-ABN-SURV-00025023 · [MEM] TCAS CAUTION - TRAFFIC ADVISORY',
       secciones: [{
         items: [
-          { t: 'sect', x: 'WITH AP/FD TCAS FUNCTION:' },
-          { t: 'note', x: 'If TCAS mode arms' },
-          { t: 'announce', x: "Announce 'TCAS BLUE'" },
-          { t: 'note', x: 'If TCAS mode does not arm' },
-          { t: 'announce', x: "Announce 'TCAS, I HAVE CTRL'" },
+          { t: 'sect', x: 'AIRCRAFT WITH AP/FD TCAS FUNCTION:' },
+          { t: 'note', x: 'As soon as a TA triggers:' },
+          { t: 'row', l: 'If AP/FD TCAS mode arms', v: 'Announce "TCAS blue"' },
+          { t: 'row', l: 'If AP/FD TCAS mode does not arm', v: 'Announce "TCAS, I have control"' },
           { t: 'hr' },
-          { t: 'sect', x: 'WITHOUT AP/FD TCAS FUNCTION:' },
-          { t: 'announce', x: 'Announce "TCAS, I HAVE CTRL"' },
-          { t: 'callout', x: 'DO NOT MANOEUVRE BASED ON TA ONLY.' }
+          { t: 'sect', x: 'AIRCRAFT WITHOUT AP/FD TCAS FUNCTION:' },
+          { t: 'announce', x: 'Announce "TCAS, I have control"' },
+          { t: 'callout', x: 'DO NOT PERFORM A MANEUVER BASED ON A TA ALONE.' }
         ]
       }],
-      porque: 'Traffic Advisories alert you to nearby traffic but do not require evasive action. Proper callouts ensure crew coordination while avoiding unnecessary maneuvers that could conflict with ATC or other traffic.',
-      truncado: 'La captura empezaba ya desplazada: puede faltar una línea inicial antes de "WITH AP/FD TCAS FUNCTION".'
+      porque: 'A Traffic Advisory alerts the crew to nearby traffic but does not itself require evasive action — manoeuvring on a TA alone risks creating the very conflict TCAS exists to prevent. The callout exists purely for crew awareness and to confirm who is flying if a Resolution Advisory follows.',
+      nota: 'Confirma qué rama de esta tarjeta aplica a tu flota en la GEN-IFIT (no todos los A320 tienen la función AP/FD TCAS instalada — en ese caso solo aplica la rama inferior).'
     },
 
     {
       id: 'tcas-ra',
-      titulo: 'TCAS RA (WARNING)',
+      titulo: 'TCAS WARNING — RESOLUTION ADVISORY',
       cat: 'TCAS',
+      fuente: 'A320 FCOM 25 NOV 2024 · PRO-ABN-SURV-00012455 · [MEM] TCAS WARNING - RESOLUTION ADVISORY',
       secciones: [{
         items: [
-          { t: 'note', x: 'Always follow RA orders as these offer best separation.' },
+          { t: 'note', x: 'Always follow RA orders, even if this means crossing the intruder\'s altitude — they ensure the best separation.' },
           { t: 'hr' },
-          { t: 'sect', x: 'IF AP/FD TCAS MODE AVAIL:' },
-          { t: 'row', l: 'TCAS blue', v: 'TCAS Green' },
-          { t: 'row', l: 'ALL RA (except CLB RA in appr F3/FF)', v: 'Follow FD ± AP' },
-          { t: 'row', l: 'If CLB RA during approach F3/FF', v: 'GO-AROUND' },
+          { t: 'sect', x: 'ALL RA, EXCEPT A CLIMB RA DURING APPROACH IN CONF 3 OR FULL:' },
+          { t: 'row', l: 'AP (if engaged)', v: 'OFF' },
+          { t: 'row', l: 'BOTH FDs', v: 'OFF' },
+          { t: 'row', l: 'VERTICAL SPEED', v: 'ADJUST or MAINTAIN' },
+          { t: 'note', hint: true, x: 'Respond promptly and smoothly. Reach the green area and/or avoid the red area of the VSI. If necessary, use the full speed range between Vα max and VMAX.' },
+          { t: 'hr' },
+          { t: 'sect', x: 'ANY CLIMB RA DURING APPROACH IN CONF 3 OR FULL:' },
+          { t: 'row', l: 'GO-AROUND', v: 'PERFORM' },
+          { t: 'note', hint: true, x: 'Follow the SRS GA mode.' },
+          { t: 'row', l: 'VERTICAL SPEED', v: 'MONITOR' },
+          { t: 'note', hint: true, x: 'Check it stays out of the red area; take over if necessary. Respect stall, GPWS or windshear warnings.' },
           { t: 'row', l: 'ATC', v: 'NOTIFY' },
           { t: 'hr' },
-          { t: 'sect', x: 'IF AP/FD TCAS MODE NOT AVAIL:' },
-          { t: 'note', hint: true, x: 'ALL RA (except CLB RA during approach F3/FF):' },
-          { t: 'row', l: 'AP', v: 'OFF' },
-          { t: 'row', l: 'BOTH FDs', v: 'OFF' },
-          { t: 'row', l: 'FLY THE GREEN on VSI', v: '5s initial / 2.5s reversal' },
-          { t: 'row', l: 'If CLB RA during approach F3/FF', v: 'GO-AROUND' }
+          { t: 'sect', x: 'WHEN "CLEAR OF CONFLICT" SOUNDS:' },
+          { t: 'row', l: 'ATC', v: 'NOTIFY' },
+          { t: 'row', l: 'LATERAL AND VERTICAL GUIDANCE', v: 'ADJUST' },
+          { t: 'note', hint: true, x: 'Resume normal navigation per ATC clearance.' },
+          { t: 'row', l: 'AP/FD', v: 'AS REQUIRED' }
         ]
       }],
-      truncado: 'La captura empezaba desplazada y se cortaba al final: puede faltar el announce inicial, la notificación a ATC y WHY IT MATTERS.'
+      porque: 'An RA is coordinated with the intruder\'s own TCAS: if you don\'t follow it, the other aircraft may be maneuvering toward you in response to its own coordinated order, compromising the separation TCAS is designed to guarantee. Both FDs go off together with the AP so the FD bars can never contradict the TCAS vertical-speed guidance the pilot is now flying to.',
+      nota: 'Completa la versión anterior (se cortaba tras la primera rama, sin el bloque de RA en aproximación, ATC NOTIFY, ni el regreso a navegación normal).'
     },
 
     {
       id: 'windshear-reactive',
-      titulo: 'WINDSHEAR - REACTIVE',
+      titulo: 'WINDSHEAR WARNING — REACTIVE WINDSHEAR',
       cat: 'WINDSHEAR',
+      fuente: 'A320 FCOM 25 NOV 2024 · PRO-ABN-SURV-00012271 · [MEM] WINDSHEAR WARNING - REACTIVE WINDSHEAR',
       secciones: [{
         items: [
-          { t: 'announce', x: 'Announce "WINDSHEAR TOGA"' },
+          { t: 'note', x: 'A WINDSHEAR message displays on one or both PFDs; the aural alert sounds three times.' },
+          { t: 'announce', x: 'Announce "WINDSHEAR, WINDSHEAR, WINDSHEAR"' },
           { t: 'hr' },
-          { t: 'sect', x: 'AT TAKE OFF (WINDSHEAR X 3 IS INHIBITED):' },
-          { t: 'note', hint: true, x: 'Before V1: If significant spd variations below V1 - reject.' },
+          { t: 'sect', x: 'AT TAKEOFF (aural alert inhibited during the roll — recognition is by crew observation):' },
+          { t: 'note', hint: true, x: 'Before V1: if significant airspeed/trend variations occur below the indicated V1, reject the takeoff.' },
           { t: 'note', hint: true, x: 'After V1:' },
           { t: 'row', l: 'THR LEVERS', v: 'TOGA' },
-          { t: 'row', l: 'REACHING V1', v: 'ROTATE' },
-          { t: 'row', l: 'SRS', v: 'FOLLOW' },
-          { t: 'note', x: '17.5° and full back stick if needed' },
+          { t: 'row', l: 'REACHING VR', v: 'ROTATE' },
+          { t: 'row', l: 'SRS ORDERS', v: 'FOLLOW' },
+          { t: 'note', hint: true, x: 'Full backstick if necessary. If FD bars not displayed: initial pitch 17.5°, then increase if needed to prevent altitude loss.' },
           { t: 'hr' },
-          { t: 'sect', x: 'AIRBORNE, INITIAL CLIMB OR LANDING:' },
-          { t: 'row', l: 'THR LEVERS AT TOGA', v: 'SET/CONFIRM' },
-          { t: 'row', l: 'AP (if engaged)', v: 'KEEP' },
-          { t: 'row', l: 'SRS', v: 'FOLLOW' },
-          { t: 'callout', x: 'MAINTAIN CONFIG TILL OUT OF SHEAR' }
+          { t: 'sect', x: 'AIRBORNE, INITIAL CLIMB, OR AT LANDING:' },
+          { t: 'row', l: 'THR LEVERS AT TOGA', v: 'SET OR CONFIRM' },
+          { t: 'row', l: 'AP (if engaged)', v: 'KEEP ON' },
+          { t: 'row', l: 'SRS ORDERS', v: 'FOLLOW' },
+          { t: 'note', hint: true, x: 'Full backstick if necessary. AP disengages if AOA exceeds alpha prot. If FD bars not displayed: initial pitch 17.5°, increase if needed.' },
+          { t: 'callout', x: 'DO NOT CHANGE CONFIGURATION (SLATS/FLAPS, GEAR) UNTIL OUT OF WINDSHEAR. CAREFULLY MONITOR FLIGHT PATH AND SPEED. WHEN OUT OF WINDSHEAR, SMOOTHLY RECOVER NORMAL CLIMB.' }
         ]
       }],
-      truncado: 'La captura empezaba desplazada: puede faltar una línea antes del announce, y el bloque WHY IT MATTERS.'
-    },
-
-    {
-      id: 'eng-fail-cruise',
-      titulo: 'ENG FAIL IN CRUISE',
-      cat: 'ENGINE',
-      secciones: [{
-        items: [
-          { t: 'note', x: 'Standard strategy unless discussed' },
-          { t: 'row', l: 'THR LEVERS', v: 'MCT' },
-          { t: 'row', l: 'A/THR', v: 'DISCONNECT' },
-          { t: 'hr' },
-          { t: 'sect', x: 'IN CRUISE:' },
-          { t: 'note', hint: true, x: 'PF sets appropriate HDG' },
-          { t: 'note', hint: true, x: 'PM determine OEI recovery altitude (MCDU PERF page or FS+)' },
-          { t: 'hr' },
-          { t: 'sect', x: 'WHEN READY FOR DESCENT:' },
-          { t: 'note', hint: true, x: 'Set speed and pull' },
-          { t: 'note', hint: true, x: 'Set OEI recovery altitude and pull for OPEN DES.' },
-          { t: 'row', l: 'Standard Strat', v: 'M0.78/300 kts (Relight)' },
-          { t: 'row', l: 'Obstacle Strat', v: 'Green Dot' }
-        ]
-      }],
-      porque: 'Engine failure in cruise requires an immediate and methodical response. Setting MCT and disconnecting A/THR…',
-      truncado: 'La captura empezaba desplazada y WHY IT MATTERS quedó cortado.'
+      porque: 'Reactive windshear detection reacts to a shear the aircraft is already inside — the priority is surviving the encounter (maximum thrust, follow SRS, no configuration changes that could cost climb performance), not analysing it. Following SRS rather than a fixed pitch keeps you at the safe margin the flight control laws compute in real time, which a hand-flown fixed attitude cannot match.',
+      nota: 'CORRECCIÓN respecto a la versión anterior de esta tarjeta: el FCOM dice "REACHING VR — ROTATE", no "REACHING V1" (la V1 no es un punto de rotación). Esta corrección ya estaba documentada en las notas de trabajo del proyecto pero no había llegado a desplegarse — queda aplicada aquí.'
     },
 
     {
       id: 'loss-of-braking',
       titulo: 'LOSS OF BRAKING',
       cat: 'GROUND',
+      fuente: 'A320 FCOM 25 NOV 2024 · PRO-ABN-BRAKES-00011315 · [MEM] LOSS OF BRAKING',
       secciones: [{
         items: [
+          { t: 'note', x: 'If no braking:' },
           { t: 'announce', x: 'Announce "LOSS OF BRAKING"' },
-          { t: 'row', l: 'REVERSE', v: 'MAX' },
-          { t: 'row', l: 'BRAKE PEDALS', v: 'RELEASE' },
-          { t: 'row', l: 'A/SKID & NSW', v: 'OFF' },
-          { t: 'note', x: 'MAX BRK PRESS 1000 psi' },
+          { t: 'row', l: 'REV', v: 'MAX' },
+          { t: 'note', hint: true, x: 'Maximum reverse thrust may be kept until full aircraft stop, if needed.' },
+          { t: 'row', l: 'BRAKE PEDALS', v: 'RELEASE (PF)' },
+          { t: 'note', hint: true, x: 'The PF releases the pedals before the PM selects A/SKID off, to avoid a brutal braking application when control transfers from the BSCU to the ABCU.' },
+          { t: 'row', l: 'A/SKID OFF', v: 'ORDER (PF)' },
+          { t: 'row', l: 'A/SKID & N/W STRG', v: 'OFF (PM)' },
+          { t: 'row', l: 'BRAKE PEDALS', v: 'PRESS' },
+          { t: 'row', l: 'MAX BRK PR', v: '1000 PSI' },
+          { t: 'note', hint: true, x: 'The ABCU automatically limits brake pressure to 1000 PSI. Monitor on the BRAKES PRESS indicator.' },
           { t: 'hr' },
-          { t: 'sect', x: 'STILL NO BRAKING?' },
-          { t: 'row', l: 'PARK BRK', v: 'USE' },
-          { t: 'note', x: 'Short applications' }
+          { t: 'sect', x: 'IF STILL NO BRAKING:' },
+          { t: 'row', l: 'PARK BRAKE', v: 'USE' },
+          { t: 'note', hint: true, x: 'Short, successive parking brake applications to stop the aircraft.' }
         ]
       }],
-      porque: "This memory item is used when the aircraft isn't slowing with brake pedal pressure. If you don't act, you risk a runway or taxiway overrun."
+      porque: "This memory item is used when the aircraft isn't slowing with brake pedal pressure alone. If you don't act, you risk a runway or taxiway overrun. Releasing the pedals before selecting A/SKID off matters specifically because it's what avoids a sudden, uncommanded brake application the instant control transfers from the BSCU to the ABCU.",
+      nota: 'Se añade el reparto PF/PM (releases/orders vs. selecciona A/SKID off) y la razón de por qué el orden de acciones importa — ambos detalles están en el FCOM pero no estaban en la versión anterior de esta tarjeta.'
     }
   ];
 
   /* ---------------------------------------------------------
-     2. Estado / progreso
+     1b. TARJETAS NUEVAS / REEMPLAZADAS (no son memory items del FCOM)
+     La lista oficial PRO-ABN-ABN-MEM tiene 10 memory items. Estas
+     tres tarjetas son maniobras que se entrenan igual que un memory
+     item y que venían en MEM_ITEMS.pdf; sus acciones están
+     contrastadas con el FCTM 25 NOV 2024.
      --------------------------------------------------------- */
+  ITEMS.push(
+    {
+      id: 'rejected-takeoff',
+      titulo: 'REJECTED TAKEOFF',
+      cat: 'SOP',
+      fuente: 'A320 FCTM 25 NOV 2024 · PR-AEP-MISC · Rejected Takeoff (Decision callouts, RTO technique) y EMER EVAC',
+      secciones: [{
+        items: [
+          { t: 'note', x: 'The decision to reject and the STOP action belong to the Captain, before V1. The Captain keeps a hand on the thrust levers until V1, whether PF or PM.' },
+          { t: 'announce', x: 'Captain: "STOP"' },
+          { t: 'note', hint: true, x: '"STOP" confirms the decision AND that the Captain has control — the only handover without "I have control".' },
+          { t: 'hr' },
+          { t: 'sect', x: 'SIMULTANEOUSLY (CAPT):' },
+          { t: 'row', l: 'THRUST LEVERS', v: 'IDLE' },
+          { t: 'row', l: 'REVERSE THRUST', v: 'MAX AVAIL' },
+          { t: 'note', hint: true, x: 'Full reverse may be kept until stop; with runway to spare, reduce reverse passing 70 kt.' },
+          { t: 'note', hint: true, x: 'Below 72 kt no ground spoilers / no autobrake: reduce thrust and apply maximum pedal pressure until stopped.' },
+          { t: 'hr' },
+          { t: 'sect', x: 'AIRCRAFT STOPPED:' },
+          { t: 'row', l: 'REVERSERS', v: 'STOWED' },
+          { t: 'row', l: 'PARKING BRAKE', v: 'ON' },
+          { t: 'row', l: 'CABIN CREW', v: 'ALERT' },
+          { t: 'row', l: 'ECAM ACTIONS', v: 'ORDER' },
+          { t: 'callout', x: 'REMAIN STATIONARY WHILE THE CREW EVALUATES THE SITUATION.' }
+        ]
+      }],
+      porque: 'Above 100 kt the Captain should be go-minded: only fire warning or severe damage, sudden loss of thrust, a condition showing the aircraft will not fly safely, or an ECAM alert justify a reject. Above V1 the takeoff must be continued.',
+      nota: 'No es memory item del FCOM: es la técnica RTO del FCTM, que se entrena de memoria. Si el frenado normal falla durante el RTO, se aplica el memory item LOSS OF BRAKING.'
+    },
+
+    {
+      id: 'eng-fail-after-v1',
+      titulo: 'ENG FAIL / FIRE / DAMAGE AFTER V1',
+      cat: 'SOP',
+      fuente: 'A320 FCTM 25 NOV 2024 · PR-AEP-ENG-00018096 · Engine Failure after V1',
+      secciones: [{
+        items: [
+          { t: 'sect', x: 'ON THE GROUND / ROTATION:' },
+          { t: 'row', l: 'RUDDER', v: 'MAINTAIN CENTRELINE' },
+          { t: 'row', l: 'ROTATION AT VR', v: '≈3°/s TO 12.5°' },
+          { t: 'note', hint: true, x: 'The 12.5° target ensures the aircraft becomes airborne (high FLEX / low VR).' },
+          { t: 'hr' },
+          { t: 'sect', x: 'WHEN SAFELY AIRBORNE:' },
+          { t: 'row', l: 'SRS', v: 'FOLLOW' },
+          { t: 'note', hint: true, x: 'SRS targets the speed at failure, limited between V2 and V2+15.' },
+          { t: 'row', l: 'BETA TARGET', v: 'CENTRE WITH RUDDER' },
+          { t: 'row', l: 'RUDDER TRIM', v: 'RELIEVE PEDAL' },
+          { t: 'row', l: 'AP', v: 'ENGAGE WHEN TRIMMED' },
+          { t: 'note', hint: true, x: 'Engine secured = ENG MASTER OFF (no damage) · AGENT 1 DISCH (damage) · fire out or AGENT 2 DISCH (fire). Delay the acceleration only to secure the engine.' },
+          { t: 'hr' },
+          { t: 'sect', x: 'EO ACCELERATION ALTITUDE:' },
+          { t: 'row', l: 'V/S', v: 'PUSH (LEVEL OFF)' },
+          { t: 'row', l: 'FLAPS', v: 'RETRACT ON SCHEDULE' },
+          { t: 'sect', x: 'AT GREEN DOT:' },
+          { t: 'row', l: 'ALT', v: 'PULL (OP CLB)' },
+          { t: 'row', l: 'THR LEVERS', v: 'MCT' },
+          { t: 'note', hint: true, x: 'Set MCT when LVR MCT flashes. If already in FLX/MCT: move to CL, then back to MCT. Continue ECAM until STATUS.' }
+        ]
+      }],
+      porque: 'After V1 the takeoff is continued. The primary task is handling: correct pitch, speed and flight path before the ECAM procedure starts.',
+      nota: 'No es memory item del FCOM: es la maniobra de fallo de motor tras V1 del FCTM. En las notas de entrenamiento, "Rudder 2/3" y "Trim 18-20" son técnica de la escuela, no del FCTM, y "1500 ft" es la altitud de aceleración con un motor: el FCTM usa la EO ACCEL ALT publicada para cada despegue.'
+    },
+
+    {
+      id: 'eng-fail-cruise',
+      titulo: 'ENG FAIL IN CRUISE',
+      cat: 'SOP',
+      fuente: 'A320 FCTM 25 NOV 2024 · PR-AEP-ENG-00018098 · Engine Failure During Cruise',
+      secciones: [
+        {
+          items: [
+            { t: 'note', x: 'As soon as the engine failure is recognized, the PF simultaneously:' },
+            { t: 'row', l: 'THR LEVERS', v: 'MCT' },
+            { t: 'row', l: 'A/THR', v: 'DISCONNECT' },
+            { t: 'hr' },
+            { t: 'sect', x: 'IN CRUISE (PF):' },
+            { t: 'row', l: 'HDG', v: 'SET AS APPROPRIATE, PULL' },
+            { t: 'row', l: 'EO RECOVERY ALT', v: 'DETERMINE' },
+            { t: 'hr' },
+            { t: 'sect', x: 'WHEN READY FOR DESCENT (PF):' },
+            { t: 'row', l: 'SPEED', v: 'SET, PULL' },
+            { t: 'row', l: 'EO RECOVERY ALT', v: 'SET, PULL (OPEN DES)' },
+            { t: 'note', hint: true, x: 'When appropriate, the PF requires the ECAM/OEB actions. Do not decelerate below green dot.' }
+          ]
+        },
+        {
+          items: [
+            { t: 'sect', x: 'STANDARD STRATEGY:' },
+            { t: 'row', l: 'SPEED', v: 'M .78 / 300 kt' },
+            { t: 'note', hint: true, x: 'Keeps the aircraft inside the windmill relight envelope. REC MAX EO CRZ ALT on MCDU PROG.' },
+            { t: 'note', hint: true, x: 'When V/S < 500 ft/min: select V/S -500 ft/min and A/THR ON.' },
+            { t: 'hr' },
+            { t: 'sect', x: 'OBSTACLE STRATEGY (DRIFT DOWN):' },
+            { t: 'row', l: 'SPEED', v: 'GREEN DOT' },
+            { t: 'note', hint: true, x: 'Drift-down ceiling on MCDU PERF CRZ (EO). When clear of obstacles, revert to the standard strategy.' }
+          ]
+        }
+      ],
+      porque: 'A/THR is disconnected so that selecting the strategy speed or pulling for OPEN DES does not reduce thrust on the live engine; the target speed is then held with the elevator. Close to the weight limits at high level the speed decays quickly, so do not delay the descent.',
+      nota: 'No es memory item del FCOM (la lista oficial tiene 10). La versión anterior de esta tarjeta venía de una captura sin verificar; ahora las acciones están contrastadas con el FCTM.'
+    }
+  );
+
+  /* ---------------------------------------------------------
+     1c. TASK SHARING (PF / PM)
+     Cada variante: { nombre, origen: 'fctm' | 'notas', cols, filas,
+       notas, avisos }.
+     - cols: ['PF','PM'] o ['CAPT','F/O']. Siempre PF (o CAPT) a la
+       izquierda, aunque en MEM_ITEMS.pdf la columna PM iba primero:
+       así la columna de cada rol no cambia de lado entre variantes.
+     - filas: [izquierda, derecha] o { trig: 'condición' }.
+     - avisos: diferencias entre las notas y el FCOM/FCTM. Nunca se
+       corrige en silencio; se transcribe y se señala.
+     Transcripción de MEM_ITEMS.pdf: se corrige ortografía y los
+     artefactos de extracción del PDF, sin cambiar el contenido.
+     --------------------------------------------------------- */
+  var NOTAS_SRC = 'MEM_ITEMS.pdf — notas de entrenamiento (callsign de ejemplo BAA123). No es documentación Airbus.';
+
+  var TS = {
+    'emergency-descent': [
+      {
+        nombre: 'FCTM (oficial)', origen: 'fctm', cols: ['PF', 'PM'],
+        fuente: 'A320 FCTM 25 NOV 2024 · PR-AEP-MISC P 5/32 · figura "EMER DESCENT - Memory Items"',
+        filas: [
+          ['CREW OXY MASKS — USE', 'CREW OXY MASKS — USE'],
+          ['EMER DESCENT — INITIATE: ALT turn pull · HDG turn pull · SPD pull', 'SIGNS — ON'],
+          ['FMA — ANNOUNCE', 'FMA — CHECK'],
+          ['If A/THR not active: THR LEVERS — IDLE', ''],
+          ['SPD BRK — FULL', '']
+        ],
+        notas: [
+          'Two steps: first the memory items, then the read & do procedure (ECAM or QRH). During the first step the PM focuses on the FMA.',
+          'Suspected structural damage (loud bang, high cabin V/S): SPEED/MACH pb to SPEED so the IAS does not increase, and use the speed brakes carefully.',
+          'CAB ALT above 14 000 ft: press MASK MAN ON. Keep TCAS in TA/RA: collision avoidance has priority, even if it interrupts the descent.',
+          'Below FL100, limit the rate of descent to about 1 000 ft/min except during the approach.'
+        ]
+      },
+      {
+        nombre: 'Notas — sin daño', origen: 'notas', cols: ['PF', 'PM'],
+        filas: [
+          { trig: 'When you see CAB ALT:' },
+          ['Callout: "EMERGENCY DESCENT"', ''],
+          ['OXY MASK ON', 'OXY MASK ON'],
+          ['Set INT / INT ON', 'Set INT / INT ON'],
+          ['"DO YOU READ?"', '"I READ YOU 5"'],
+          ['ALT turn pull', ''],
+          ['HDG turn pull', ''],
+          ['Pull SPEED', ''],
+          ['Read FMA (check THR IDLE): THR IDLE · OP DES · HDG', 'Checked'],
+          ['If A/THR not active: THR LEVER — IDLE', ''],
+          ['SPD BRK FULL', ''],
+          ['— Second loop —', 'SEAT BELTS ON'],
+          ['ALT 10 000 ft pull', 'ENG MODE — IGNITION'],
+          ['HDG 45/60° right or left', 'SQUAWK 7700'],
+          ['Passing FL030 (sic) — set speed 340 kt', ''],
+          ['Hands on SPD BRK', ''],
+          ['ATC: MAYDAY', ''],
+          ['"ECAM ACTIONS"', '']
+        ],
+        notas: [
+          'If you encounter a TCAS alert during the emergency descent, give it priority and retract the SPD BRK.',
+          'When approaching the level-off altitude, retract the SPD BRK.',
+          'Normally the Captain takes control.',
+          'Below 14 000 ft the cabin crew and passengers may remove their oxygen masks.',
+          'The cockpit crew may remove their oxygen masks in sequence at FL100.'
+        ],
+        avisos: [
+          '"Passing FL030 — set speed 340 kt": el descenso termina en FL100, así que FL030 no tiene sentido aquí; probablemente es FL300 (paso de Mach a IAS). Se deja como está en la fuente — confírmalo con tu instructor.',
+          'El "second loop" (ENG MODE IGN, ALT, HDG 45/60°, 7700) corresponde al segundo paso del FCTM (read & do ECAM/QRH), no a los memory items. El FCOM dice "ATC XPDR 7700 — CONSIDER", no obligatorio.',
+          'El PM dice "SEAT BELTS ON": en el FCTM la acción es "SIGNS — ON".'
+        ]
+      },
+      {
+        nombre: 'Notas — con daño', origen: 'notas', cols: ['PF', 'PM'],
+        filas: [
+          { trig: 'When you see CAB ALT and hear a loud bang or high cabin V/S:' },
+          ['Callout: "EMERGENCY DESCENT"', ''],
+          ['OXY MASK ON', 'OXY MASK ON'],
+          ['Set INT / INT ON', 'Set INT / INT ON'],
+          ['"DO YOU READ?"', '"I READ YOU 5"'],
+          ['ALT turn pull', ''],
+          ['HDG turn pull', ''],
+          ['Pull SPEED', ''],
+          ['Read FMA (check THR IDLE): THR IDLE · OP DES · HDG', 'Checked'],
+          ['If A/THR not active: THR LEVER — IDLE', ''],
+          ['SPD BRK FULL', ''],
+          ['— Second loop —', 'SEAT BELTS ON'],
+          ['ALT 10 000 ft pull', 'ENG MODE — IGNITION'],
+          ['HDG 45/60° right or left', 'SQUAWK 7700'],
+          ['Push SPD/MACH · make sure SPD > 255 kt', 'ATC: MAYDAY · PA'],
+          ['Hands on SPD BRK', ''],
+          ['"ECAM ACTIONS"', '']
+        ],
+        notas: [
+          'Example call: "MAYDAY MAYDAY MAYDAY, BAA123, emergency descent, descending FL100, heading 200".',
+          'While approaching the level-off altitude, start retracting the SPD BRK.'
+        ],
+        avisos: [
+          'La cifra "SPD > 255 kt" no aparece en el FCTM. Lo que dice el FCTM con daño estructural: SPEED/MACH pb a SPEED para no aumentar la IAS (o reducirla), y speed brakes con cuidado.',
+          'En esta variante el MAYDAY lo hace el PM; en la variante sin daño lo hace el PF. El FCTM (AOP-20) pasa la COM al PF una vez iniciadas las acciones ECAM. Conviene unificarlo según tu operador.'
+        ]
+      }
+    ],
+
+    'tcas-ta': [
+      {
+        nombre: 'FCTM (oficial)', origen: 'fctm', cols: ['PF', 'PM'],
+        fuente: 'A320 FCTM 25 NOV 2024 · AS-TCAS P 2/4',
+        filas: [
+          { trig: 'If a TA is generated:' },
+          ['"TCAS, I HAVE CONTROL"', ''],
+          ['No evasive manoeuvre on the basis of a TA alone', '']
+        ],
+        notas: [
+          'Limit V/S to 1 500 ft/min in the last 2 000 ft of a climb or descent, especially with converging traffic levelling off 1 000 ft above or below.'
+        ]
+      },
+      {
+        nombre: 'Notas de entrenamiento', origen: 'notas', cols: ['PF', 'PM'],
+        filas: [
+          ['Whoever notices the traffic first: "TRAFFIC AT 1 O\'CLOCK" — you see it in white', 'Whoever notices the traffic first: "TRAFFIC AT 1 O\'CLOCK"'],
+          { trig: 'When you hear "TRAFFIC, TRAFFIC":' },
+          ['"TCAS, I HAVE CONTROL" · ND ROSE NAV, range 10', '']
+        ]
+      }
+    ],
+
+    'tcas-ra': [
+      {
+        nombre: 'FCTM (oficial)', origen: 'fctm', cols: ['PF', 'PM'],
+        fuente: 'A320 FCTM 25 NOV 2024 · AS-TCAS P 2-3/4',
+        filas: [
+          ['Disconnect the AP; smoothly and firmly follow the VSI green sector within 5 s', ''],
+          ['Request both FDs OFF', 'Disconnect both FDs — does not try to see the intruders'],
+          ['Avoid excessive manoeuvres: V/S out of the red, inside the green (full speed range Vα max – VMAX if needed)', 'Notify ATC'],
+          { trig: 'Any CLIMB RA in approach, CONF 3 or FULL:' },
+          ['Go-around, follow SRS (AP/FD can stay engaged)', 'Check V/S stays out of the red; take over if needed'],
+          { trig: 'When clear of conflict:' },
+          ['Resume normal navigation per ATC clearance, AP/FD as required', '']
+        ],
+        notas: [
+          'Follow the RA in the correct direction even against ATC, at max ceiling with a CLIMB RA, or if it means crossing the intruder\'s altitude.',
+          'Both FDs off when the APs are off: to keep A/THR in speed mode and avoid confusing FD bars with the TCAS orders.'
+        ]
+      },
+      {
+        nombre: 'Notas de entrenamiento', origen: 'notas', cols: ['PF', 'PM'],
+        filas: [
+          { trig: 'When you hear CLIMB / DESCEND / MAINTAIN and see the traffic in red:' },
+          ['Disconnect AP — "AP OFF"', ''],
+          ['Order "FD OFF"', 'FD OFF (both, with both hands)'],
+          ['Pitch gently to the green, out of the red', 'ATC: "<callsign>, TCAS RA"'],
+          { trig: 'When you hear "CLEAR OF CONFLICT" or level off:' },
+          ['Pitch 3°', ''],
+          ['Order "FD ON"', 'FD ON'],
+          ['Order "MANAGED SPEED"', 'Push SPD'],
+          ['Order "MANAGED NAV"', 'Push HDG'],
+          ['Order "PULL/PUSH ALT"', 'Pull/push ALT'],
+          ['Order "AP ON"', 'AP ON'],
+          ['Read FMA: THR CLB/IDLE · OP CLB/DES · NAV/HDG · AP2', 'Check'],
+          ['', 'ATC: "<callsign>, clear of conflict, passing FL030, returning FL040"'],
+          ['', 'ATC: "<callsign>, FL040 resumed"']
+        ],
+        avisos: [
+          'Las notas dicen "pitch gently"; el FCTM dice "smoothly and firmly … within 5 s". Suave, pero la respuesta tiene que llegar en 5 segundos.',
+          'En las notas el PM también busca el tráfico; el FCTM indica que durante el RA el PM no intenta ver a los intrusos. El aviso visual encaja en la fase TA.',
+          '"Pitch 3°" y la secuencia FD ON / managed / AP ON son técnica de entrenamiento; el FCTM solo dice "resume normal navigation … using the AP/FD, as required".'
+        ]
+      }
+    ],
+
+    'rejected-takeoff': [
+      {
+        nombre: 'FCTM (oficial)', origen: 'fctm', cols: ['CAPT', 'F/O'],
+        fuente: 'A320 FCTM 25 NOV 2024 · PR-AEP-MISC P 19-20/32 · RTO technique',
+        filas: [
+          ['"STOP" — ANNOUNCE', ''],
+          ['Simultaneously: THRUST LEVERS — IDLE · REVERSE THRUST — MAX AVAIL', 'REVERSERS — CHECK / ANNOUNCE · DECELERATION — CHECK / ANNOUNCE · AUTOBRAKE — MONITOR · ANY AUDIO — CANCEL'],
+          { trig: 'Aircraft stopped — consider positioning to keep any fire away from the fuselage:' },
+          ['REVERSERS — STOWED', 'ATC — NOTIFY'],
+          ['PARKING BRAKE — ON', 'EMER EVAC procedure (QRH) — LOCATE'],
+          ['CABIN CREW — ALERT', ''],
+          ['ECAM ACTIONS — ORDER', 'ECAM ACTIONS — PERFORM']
+        ],
+        notas: [
+          'The aircraft should remain stationary while the crew evaluates the situation.',
+          'Deceleration is felt and confirmed with the speed trend; the DECEL light is not a criterion (it may not appear on a contaminated runway with the autobrake working).',
+          'With A/BRK MAX decelerating the aircraft, the Captain avoids pressing the pedals. If braking seems inadequate, apply full manual braking.',
+          'On ground after the ECAM actions: the F/O does the ECAM, the Captain builds the evacuation decision; if the fire is still out of control after the agents, the Captain calls the EMER EVAC procedure.'
+        ]
+      },
+      {
+        nombre: 'Notas de entrenamiento', origen: 'notas', cols: ['CAPT', 'F/O'],
+        filas: [
+          ['Whoever notices the failure calls out "STOP"', 'Whoever notices the failure calls out "STOP"'],
+          ['"STOP"', '"ENGINE FIRE / FAILURE"'],
+          ['Thrust IDLE / full reverse', ''],
+          ['Control with pedals, maintain centreline · press brakes / cancel reverse to idle · when stopped, PARK BRK ON', '"SPOILERS" · "REVERSE GREEN" · "DECEL" · "70 KT"'],
+          ['PA: "ATTENTION, CREW AT STATIONS" ×2', 'ATC: "MAYDAY ×3, BAA123, engine failure, stopped at A3 / end of runway"'],
+          ['"ECAM ACTIONS"', 'Perform'],
+          ['Put the light on · take your seat back · ATC: "BAA123, fire…" and follow up with the F/O', ''],
+          { trig: 'When the cockpit is dark (ECAM actions complete):' },
+          ['"ON GROUND EMERGENCY EVACUATION CHECKLIST"', 'Perform'],
+          ['Fire is on → evacuation required', 'If evacuation required:'],
+          ['PA: "EVACUATE" ×3', ''],
+          ['EVAC panel: press COMMAND pb, then HORN SHUTOFF', ''],
+          ['Not required', 'If evacuation not required']
+        ],
+        avisos: [
+          'La primera fila dice que quien detecta el fallo canta "STOP". Según el FCTM, la decisión y el callout "STOP" son exclusivos del Capitán; quien detecta el fallo lo anuncia (p. ej. "ENGINE FIRE") y el Capitán decide. La segunda fila de las mismas notas ya refleja ese reparto.',
+          'En las notas el F/O avisa ATC con MAYDAY durante la deceleración; en el FCTM, ATC — NOTIFY es con el avión detenido.'
+        ]
+      }
+    ],
+
+    'eng-fail-after-v1': [
+      {
+        nombre: 'Notas de entrenamiento', origen: 'notas', cols: ['PF', 'PM'],
+        filas: [
+          ['Rudder 2/3', ''],
+          ['Pitch 12.5°', ''],
+          ['Trim 18–20', ''],
+          ['Order "GEAR UP"', '"Positive climb"'],
+          ['Order "PULL HDG"', 'Pull HDG'],
+          ['Fly the aircraft until 400 ft', ''],
+          ['At 400 ft: "ECAM ACTIONS"', 'Perform'],
+          ['"STOP ECAM"', '"Engine secured"'],
+          ['ATC: MAYDAY', ''],
+          ['Fly the aircraft until 1 500 ft', ''],
+          ['Push V/S to level off', ''],
+          ['At F speed: flap 1', ''],
+          ['At S speed: flap 2', ''],
+          { trig: 'At green dot:' },
+          ['Pull ALT', ''],
+          ['Set MCT', ''],
+          ['Read FMA', ''],
+          ['"CONTINUE ECAM"', 'Perform']
+        ],
+        notas: [
+          'Engine failure without damage is secured after ENG MASTER OFF: PF "STOP ECAM".',
+          'Engine failure with damage is secured after AGENT 1 DISCH: PF "STOP ECAM".',
+          'Engine fire is secured after AGENT 2 DISCH: PF "STOP ECAM".'
+        ],
+        avisos: [
+          'Las tres definiciones de "motor asegurado" coinciden con el FCTM (en el caso de fuego: "fire extinguished or AGENT 2 DISCH").',
+          '"Pitch 12.5°" coincide con el FCTM (rotación a ≈3°/s hacia 12.5°). "Rudder 2/3" y "Trim 18–20" son técnica de la escuela.',
+          '"1 500 ft" equivale a la altitud de aceleración con un motor; el FCTM usa la EO ACCEL ALT publicada para cada despegue, que no siempre es 1 500 ft.',
+          'El esquema normal de retracción es: al pasar F speed → flaps 1; al pasar S speed → flaps 0. "At S speed flap 2" no encaja con ese esquema (probablemente quiso decir flaps 0) — confírmalo con tu instructor.'
+        ]
+      }
+    ],
+
+    'eng-fail-cruise': [
+      {
+        nombre: 'Notas — estrategia estándar', origen: 'notas', cols: ['PF', 'PM'],
+        filas: [
+          ['Select MCT', ''],
+          ['A/THR OFF', ''],
+          ['Select HDG 45–60° R/L + pull', ''],
+          ['S/E ceiling (PROG) — select but do not pull', ''],
+          ['ATC: MAYDAY', ''],
+          ['Speed .78/300 — pull', ''],
+          ['ALT pull — descend', ''],
+          ['Read FMA', 'Check'],
+          ['"ECAM ACTIONS"', ''],
+          ['When V/S < 500: set -500 ft/min + pull', ''],
+          ['Speed managed', '']
+        ],
+        avisos: [
+          'FCTM: con V/S < 500 ft/min se selecciona V/S -500 ft/min y A/THR ON. Las notas dicen "speed managed".',
+          '"HDG 45–60°" es la técnica de salida de aerovía de la escuela; el FCTM solo dice "sets a HDG as appropriate".'
+        ]
+      },
+      {
+        nombre: 'Notas — estrategia de obstáculos', origen: 'notas', cols: ['PF', 'PM'],
+        filas: [
+          ['Select MCT', ''],
+          ['A/THR OFF', ''],
+          ['HDG select 45–60° R/L + pull', ''],
+          ['S/E ceiling (PERF) — select but do not pull', ''],
+          ['ATC: MAYDAY', ''],
+          ['Set speed GREEN DOT', ''],
+          ['Pull ALT — descend', ''],
+          ['Read FMA', 'Checked'],
+          ['"ECAM ACTIONS"', ''],
+          ['When clear of obstacles: return to the standard strategy', '']
+        ],
+        avisos: [
+          'Coincide con el FCTM: drift down a green dot, techo en MCDU PERF CRZ (EO), y vuelta a la estrategia estándar cuando se libran los obstáculos.'
+        ]
+      }
+    ],
+
+    'windshear-reactive': [
+      {
+        nombre: 'Notas (predictive y reactive)', origen: 'notas', cols: ['PF', 'PM'],
+        filas: [
+          { trig: 'If before V1: reject the takeoff' },
+          ['When you hear "WINDSHEAR":', 'If you notice the windshear:'],
+          ['Callout: "WINDSHEAR, TOGA"', 'Callout: "WINDSHEAR"'],
+          ['Set TOGA thrust', ''],
+          ['Read FMA changes', 'Checked'],
+          ['Follow the flight director', 'Read tailwind / speed'],
+          ['', 'When it\'s crosswind:'],
+          ['Set THR LVR CLB', 'Callout: "OUT OF WINDSHEAR"'],
+          ['', 'PACKS ON'],
+          ['Order "ARM A/THR"', ''],
+          ['Order "AP1 ON"', ''],
+          ['Read FMA changes', 'Checked'],
+          ['Retract flaps', ''],
+          ['', 'When stabilised: advise ATC'],
+          ['In landing: perform a go-around', '']
+        ],
+        notas: [
+          'Do not change configuration until out of the windshear.',
+          'Recover smoothly to the climb once out of the windshear.',
+          'For departure: delay, or choose another runway.'
+        ],
+        avisos: [
+          '"PACKS ON" y "retract flaps" son acciones posteriores de la técnica de entrenamiento (ya fuera del windshear); no forman parte del memory item del FCOM.',
+          '"Read tailwind / speed" y "when it\'s crosswind" son poco claros en la fuente y se transcriben tal cual.'
+        ]
+      }
+    ],
+
+    'egpws-warning': [
+      {
+        nombre: 'Notas de entrenamiento', origen: 'notas', cols: ['PF', 'PM'],
+        filas: [
+          { trig: 'When you hear "TERRAIN … PULL UP":' },
+          ['Callout "PULL UP" & set TOGA', ''],
+          ['AP OFF', ''],
+          ['Read FMA changes', ''],
+          ['Check SPD BRK retracted', ''],
+          ['Bank: wings level', '']
+        ],
+        notas: ['Do not change configuration until clear of the obstacle.'],
+        avisos: [
+          'Las notas no incluyen "PITCH — PULL UP (full backstick and maintain)", que sí es acción del memory item en el FCOM. El callout del FCOM es "PULL UP TOGA".',
+          'Las notas no asignan tareas al PM. Con el reparto general del FCTM (AOP-20), el PM vigila la trayectoria y el FMA.'
+        ]
+      }
+    ]
+  };
+
+  /* ---------------------------------------------------------
+     2. Estado / progreso
+     estado.a320 = {
+       sabidas:{id:n}, falladas:{id:n}, vistas:{id:n},
+       layout: 'auto' | 'vert',
+       rol:    'ambos' | 'pf' | 'pm',
+       sesion: { modo:'todas'|'falladas', orden:[id...], pos, revelada, ok, no } | null
+     }
+     `sesion` guarda una ronda de tarjetas a medio terminar para poder
+     salir y retomarla más tarde en el mismo punto (también tras cerrar
+     el navegador, porque viaja dentro de `estado`).
+     --------------------------------------------------------- */
+  var IDS = {};
+  ITEMS.forEach(function (it) { IDS[it.id] = it; });
+
   function estadoVacio() {
-    return { sabidas: {}, falladas: {}, vistas: {}, layout: 'auto' };
+    return { sabidas: {}, falladas: {}, vistas: {}, layout: 'auto', rol: 'ambos', sesion: null };
+  }
+
+  function normalizarSesion(raw) {
+    if (!raw || typeof raw !== 'object' || !Array.isArray(raw.orden)) return null;
+    var visto = {};
+    var orden = raw.orden.filter(function (id) {
+      if (typeof id !== 'string' || !IDS[id] || visto[id]) return false;
+      visto[id] = true; return true;
+    });
+    // si alguna tarjeta de la sesión ya no existe, se descarta la sesión entera
+    if (!orden.length || orden.length !== raw.orden.length) return null;
+    var num = function (v) { return (typeof v === 'number' && isFinite(v) && v >= 0) ? v : 0; };
+    var pos = num(raw.pos);
+    if (pos >= orden.length) return null;
+    return {
+      modo: raw.modo === 'falladas' ? 'falladas' : 'todas',
+      orden: orden, pos: pos, revelada: !!raw.revelada, ok: num(raw.ok), no: num(raw.no)
+    };
   }
 
   function normalizar(raw) {
@@ -3105,20 +3778,38 @@ intentarSesionGuardada(); (function () {
       });
     });
     if (raw.layout === 'vert' || raw.layout === 'auto') out.layout = raw.layout;
+    if (raw.rol === 'pf' || raw.rol === 'pm' || raw.rol === 'ambos') out.rol = raw.rol;
+    out.sesion = normalizarSesion(raw.sesion);
     return out;
   }
 
   function est() {
     if (typeof estado === 'undefined' || !estado) return estadoVacio();
     if (!estado.a320) estado.a320 = estadoVacio();
-    return estado.a320;
+    var e = estado.a320;
+    // estado guardado por versiones anteriores del módulo
+    if (!e.rol) e.rol = 'ambos';
+    if (e.sesion === undefined) e.sesion = null;
+    return e;
+  }
+
+  function guardar() {
+    if (typeof guardarProgreso === 'function') guardarProgreso();
+    else if (typeof guardarProgresoAhora === 'function') guardarProgresoAhora();
   }
 
   function bump(bucket, id) {
     var e = est();
     e[bucket][id] = (e[bucket][id] || 0) + 1;
-    if (typeof guardarProgreso === 'function') guardarProgreso();
-    else if (typeof guardarProgresoAhora === 'function') guardarProgresoAhora();
+    guardar();
+  }
+
+  // "a repasar": la tarjeta se ha fallado más veces de las que se ha sabido
+  function aRepasar() {
+    var e = est();
+    return ITEMS.filter(function (it) {
+      return (e.falladas[it.id] || 0) > (e.sabidas[it.id] || 0);
+    });
   }
 
   /* ---------------------------------------------------------
@@ -3178,7 +3869,6 @@ intentarSesionGuardada(); (function () {
       return '<div class="a320-chunks n1"><div class="a320-chunk">' +
         renderBlocks(chunks[0] || []) + '</div></div>';
     }
-    // ¿la primera fase es solo cabecera (sin acciones)? -> ocupa todo el ancho
     var hayLead = !chunks[0].some(function (b) { return b.t === 'row' || b.t === 'callout'; });
     var columnas = chunks.length - (hayLead ? 1 : 0);
 
@@ -3202,6 +3892,78 @@ intentarSesionGuardada(); (function () {
     return html;
   }
 
+  /* ---- task sharing ---- */
+  // qué columna es "la tuya" según el rol elegido (solo en tablas PF/PM)
+  function colDelRol(v, rol) {
+    if (rol === 'ambos' || v.cols[0] !== 'PF') return -1;
+    return rol === 'pf' ? 0 : 1;
+  }
+
+  function renderVariante(v, rol) {
+    var mia = colDelRol(v, rol);
+    var cls = 'a320-tstable' + (mia >= 0 ? ' foco-' + mia : '');
+    var html = '<table class="' + cls + '"><thead><tr>' +
+      '<th class="c0">' + esc(v.cols[0]) + (mia === 0 ? ' <em>(tú)</em>' : '') + '</th>' +
+      '<th class="c1">' + esc(v.cols[1]) + (mia === 1 ? ' <em>(tú)</em>' : '') + '</th>' +
+      '</tr></thead><tbody>';
+    v.filas.forEach(function (f) {
+      if (!Array.isArray(f)) {
+        html += '<tr class="trig"><td colspan="2">' + esc(f.trig) + '</td></tr>';
+      } else {
+        html += '<tr><td class="c0' + (f[0] ? '' : ' vacia') + '">' + esc(f[0]) + '</td>' +
+          '<td class="c1' + (f[1] ? '' : ' vacia') + '">' + esc(f[1]) + '</td></tr>';
+      }
+    });
+    html += '</tbody></table>';
+    if (v.cols[0] !== 'PF' && rol !== 'ambos') {
+      html += '<div class="a320-tsnote">El reparto de esta maniobra es por asiento (CAPT / F-O), no por PF / PM.</div>';
+    }
+    if (v.notas && v.notas.length) {
+      html += '<ul class="a320-tsnotas">' + v.notas.map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('') + '</ul>';
+    }
+    if (v.avisos && v.avisos.length) {
+      html += '<div class="a320-tsavisos"><b>Diferencias con FCOM/FCTM</b><ul>' +
+        v.avisos.map(function (n) { return '<li>' + esc(n) + '</li>'; }).join('') + '</ul></div>';
+    }
+    html += '<div class="a320-tssrc">' + esc(v.origen === 'fctm' ? v.fuente : NOTAS_SRC) + '</div>';
+    return html;
+  }
+
+  function renderTaskSharing(item) {
+    var vars = TS[item.id];
+    if (!vars || !vars.length) return '';
+    var rol = est().rol;
+    var html = '<div class="a320-ts" data-item="' + esc(item.id) + '">' +
+      '<div class="a320-sectlbl">Task sharing</div>';
+    if (vars.length > 1) {
+      html += '<div class="a320-tstabs">' + vars.map(function (v, i) {
+        return '<button type="button" class="a320-tstab' + (i === 0 ? ' on' : '') + (v.origen === 'fctm' ? ' fctm' : '') +
+          '" data-i="' + i + '">' + esc(v.nombre) + '</button>';
+      }).join('') + '</div>';
+    } else {
+      html += '<div class="a320-tstabs solo"><span class="a320-tstab on' + (vars[0].origen === 'fctm' ? ' fctm' : '') + '">' +
+        esc(vars[0].nombre) + '</span></div>';
+    }
+    html += '<div class="a320-tsbody">' + renderVariante(vars[0], rol) + '</div></div>';
+    return html;
+  }
+
+  // pestañas de variante: delegación de eventos sobre cualquier contenedor
+  function activarTabs(root) {
+    if (!root) return;
+    root.addEventListener('click', function (ev) {
+      var t = ev.target.closest ? ev.target.closest('button.a320-tstab') : null;
+      if (!t) return;
+      var box = t.closest('.a320-ts');
+      var vars = TS[box.getAttribute('data-item')];
+      var i = +t.getAttribute('data-i');
+      if (!vars || !vars[i]) return;
+      Array.prototype.forEach.call(box.querySelectorAll('.a320-tstab'), function (b) { b.classList.remove('on'); });
+      t.classList.add('on');
+      box.querySelector('.a320-tsbody').innerHTML = renderVariante(vars[i], est().rol);
+    });
+  }
+
   function renderExtras(item) {
     var html = '';
     if (item.porque) {
@@ -3212,17 +3974,18 @@ intentarSesionGuardada(); (function () {
       html += '<div class="a320-tip"><div class="th">' + ICON_TIP + "<span>Captain's tip</span></div>" +
         '<p>&ldquo;' + esc(item.tip) + '&rdquo;</p></div>';
     }
-    if (item.truncado) {
-      html += '<div class="a320-trunc"><b>NOTA DE TRANSCRIPCIÓN — </b>' + esc(item.truncado) +
-        ' Completar desde FCOM/QRH antes de estudiar esta tarjeta como definitiva.</div>';
+    if (item.nota) {
+      html += '<div class="a320-trunc"><b>NOTA — </b>' + esc(item.nota) + '</div>';
+    }
+    if (item.fuente) {
+      html += '<div class="a320-fuente">' + esc(item.fuente) + '</div>';
     }
     return html;
   }
 
-  // Cuerpo completo: columna de acciones + raíl (why / tip / nota)
   function renderCuerpo(item) {
     var extras = renderExtras(item);
-    return '<div class="a320-main">' + renderAcciones(item) + '</div>' +
+    return '<div class="a320-main">' + renderAcciones(item) + renderTaskSharing(item) + '</div>' +
       (extras ? '<div class="a320-rail">' + extras + '</div>' : '');
   }
   function claseCuerpo(item, base) {
@@ -3246,17 +4009,23 @@ intentarSesionGuardada(); (function () {
           '<div class="h1">A320 &mdash; Memory Items</div>' +
           '<span></span>' +
         '</div>' +
-        '<div class="a320-modes">' +
-          '<button class="btn btn-a320amber" id="a320StartFlash">Estudiar con tarjetas</button>' +
-          '<button class="btn btn-ghost" id="a320Layout"></button>' +
-          '<button class="btn btn-ghost" id="a320Reset">Reiniciar estadísticas</button>' +
+        '<div class="a320-modes" id="a320Modes"></div>' +
+        '<div class="a320-rolbar">' +
+          '<span class="a320-rollbl">Practicar como</span>' +
+          '<div class="a320-rolseg" id="a320Rol">' +
+            '<button type="button" data-rol="ambos">Ambos</button>' +
+            '<button type="button" data-rol="pf">PF</button>' +
+            '<button type="button" data-rol="pm">PM</button>' +
+          '</div>' +
+          '<button class="btn btn-ghost a320-small" id="a320Layout"></button>' +
+          '<button class="btn btn-ghost a320-small" id="a320Reset">Reiniciar estadísticas</button>' +
         '</div>' +
         '<div class="a320-grid" id="a320Grid"></div>' +
       '</section>' +
 
       '<section id="screen-a320-flash" class="screen">' +
         '<div class="a320-fbar">' +
-          '<button class="back" id="a320FlashExit">&larr; Salir</button>' +
+          '<button class="back" id="a320FlashExit">&larr; Salir (se guarda)</button>' +
           '<span class="prog" id="a320FlashProg"></span>' +
         '</div>' +
         '<div class="a320-ftape"><i id="a320FlashTape" style="width:0%"></i></div>' +
@@ -3266,7 +4035,7 @@ intentarSesionGuardada(); (function () {
       '<div class="a320-overlay" id="a320Overlay" role="dialog" aria-modal="true" aria-labelledby="a320ModalTitle">' +
         '<div class="a320-modal">' +
           '<div class="a320-head">' +
-            '<div class="kicker">Memory item</div>' +
+            '<div class="kicker" id="a320ModalKicker">Memory item</div>' +
             '<div class="ttl" id="a320ModalTitle"></div>' +
             '<button class="a320-x" id="a320ModalX" aria-label="Cerrar">&times;</button>' +
           '</div>' +
@@ -3280,19 +4049,24 @@ intentarSesionGuardada(); (function () {
     byId('a320Back').onclick = function () {
       if (typeof volverABancos === 'function') volverABancos();
     };
-    byId('a320StartFlash').onclick = iniciarFlash;
     byId('a320Layout').onclick = function () {
       var e = est();
       e.layout = (e.layout === 'vert') ? 'auto' : 'vert';
       aplicarLayout();
-      if (typeof guardarProgreso === 'function') guardarProgreso();
-      else if (typeof guardarProgresoAhora === 'function') guardarProgresoAhora();
+      guardar();
     };
+    byId('a320Rol').addEventListener('click', function (ev) {
+      var b = ev.target.closest ? ev.target.closest('button[data-rol]') : null;
+      if (!b) return;
+      est().rol = b.getAttribute('data-rol');
+      guardar();
+      aplicarRol();
+    });
     byId('a320Reset').onclick = function () {
-      if (!confirm('¿Reiniciar las estadísticas de los memory items del A320?')) return;
-      if (typeof estado !== 'undefined' && estado) estado.a320 = estadoVacio();
-      if (typeof guardarProgreso === 'function') guardarProgreso();
-      else if (typeof guardarProgresoAhora === 'function') guardarProgresoAhora();
+      if (!confirm('¿Reiniciar las estadísticas de los memory items del A320? También se borra la ronda de tarjetas a medio terminar.')) return;
+      var e = est();
+      e.sabidas = {}; e.falladas = {}; e.vistas = {}; e.sesion = null; // conserva layout y rol
+      guardar();
       renderIndice();
     };
     byId('a320ModalX').onclick = cerrarModal;
@@ -3301,21 +4075,30 @@ intentarSesionGuardada(); (function () {
       if (ev.target === this) cerrarModal();
     });
     byId('a320FlashExit').onclick = function () {
+      guardarSesion();
       renderIndice();
       showScreen('screen-a320');
     };
     document.addEventListener('keydown', function (ev) {
       if (ev.key === 'Escape' && byId('a320Overlay').classList.contains('open')) cerrarModal();
     });
+    activarTabs(byId('a320ModalBody'));
+    activarTabs(byId('a320FlashSlot'));
   }
 
-  // 'auto' = horizontal en pantallas anchas, columna en móvil.
-  // 'vert'  = fuerza siempre una sola columna.
   function aplicarLayout() {
     var vert = est().layout === 'vert';
     document.body.classList.toggle('a320-vert', vert);
     var b = byId('a320Layout');
     if (b) b.textContent = vert ? 'Diseño: columna' : 'Diseño: automático';
+  }
+
+  function aplicarRol() {
+    var rol = est().rol;
+    var seg = byId('a320Rol');
+    if (seg) Array.prototype.forEach.call(seg.querySelectorAll('button'), function (b) {
+      b.classList.toggle('on', b.getAttribute('data-rol') === rol);
+    });
   }
 
   /* ---------------------------------------------------------
@@ -3324,12 +4107,14 @@ intentarSesionGuardada(); (function () {
   var scrollBloqueado = false;
 
   function abrirModal(item) {
+    byId('a320ModalKicker').textContent = item.cat === 'SOP' ? 'Maniobra (FCTM) — no es memory item' : 'Memory item';
     byId('a320ModalTitle').textContent = item.titulo;
     var body = byId('a320ModalBody');
     body.className = claseCuerpo(item, 'a320-body');
     body.innerHTML = renderCuerpo(item);
     byId('a320Overlay').classList.add('open');
     byId('a320Overlay').scrollTop = 0;
+    body.scrollTop = 0;
     document.body.style.overflow = 'hidden';
     scrollBloqueado = true;
     bump('vistas', item.id);
@@ -3344,9 +4129,32 @@ intentarSesionGuardada(); (function () {
   /* ---------------------------------------------------------
      7. Pantalla índice
      --------------------------------------------------------- */
+  function renderModos() {
+    var box = byId('a320Modes');
+    if (!box) return;
+    var e = est();
+    var s = e.sesion;
+    var nRep = aRepasar().length;
+    var html = '';
+    if (s) {
+      html += '<button class="btn btn-a320amber" id="a320Resume">Continuar ronda' +
+        (s.modo === 'falladas' ? ' de repaso' : '') + ' (' + s.pos + '/' + s.orden.length + ')</button>' +
+        '<button class="btn btn-ghost" id="a320StartFlash">Empezar de nuevo</button>';
+    } else {
+      html += '<button class="btn btn-a320amber" id="a320StartFlash">Estudiar con tarjetas</button>';
+    }
+    if (nRep) html += '<button class="btn btn-a320red" id="a320Repaso">Repasar falladas (' + nRep + ')</button>';
+    box.innerHTML = html;
+    if (s) byId('a320Resume').onclick = reanudarFlash;
+    byId('a320StartFlash').onclick = function () { iniciarFlash('todas'); };
+    if (nRep) byId('a320Repaso').onclick = function () { iniciarFlash('falladas'); };
+  }
+
   function renderIndice() {
     var grid = byId('a320Grid');
     if (!grid) return;
+    renderModos();
+    aplicarRol();
     var e = est();
     grid.innerHTML = '';
     ITEMS.forEach(function (item, i) {
@@ -3355,10 +4163,11 @@ intentarSesionGuardada(); (function () {
       var meta = (ok + no) === 0
         ? 'sin practicar'
         : '<span class="ok">' + ok + '&nbsp;ok</span> &middot; <span class="no">' + no + '&nbsp;fallo' + (no === 1 ? '' : 's') + '</span>';
+      var badges = (TS[item.id] ? '<span class="a320-badge">' + esc(TS[item.id][0].cols.join('/')) + '</span>' : '');
       var b = document.createElement('button');
-      b.className = 'a320-card';
+      b.className = 'a320-card' + (item.cat === 'SOP' ? ' sop' : '');
       b.innerHTML =
-        '<div class="r1"><span class="cat">' + esc(item.cat) + '</span>' +
+        '<div class="r1"><span class="cat">' + esc(item.cat) + '</span>' + badges +
         '<span class="idx">' + String(i + 1).padStart(2, '0') + '</span></div>' +
         '<div class="nm">' + esc(item.titulo) + '</div>' +
         '<div class="meta">' + meta + '</div>';
@@ -3375,9 +4184,9 @@ intentarSesionGuardada(); (function () {
   }
 
   /* ---------------------------------------------------------
-     8. Modo tarjetas
+     8. Modo tarjetas (con ronda guardada)
      --------------------------------------------------------- */
-  var mazo = [], pos = 0, revelada = false, ronda = { ok: 0, no: 0 };
+  var mazo = [], pos = 0, revelada = false, ronda = { ok: 0, no: 0 }, modo = 'todas';
 
   function barajar(arr) {
     var a = arr.slice();
@@ -3388,11 +4197,40 @@ intentarSesionGuardada(); (function () {
     return a;
   }
 
-  function iniciarFlash() {
-    mazo = barajar(ITEMS);
+  function guardarSesion() {
+    var e = est();
+    e.sesion = (mazo.length && pos < mazo.length)
+      ? { modo: modo, orden: mazo.map(function (it) { return it.id; }), pos: pos, revelada: revelada, ok: ronda.ok, no: ronda.no }
+      : null;
+    guardar();
+  }
+
+  function iniciarFlash(m) {
+    modo = m === 'falladas' ? 'falladas' : 'todas';
+    var base = modo === 'falladas' ? aRepasar() : ITEMS;
+    if (!base.length) { renderIndice(); return; }
+    mazo = barajar(base);
     pos = 0; revelada = false; ronda = { ok: 0, no: 0 };
+    guardarSesion();
     renderFlash();
     showScreen('screen-a320-flash');
+  }
+
+  function reanudarFlash() {
+    var s = est().sesion;
+    if (!s) { iniciarFlash('todas'); return; }
+    mazo = s.orden.map(function (id) { return IDS[id]; });
+    modo = s.modo; pos = s.pos; revelada = s.revelada; ronda = { ok: s.ok, no: s.no };
+    renderFlash();
+    showScreen('screen-a320-flash');
+  }
+
+  function promptRol(item) {
+    var rol = est().rol;
+    var ts = TS[item.id];
+    if (rol === 'ambos' || !ts) return 'Recita en voz alta las acciones de memoria de este ítem.';
+    if (ts[0].cols[0] !== 'PF') return 'Recita las acciones y callouts de CAPT y F/O (el reparto de esta maniobra es por asiento).';
+    return 'Recita tus acciones y callouts como <b>' + (rol === 'pf' ? 'PF' : 'PM') + '</b>. Al revelar se resalta tu columna.';
   }
 
   function renderFlash() {
@@ -3401,25 +4239,29 @@ intentarSesionGuardada(); (function () {
     var tape = byId('a320FlashTape');
 
     if (pos >= mazo.length) {
+      guardarSesion(); // ronda completa: borra la sesión guardada
       prog.textContent = 'Ronda completa';
       tape.style.width = '100%';
       var pct = mazo.length ? Math.round(ronda.ok / mazo.length * 100) : 0;
+      var nRep = aRepasar().length;
       slot.innerHTML =
         '<div class="a320-resume">' +
           '<div class="big">' + pct + '%</div>' +
           '<div class="sub">' + ronda.ok + ' sabidas &middot; ' + ronda.no + ' por repasar</div>' +
           '<div class="acts">' +
             '<button class="btn btn-a320amber" id="a320Again">Otra ronda</button>' +
+            (nRep ? '<button class="btn btn-a320red" id="a320AgainRep">Repasar falladas (' + nRep + ')</button>' : '') +
             '<button class="btn btn-ghost" id="a320ToIndex">Ver lista</button>' +
           '</div>' +
         '</div>';
-      byId('a320Again').onclick = iniciarFlash;
+      byId('a320Again').onclick = function () { iniciarFlash('todas'); };
+      if (nRep) byId('a320AgainRep').onclick = function () { iniciarFlash('falladas'); };
       byId('a320ToIndex').onclick = function () { renderIndice(); showScreen('screen-a320'); };
       return;
     }
 
     var item = mazo[pos];
-    prog.textContent = (pos + 1) + ' / ' + mazo.length;
+    prog.textContent = (modo === 'falladas' ? 'Repaso · ' : '') + (pos + 1) + ' / ' + mazo.length;
     tape.style.width = (pos / mazo.length * 100) + '%';
 
     var cuerpo = revelada
@@ -3429,13 +4271,13 @@ intentarSesionGuardada(); (function () {
           '<button class="btn btn-a320green" id="a320Ok">La sabía</button>' +
         '</div>'
       : '<div class="fbody"><div class="fprompt">' +
-          '<span>Recita en voz alta las acciones de memoria de este ítem.</span>' +
+          '<span>' + promptRol(item) + '</span>' +
         '</div></div>' +
         '<div class="ffoot"><button class="btn btn-a320amber" id="a320Reveal">Ver acciones</button></div>';
 
     slot.innerHTML =
       '<div class="a320-flash">' +
-        '<div class="fhead"><div class="kicker">Memory item</div>' +
+        '<div class="fhead"><div class="kicker">' + (item.cat === 'SOP' ? 'Maniobra (FCTM)' : 'Memory item') + '</div>' +
         '<div class="ttl">' + esc(item.titulo) + '</div></div>' +
         cuerpo +
       '</div>';
@@ -3446,18 +4288,23 @@ intentarSesionGuardada(); (function () {
     } else {
       byId('a320Reveal').onclick = function () {
         revelada = true;
-        bump('vistas', item.id);
+        var e = est();
+        e.vistas[item.id] = (e.vistas[item.id] || 0) + 1;
+        guardarSesion(); // guarda "vistas" y el punto de la ronda
         renderFlash();
       };
     }
-    window.scrollTo(0, 0);
+    try { window.scrollTo(0, 0); } catch (err) { /* entornos sin scroll */ }
   }
 
   function calificar(acierto) {
     var item = mazo[pos];
-    bump(acierto ? 'sabidas' : 'falladas', item.id);
+    var e = est();
+    var k = acierto ? 'sabidas' : 'falladas';
+    e[k][item.id] = (e[k][item.id] || 0) + 1;
     if (acierto) ronda.ok++; else ronda.no++;
     pos++; revelada = false;
+    guardarSesion();
     renderFlash();
   }
 
@@ -3477,7 +4324,7 @@ intentarSesionGuardada(); (function () {
     b.innerHTML =
       '<span class="btag">A320</span>' +
       '<div class="bname">A320</div>' +
-      '<div class="blong">Memory Items &mdash; acciones de memoria</div>' +
+      '<div class="blong">Memory Items &mdash; acciones de memoria y reparto PF/PM</div>' +
       '<div class="bstats">' +
         '<div><b>' + ITEMS.length + '</b>tarjetas</div>' +
         '<div><b>' + practicados + '/' + ITEMS.length + '</b>practicadas</div>' +
@@ -3486,7 +4333,6 @@ intentarSesionGuardada(); (function () {
     grid.appendChild(b);
   }
 
-  // renderBancos → añadir el tercer tile
   if (typeof window.renderBancos === 'function') {
     var _renderBancos = window.renderBancos;
     window.renderBancos = function () {
@@ -3496,7 +4342,6 @@ intentarSesionGuardada(); (function () {
     };
   }
 
-  // migrarEstado → conservar estado.a320 al cargar progreso guardado
   if (typeof window.migrarEstado === 'function') {
     var _migrar = window.migrarEstado;
     window.migrarEstado = function (prog) {
@@ -3506,14 +4351,13 @@ intentarSesionGuardada(); (function () {
     };
   }
 
-  // API mínima por si quieres llamarla desde fuera
   window.A320Memory = {
     items: ITEMS,
+    taskSharing: TS,
     entrar: entrarA320,
     abrir: function (id) {
       inyectar();
-      var it = ITEMS.filter(function (x) { return x.id === id; })[0];
-      if (it) abrirModal(it);
+      if (IDS[id]) abrirModal(IDS[id]);
     }
   };
 

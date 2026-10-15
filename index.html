@@ -20767,6 +20767,662 @@ intentarSesionGuardada(); (function () {
   }
   console.log('ATPL (Wizz Air Prep) v2 loaded as a NEW additive bank (wizzatplv2):', bancos['wizzatplv2'].temas.reduce((a,t)=>a+t.preguntas.length,0), 'questions. Existing wizzatpl bank(s) left untouched.');
 })();
+
+/* =============================================================================
+   A320 TECH · TEST 100 — tests aleatorios de 100 preguntas + registro de vistas
+   -----------------------------------------------------------------------------
+   Módulo autónomo (IIFE). Se instala DESPUÉS de banco_a320_tech y de los módulos
+   de Simulacro y Repaso de falladas: pegar al FINAL del último bloque de script,
+   justo antes de su etiqueta de cierre (igual que los demás módulos), para que los
+   enganches queden puestos antes de que se restaure la sesión guardada.
+   No modifica el motor ni ningún otro módulo: solo envuelve
+   funciones existentes (migrarEstado, renderMaterias, renderBancos, elegir,
+   renderPregunta, repetirMateria, guardarProgresoAhora, cerrarSesion).
+
+   QUÉ HACE
+   --------
+   1. TEST 100 ALEATORIO  — arma un examen de 100 preguntas al azar con
+      representación de TODAS las materias del banco (reparto proporcional al
+      tamaño de cada materia, con un mínimo de MIN_MATERIA por materia), mezcladas
+      en orden aleatorio. Mismo flujo que el Simulacro: sin corrección hasta
+      "Terminar test"; luego informe de desempeño y revisión con explicaciones.
+   2. TEST 100 SIN VER    — igual, pero solo con preguntas que aún no se han
+      visto. Si quedan menos de 100, genera un test corto con todas las que
+      quedan (el título lo dice).
+   3. REGISTRO DE VISTAS  — una pregunta cuenta como "vista" cuando la respondes
+      en el banco A320 TECH: en un Test 100, en un Simulacro de materia o en la
+      práctica normal por materia (cambia CONTAR_PRACTICA para excluir esta
+      última). Se guarda dentro de `estado.a320tests`, así que viaja con el
+      progreso al servidor y se recupera en cualquier dispositivo.
+   4. REINICIAR VISTAS    — vacía el registro (con confirmación). No toca los
+      resultados por materia.
+
+   IDENTIDAD DE PREGUNTA
+   ---------------------
+   Hash estable del ENUNCIADO (nunca el índice), así el registro sobrevive a
+   reordenamientos y a la rotación de opciones. Los enunciados repetidos entre
+   materias cuentan como una sola pregunta.
+
+   NO TOCA enunciados, opciones ni claves de respuesta: los tests usan las mismas
+   referencias a los objetos de pregunta del banco.
+
+   CONSOLA
+   -------
+     A320Test100.iniciar('todas' | 'nuevas')   A320Test100.reiniciarVistas(true)
+     A320Test100.stats()                       A320Test100.vistas()
+   ============================================================================= */
+(function () {
+  'use strict';
+  if (window.__A320_TEST100__) return;
+  window.__A320_TEST100__ = true;
+
+  if (typeof bancos === 'undefined' || !bancos || !bancos.a320tech) {
+    console.warn('[a320 test100] bancos.a320tech no encontrado; carga este módulo DESPUÉS de banco_a320_tech.');
+    return;
+  }
+
+  /* ------------------------------ configuración ------------------------------ */
+  var BK = 'a320tech';
+  var TAG = '_esTest100';
+  var N_TEST = 100;            // preguntas por test
+  var MIN_MATERIA = 2;         // mínimo por materia (si hay disponibles)
+  var CONTAR_PRACTICA = true;  // true: la práctica/simulacro por materia también cuenta como "vista"
+  var GUARDADO_MS = 800;       // espera antes de guardar tras responder
+
+  var REAL_N = bancos[BK].temas.length; // materias reales (antes de añadir virtuales)
+
+  /* --------------------------- identidad de pregunta --------------------------- */
+  var _idCache = (typeof WeakMap === 'function') ? new WeakMap() : null;
+  function idDe(preg) {
+    if (_idCache && _idCache.has(preg)) return _idCache.get(preg);
+    var s = String(preg.q), h1 = 5381, h2 = 2166136261;
+    for (var i = 0; i < s.length; i++) {
+      var c = s.charCodeAt(i);
+      h1 = (((h1 << 5) + h1) + c) >>> 0;
+      h2 = Math.imul(h2 ^ c, 16777619) >>> 0;
+    }
+    var id = h1.toString(36) + h2.toString(36);
+    if (_idCache) _idCache.set(preg, id);
+    return id;
+  }
+
+  /* Pool de preguntas únicas por enunciado, con su materia de origen. */
+  var POOL = [];          // [{p, ti, id}]
+  var DUPLICADAS = 0;
+  (function construirPool() {
+    var vistos = {};
+    bancos[BK].temas.forEach(function (t, ti) {
+      t.preguntas.forEach(function (p) {
+        var id = idDe(p);
+        if (vistos[id]) { DUPLICADAS++; return; }
+        vistos[id] = true;
+        POOL.push({ p: p, ti: ti, id: id });
+      });
+    });
+  })();
+
+  /* --------------------------------- estado --------------------------------- */
+  var dirty = false;
+  var timer = null;
+
+  function vacio() { return { v: 1, vistas: {}, sembrado: false }; }
+
+  function normalizar(raw) {
+    var out = vacio();
+    if (!raw || typeof raw !== 'object') return out;
+    if (raw.vistas && typeof raw.vistas === 'object') {
+      Object.keys(raw.vistas).forEach(function (id) {
+        var n = raw.vistas[id];
+        if (typeof n === 'number' && isFinite(n) && n > 0) out.vistas[id] = n;
+      });
+    }
+    out.sembrado = !!raw.sembrado;
+    return out;
+  }
+
+  /* Primera vez (usuarios con progreso previo): las preguntas ya respondidas en
+     la práctica por materia se cuentan como vistas. Ocurre una sola vez. */
+  function sembrar(e) {
+    var est = (typeof estado !== 'undefined' && estado) ? estado[BK] : null;
+    if (!Array.isArray(est)) return;
+    for (var ti = 0; ti < REAL_N; ti++) {
+      var es = est[ti], t = bancos[BK].temas[ti];
+      if (!es || !Array.isArray(es.respuestas) || !t || t[TAG]) continue;
+      t.preguntas.forEach(function (p, qi) {
+        if (es.respuestas[qi] !== null && es.respuestas[qi] !== undefined) {
+          var id = idDe(p);
+          e.vistas[id] = Math.max(1, e.vistas[id] || 0);
+        }
+      });
+    }
+    dirty = true;
+  }
+
+  function est() {
+    if (typeof estado === 'undefined' || !estado) return vacio();
+    var e = estado.a320tests;
+    if (!e || typeof e !== 'object' || !e.vistas || typeof e.vistas !== 'object') {
+      e = estado.a320tests = vacio();
+    }
+    if (!e.sembrado) {
+      e.sembrado = true;
+      if (CONTAR_PRACTICA) sembrar(e);
+    }
+    return e;
+  }
+
+  function guardarYa() {
+    if (typeof guardarProgresoAhora === 'function') return guardarProgresoAhora();
+  }
+  function programarGuardado() {
+    clearTimeout(timer);
+    timer = setTimeout(guardarYa, GUARDADO_MS);
+  }
+  function flush() {
+    clearTimeout(timer);
+    if (dirty) { dirty = false; guardarYa(); }
+  }
+  function marcarVista(id) {
+    var e = est();
+    e.vistas[id] = (e.vistas[id] || 0) + 1;
+    dirty = true;
+    programarGuardado();
+    if (!t100) refrescarPanel();
+  }
+
+  /* ------------------------------- estadísticas ------------------------------ */
+  function stats() {
+    var e = est();
+    var porMateria = bancos[BK].temas.slice(0, REAL_N).map(function (t) {
+      return { nombre: t.nombre, total: 0, vistas: 0 };
+    });
+    var vistas = 0;
+    POOL.forEach(function (x) {
+      var m = porMateria[x.ti];
+      m.total++;
+      if (e.vistas[x.id]) { m.vistas++; vistas++; }
+    });
+    return {
+      total: POOL.length, vistas: vistas, restantes: POOL.length - vistas,
+      duplicadas: DUPLICADAS, porMateria: porMateria
+    };
+  }
+
+  /* ------------------------------ armado del test ----------------------------- */
+  function barajar(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  /* Reparto por materia: mínimo MIN_MATERIA (o lo disponible), el resto en
+     proporción a lo que queda disponible (restos mayores). */
+  function calcularCupos(disp, n) {
+    var total = disp.reduce(function (a, b) { return a + b; }, 0);
+    if (total <= n) return disp.slice();
+    var activas = disp.filter(function (d) { return d > 0; }).length;
+    var piso = Math.min(MIN_MATERIA, Math.floor(n / Math.max(1, activas)));
+    var q = disp.map(function (d) { return Math.min(d, piso); });
+    var resto = n - q.reduce(function (a, b) { return a + b; }, 0);
+    var cap = disp.map(function (d, i) { return d - q[i]; });
+    var capTot = cap.reduce(function (a, b) { return a + b; }, 0);
+    if (resto > 0 && capTot > 0) {
+      var ideal = cap.map(function (c) { return c * resto / capTot; });
+      var base = ideal.map(Math.floor);
+      var usados = base.reduce(function (a, b) { return a + b; }, 0);
+      var orden = ideal.map(function (v, i) { return { i: i, f: v - Math.floor(v) }; })
+        .sort(function (a, b) { return b.f - a.f; });
+      for (var k = 0; usados < resto && k < orden.length; k++, usados++) base[orden[k].i]++;
+      base.forEach(function (b, i) { q[i] += b; });
+    }
+    return q;
+  }
+
+  function construir(modo) {
+    var e = est();
+    var porMateria = bancos[BK].temas.slice(0, REAL_N).map(function () { return []; });
+    POOL.forEach(function (x) {
+      if (modo === 'nuevas' && e.vistas[x.id]) return;
+      porMateria[x.ti].push(x);
+    });
+    var disp = porMateria.map(function (l) { return l.length; });
+    var total = disp.reduce(function (a, b) { return a + b; }, 0);
+    var n = Math.min(N_TEST, total);
+    var cupos = calcularCupos(disp, n);
+    var elegidas = [];
+    porMateria.forEach(function (l, ti) {
+      barajar(l).slice(0, cupos[ti]).forEach(function (x) { elegidas.push(x); });
+    });
+    return barajar(elegidas);
+  }
+
+  /* ------------------------------- test en curso ------------------------------ */
+  var t100 = null;   // {virtual, modo, revelado}
+  var textoBarraOriginal = null;
+  var textoRepetirOriginal = null;
+
+  function temaT100() {
+    if (!t100 || bancoActual !== BK) return null;
+    var t = bancos[BK].temas[temaActual];
+    return (t && t[TAG]) ? t : null;
+  }
+
+  function purgar() {
+    var temas = bancos[BK].temas;
+    for (var i = temas.length - 1; i >= 0; i--) {
+      if (temas[i] && temas[i][TAG]) {
+        temas.splice(i, 1);
+        if (estado && Array.isArray(estado[BK])) estado[BK].splice(i, 1);
+      }
+    }
+    if (t100) {
+      document.body.classList.remove('modo-examen', 'modo-t100', 't100-revelado');
+      restaurarTextos();
+    }
+    t100 = null;
+  }
+
+  function restaurarTextos() {
+    var bar = document.querySelector('#examBar span');
+    if (bar && textoBarraOriginal !== null) bar.innerHTML = textoBarraOriginal;
+    textoBarraOriginal = null;
+    var b = document.querySelector('#screen-results .resbtns .btn-amber');
+    if (b && textoRepetirOriginal !== null) b.innerHTML = textoRepetirOriginal;
+    textoRepetirOriginal = null;
+  }
+
+  function marcarExplicacion() {
+    var scope = document.getElementById('screen-quiz');
+    if (!scope) return;
+    scope.querySelectorAll('button,a,li,span,div,h1,h2,h3,h4').forEach(function (el) {
+      if (el.children.length) return;
+      var t = (el.textContent || '').trim().toLowerCase();
+      if (t === 'explicación' || t === 'explicacion' || t === 'explicaciones' || t === 'explanation') {
+        el.classList.add('ex-gate');
+      }
+    });
+  }
+
+  function iniciar(modo) {
+    modo = (modo === 'nuevas') ? 'nuevas' : 'todas';
+    purgar();
+    bancoActual = BK;
+    var sel = construir(modo);
+    if (!sel.length) {
+      alert('No quedan preguntas sin ver en el banco A320 TECH.\nPuedes reiniciar el registro de vistas para empezar de nuevo.');
+      refrescarPanel();
+      return false;
+    }
+    var n = sel.length;
+    var nombre = 'Test ' + n + ' · ' + (modo === 'nuevas' ? 'Sin ver' : 'Aleatorio') + ' · A320';
+    var virtual = {
+      nombre: nombre,
+      preguntas: sel.map(function (x) { return x.p; }),
+      _ids: sel.map(function (x) { return x.id; }),
+      _tis: sel.map(function (x) { return x.ti; })
+    };
+    virtual[TAG] = true;
+    bancos[BK].temas.push(virtual);
+    var vi = bancos[BK].temas.length - 1;
+    estado[BK][vi] = {
+      respuestas: new Array(n).fill(null),
+      index: 0, startTime: Date.now(), finished: false, lastPct: null, lastTime: null
+    };
+    t100 = { virtual: vi, modo: modo, revelado: false };
+    temaActual = vi;
+
+    document.body.classList.add('modo-examen', 'modo-t100');
+    document.body.classList.remove('t100-revelado');
+    var bar = document.querySelector('#examBar span');
+    if (bar) {
+      if (textoBarraOriginal === null) textoBarraOriginal = bar.innerHTML;
+      bar.innerHTML = '&#9992; Test A320 — sin corrección hasta terminar';
+    }
+    marcarExplicacion();
+    showScreen('screen-quiz');
+    renderPregunta();
+    return true;
+  }
+
+  function terminar() {
+    var tema = temaT100();
+    if (!tema || t100.revelado) return;
+    var e = estado[BK][temaActual];
+    var faltan = tema.preguntas.length - contarRespondidas(e);
+    if (faltan > 0) {
+      if (!confirm('Quedan ' + faltan + ' pregunta(s) sin responder.\nSe contarán como incorrectas. ¿Terminar el test?')) return;
+    }
+    t100.revelado = true;
+    document.body.classList.remove('modo-examen', 'modo-t100');
+    document.body.classList.add('t100-revelado');
+    var b = document.querySelector('#screen-results .resbtns .btn-amber');
+    if (b) {
+      if (textoRepetirOriginal === null) textoRepetirOriginal = b.innerHTML;
+      b.innerHTML = '&#8635; Nuevo test';
+    }
+    finalizarMateria();
+    flush();
+  }
+
+  function revisar() {
+    if (!t100 || !t100.revelado) return;
+    estado[BK][temaActual].index = 0;
+    showScreen('screen-quiz');
+    renderPregunta();
+  }
+
+  /* ------------------------------ reinicio de vistas ------------------------------ */
+  function reiniciarVistas(silencioso) {
+    if (!silencioso) {
+      var s = stats();
+      if (!confirm('¿Reiniciar el registro de preguntas vistas del banco A320 TECH?\n\n' +
+                   'Hoy hay ' + s.vistas + ' de ' + s.total + ' marcadas como vistas; todas pasarán a "sin ver".\n' +
+                   'Tus resultados por materia no se tocan.')) return false;
+    }
+    var e = est();
+    e.vistas = {};
+    e.sembrado = true;     // no volver a sembrar desde la práctica ya hecha
+    dirty = false;
+    clearTimeout(timer);
+    guardarYa();
+    refrescarPanel();
+    return true;
+  }
+
+  /* ------------------------------------ UI ------------------------------------ */
+  function inyectarCSS() {
+    if (document.getElementById('t100-css')) return;
+    var css = document.createElement('style');
+    css.id = 't100-css';
+    css.textContent = [
+      '.t100-card{background:var(--panel); border:1px solid var(--hair); border-radius:var(--radius); padding:18px 18px 14px; margin:0 0 22px;}',
+      '.t100-head{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px;}',
+      '.t100-tag{font-family:var(--f-mono); font-size:11px; font-weight:700; letter-spacing:.06em; background:var(--amber-dim); color:var(--amber); padding:3px 8px; border-radius:5px;}',
+      '.t100-title{font-family:var(--f-display); font-weight:800; font-size:22px; text-transform:uppercase; line-height:1; letter-spacing:.01em;}',
+      '.t100-stats{display:flex; gap:22px; flex-wrap:wrap; font-family:var(--f-mono); font-size:11px; color:var(--dim); text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px;}',
+      '.t100-stats b{display:block; font-size:20px; color:var(--text); letter-spacing:0; margin-top:2px;}',
+      '.t100-bar{height:5px; background:var(--panel2); border-radius:3px; overflow:hidden; margin:2px 0 14px;}',
+      '.t100-bar > div{height:100%; background:var(--cyan);}',
+      '.t100-btns{display:flex; gap:10px; flex-wrap:wrap;}',
+      '.t100-btns .btn{padding:12px 16px;}',
+      '.t100-btns .btn[disabled]{opacity:.45; cursor:not-allowed; filter:none;}',
+      '.t100-btns .t100-reset{margin-left:auto;}',
+      '.t100-card details{margin-top:14px; border-top:1px solid var(--hair); padding-top:10px;}',
+      '.t100-card summary{cursor:pointer; font-family:var(--f-mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim);}',
+      '.t100-card summary:hover{color:var(--text);}',
+      '.t100-rows{display:grid; grid-template-columns:1fr; gap:6px 24px; margin-top:10px;}',
+      '@media(min-width:640px){ .t100-rows{grid-template-columns:1fr 1fr;} }',
+      '.t100-row{display:grid; grid-template-columns:1fr auto; gap:2px 10px; font-size:12.5px; align-items:baseline;}',
+      '.t100-row .n{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}',
+      '.t100-row .c{font-family:var(--f-mono); font-size:11.5px; color:var(--dim);}',
+      '.t100-row .t100-bar{grid-column:1 / -1; height:3px; margin:0;}',
+      '.t100-note{margin-top:12px; font-size:11.5px; color:var(--dim); line-height:1.45;}',
+      /* sin explicación durante el test: por estructura, no por texto, para que
+         sobreviva a los re-renders de las pestañas (comentarios, notas) */
+      'body.modo-t100 #qTabs .qtab:nth-child(2), body.modo-t100 #panel-exp{display:none !important;}',
+      /* botones propios del modo test */
+      '#t100EndBtn{display:none; margin-right:auto;}',
+      'body.modo-t100 #t100EndBtn{display:inline-flex;}',
+      'body.modo-t100 #examEndBtn{display:none !important;}',
+      '#t100ReviewBtn{display:none;}',
+      'body.t100-revelado #t100ReviewBtn{display:inline-flex;}'
+    ].join('\n');
+    document.head.appendChild(css);
+  }
+
+  function montarBotonesQuiz() {
+    var foot = document.querySelector('#screen-quiz .quizfoot');
+    if (foot && !document.getElementById('t100EndBtn')) {
+      var b = document.createElement('button');
+      b.id = 't100EndBtn';
+      b.className = 'btn btn-amber';
+      b.textContent = 'Terminar test';
+      b.onclick = terminar;
+      foot.insertBefore(b, foot.firstChild);
+    }
+    var res = document.querySelector('#screen-results .resbtns');
+    if (res && !document.getElementById('t100ReviewBtn')) {
+      var r = document.createElement('button');
+      r.id = 't100ReviewBtn';
+      r.className = 'btn btn-cyan';
+      r.textContent = 'Revisar test';
+      r.onclick = revisar;
+      res.insertBefore(r, res.firstChild);
+    }
+  }
+
+  function escapar(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  }
+
+  function refrescarPanel() {
+    var grid = document.getElementById('tilesGrid');
+    if (!grid || !grid.parentNode) return;
+    var panel = document.getElementById('t100Panel');
+    if (!panel) {
+      panel = document.createElement('div');
+      panel.id = 't100Panel';
+      panel.className = 't100-card';
+      grid.parentNode.insertBefore(panel, grid);
+      panel.addEventListener('click', function (ev) {
+        var el = ev.target.closest ? ev.target.closest('[data-t100]') : null;
+        if (!el || el.disabled) return;
+        var acc = el.getAttribute('data-t100');
+        if (acc === 'todas' || acc === 'nuevas') iniciar(acc);
+        else if (acc === 'reset') reiniciarVistas(false);
+      });
+    }
+    if (bancoActual !== BK) { panel.style.display = 'none'; return; }
+    panel.style.display = '';
+
+    var s = stats();
+    var pct = s.total ? Math.round(s.vistas * 100 / s.total) : 0;
+    var nNuevas = Math.min(N_TEST, s.restantes);
+    var etqNuevas = s.restantes === 0
+      ? 'Todo visto ✓'
+      : (s.restantes < N_TEST ? '✈ Test corto sin ver · ' + s.restantes : '✈ Test ' + N_TEST + ' sin ver');
+    var nTodas = Math.min(N_TEST, s.total);
+
+    var filas = s.porMateria.map(function (m) {
+      var p = m.total ? Math.round(m.vistas * 100 / m.total) : 0;
+      return '<div class="t100-row"><span class="n">' + escapar(m.nombre) + '</span>' +
+             '<span class="c">' + m.vistas + '/' + m.total + '</span>' +
+             '<div class="t100-bar"><div style="width:' + p + '%"></div></div></div>';
+    }).join('');
+
+    panel.innerHTML =
+      '<div class="t100-head"><span class="t100-tag">TEST ' + N_TEST + '</span>' +
+        '<span class="t100-title">Tests aleatorios · todas las materias</span></div>' +
+      '<div class="t100-stats">' +
+        '<div>Vistas<b>' + s.vistas + '/' + s.total + '</b></div>' +
+        '<div>Sin ver<b>' + s.restantes + '</b></div>' +
+        '<div>Avance<b>' + pct + '%</b></div></div>' +
+      '<div class="t100-bar"><div style="width:' + pct + '%"></div></div>' +
+      '<div class="t100-btns">' +
+        '<button class="btn btn-cyan" data-t100="todas" title="' + nTodas + ' preguntas al azar de todas las materias, vistas o no">✈ Test ' + nTodas + ' aleatorio</button>' +
+        '<button class="btn btn-amber" data-t100="nuevas"' + (s.restantes === 0 ? ' disabled' : '') +
+          ' title="Solo preguntas que aún no has visto (' + nNuevas + ' en este test)">' + etqNuevas + '</button>' +
+        '<button class="btn btn-ghost t100-reset" data-t100="reset"' + (s.vistas === 0 ? ' disabled' : '') +
+          ' title="Vuelve a marcar todas las preguntas como sin ver">↺ Reiniciar vistas</button>' +
+      '</div>' +
+      '<details><summary>Detalle por materia</summary><div class="t100-rows">' + filas + '</div></details>' +
+      '<div class="t100-note">Cuenta como “vista” cada pregunta que respondes en este banco' +
+        (CONTAR_PRACTICA ? ' (tests, simulacros y práctica por materia)' : ' (tests y simulacros)') +
+        '. Reiniciar no borra tus resultados por materia.' +
+        (s.duplicadas ? ' ' + s.duplicadas + ' enunciados repetidos entre materias cuentan como una sola pregunta.' : '') +
+      '</div>';
+  }
+
+  /* ----------------------- enganches sobre el motor y módulos ----------------------- */
+
+  /* El registro de vistas viaja dentro de `estado`: hay que conservarlo al cargar. */
+  var _migrar = window.migrarEstado;
+  if (typeof _migrar === 'function') {
+    window.migrarEstado = function (prog) {
+      var out = _migrar.apply(this, arguments) || {};
+      out.a320tests = normalizar(prog && prog.a320tests);
+      return out;
+    };
+  }
+
+  /* Nunca guardar la materia virtual del test dentro de estado[BK]. */
+  var _guardar = window.guardarProgresoAhora;
+  window.guardarProgresoAhora = function () {
+    var arr = (typeof estado !== 'undefined' && estado) ? estado[BK] : null;
+    var quitada = null, pos = -1;
+    if (t100 && Array.isArray(arr)) {
+      pos = t100.virtual;
+      var tv = bancos[BK].temas[pos];
+      if (tv && tv[TAG] && arr[pos]) quitada = arr.splice(pos, 1)[0];
+    }
+    try { return _guardar.apply(this, arguments); }
+    finally { if (quitada) arr.splice(pos, 0, quitada); }
+  };
+
+  var _renderMaterias = window.renderMaterias;
+  window.renderMaterias = function () {
+    purgar();
+    var r = _renderMaterias.apply(this, arguments);
+    flush();
+    try { montarBotonesQuiz(); refrescarPanel(); } catch (err) { console.warn('[a320 test100]', err); }
+    return r;
+  };
+
+  var _renderBancos = window.renderBancos;
+  window.renderBancos = function () {
+    purgar();
+    var r = _renderBancos.apply(this, arguments);
+    flush();
+    return r;
+  };
+
+  if (typeof window.cerrarSesion === 'function') {
+    var _cerrar = window.cerrarSesion;
+    window.cerrarSesion = function () { purgar(); return _cerrar.apply(this, arguments); };
+  }
+
+  /* Responder: dentro de un Test 100 sin corrección; en el resto del banco, contar como vista. */
+  var _elegir = window.elegir;
+  window.elegir = function (oi) {
+    var tema = temaT100();
+    if (tema) {
+      if (t100.revelado) return;
+      var e = estado[BK][temaActual];
+      var qi = e.index, antes = e.respuestas[qi];
+      e.respuestas[qi] = oi;
+      if (antes === null) marcarVista(tema._ids[qi]);
+      renderPregunta();
+      return;
+    }
+    if (CONTAR_PRACTICA && bancoActual === BK && estado && Array.isArray(estado[BK])) {
+      var t = bancos[BK].temas[temaActual], es = estado[BK][temaActual];
+      if (t && es && !t[TAG]) {
+        var i = es.index, prev = es.respuestas[i], preg = t.preguntas[i];
+        var res = _elegir.apply(this, arguments);
+        if (preg && prev === null && es.respuestas[i] !== null) marcarVista(idDe(preg));
+        return res;
+      }
+    }
+    return _elegir.apply(this, arguments);
+  };
+
+  /* Pintar el quiz del test: sin colores de acierto hasta terminar. */
+  var _renderPregunta = window.renderPregunta;
+  window.renderPregunta = function () {
+    _renderPregunta.apply(this, arguments);
+    var tema = temaT100();
+    if (!tema) return;
+    var e = estado[BK][temaActual];
+    var qi = e.index, total = tema.preguntas.length;
+    var qBlock = document.getElementById('qBlock');
+    var filas = document.querySelectorAll('#qOpts .opt');
+    var lbl2 = document.getElementById('tapeLabel2');
+    if (lbl2) {
+      var cod = t100.revelado ? (bancos[BK].codigos[bancos[BK].temas[tema._tis[qi]].nombre] || '') : '';
+      lbl2.textContent = 'TEST' + (cod ? ' · ' + cod : '');
+    }
+    if (!t100.revelado) {
+      if (qBlock) qBlock.className = 'q';
+      Array.prototype.forEach.call(filas, function (row, oi) {
+        row.classList.remove('correct', 'incorrect');
+        Array.prototype.forEach.call(row.querySelectorAll('.tag'), function (t) { t.remove(); });
+        if (e.respuestas[qi] === oi) {
+          row.classList.add('picked');
+          var tg = document.createElement('span');
+          tg.className = 'tag';
+          tg.textContent = 'TU RESPUESTA';
+          row.appendChild(tg);
+        } else {
+          row.classList.remove('picked');
+        }
+        row.onclick = function () { elegir(oi); };
+      });
+      var sc = document.getElementById('quizScore');
+      if (sc) sc.textContent = 'RESPONDIDAS ' + contarRespondidas(e) + '/' + total;
+      var cnt = document.getElementById('examCounter');
+      if (cnt) cnt.textContent = contarRespondidas(e) + '/' + total;
+      Array.prototype.forEach.call(document.querySelectorAll('#navGrid .navbtn'), function (b, i) {
+        b.classList.remove('nc', 'ni');
+        if (e.respuestas[i] !== null) b.classList.add('nx');
+      });
+      var nb = document.getElementById('nextBtn');
+      if (nb) nb.style.visibility = (qi < total - 1) ? 'visible' : 'hidden';
+      marcarExplicacion();
+    } else {
+      if (qBlock) qBlock.className = 'q answered';
+      Array.prototype.forEach.call(filas, function (row) {
+        row.classList.remove('picked');
+        row.onclick = null;
+      });
+    }
+  };
+
+  /* "Repetir materia" en el informe → nuevo test del mismo tipo. */
+  var _repetir = window.repetirMateria;
+  window.repetirMateria = function () {
+    if (temaT100()) { iniciar(t100.modo); return; }
+    return _repetir.apply(this, arguments);
+  };
+
+  /* ----------------------------------- arranque ----------------------------------- */
+  /* Red de seguridad: si este módulo se pegó en un script aparte y la sesión ya
+     se restauró antes de instalarlo, `estado` perdió el registro; lo recuperamos. */
+  try {
+    if (typeof estado !== 'undefined' && estado && !estado.a320tests &&
+        typeof perfilActual !== 'undefined' && perfilActual && perfilActual.persistente &&
+        typeof apiMe === 'function') {
+      apiMe().then(function (res) {
+        var p = null;
+        try { p = res && res.progress ? JSON.parse(res.progress) : null; } catch (err) { p = null; }
+        if (typeof estado !== 'undefined' && estado && !estado.a320tests) {
+          estado.a320tests = normalizar(p && p.a320tests);
+          refrescarPanel();
+        }
+      }).catch(function () { /* sin red: seguimos con registro vacío */ });
+    }
+  } catch (err) { /* no-op */ }
+  inyectarCSS();
+  function montar() { try { montarBotonesQuiz(); } catch (err) { /* no-op */ } }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', montar);
+  else montar();
+
+  window.A320Test100 = {
+    iniciar: iniciar,
+    reiniciarVistas: reiniciarVistas,
+    stats: stats,
+    vistas: function () { return Object.keys(est().vistas); },
+    _calcularCupos: calcularCupos,
+    _construir: construir
+  };
+
+  console.log('[a320 test100] instalado: ' + POOL.length + ' preguntas únicas en ' + REAL_N + ' materias (' + DUPLICADAS + ' enunciados repetidos).');
+})();
+
 </script>
 </body>
 </html>

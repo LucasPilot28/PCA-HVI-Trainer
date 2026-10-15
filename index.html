@@ -21423,6 +21423,517 @@ intentarSesionGuardada(); (function () {
   console.log('[a320 test100] instalado: ' + POOL.length + ' preguntas únicas en ' + REAL_N + ' materias (' + DUPLICADAS + ' enunciados repetidos).');
 })();
 
+
+/* =============================================================================
+   SELECTOR DE IDIOMA DE LA INTERFAZ · ES / EN
+   -----------------------------------------------------------------------------
+   Módulo autónomo (IIFE). Pegar al FINAL del último bloque de script, después
+   de todos los demás módulos. No modifica el motor ni ningún otro módulo.
+
+   QUÉ HACE
+   --------
+   Añade un selector «ES | EN» fijo arriba a la derecha, visible en todas las
+   pantallas (también en el login). Al elegir inglés se traduce SOLO la interfaz;
+   el contenido de estudio nunca se toca: enunciados, opciones, explicaciones,
+   comentarios y notas de los usuarios, y el texto de los memory items / Tech Int
+   se quedan tal cual están.
+
+   CÓMO FUNCIONA
+   -------------
+   Los textos de la interfaz están escritos en español dentro de cada módulo. En
+   vez de reescribirlos, este módulo los traduce en el DOM con un diccionario
+   (frases exactas) + patrones (frases con números, p. ej. «36 preguntas»), y un
+   MutationObserver mantiene la traducción mientras las pantallas se vuelven a
+   dibujar. También traduce los cuadros confirm()/alert(). Al volver a español
+   se restauran los textos originales. La preferencia se guarda en este
+   navegador (localStorage, clave hvi_pca_trainer:lang); por defecto: español.
+
+   PARA AÑADIR UNA FRASE NUEVA
+   ---------------------------
+   Agregar «'texto en español': 'English text'» a EXACT, o un patrón a PATRONES.
+   Una frase sin entrada simplemente se queda en español (nunca rompe nada).
+
+   CONSOLA
+   -------
+     I18N.set('en') | I18N.set('es') | I18N.lang | I18N.t('Cerrar sesión')
+   ============================================================================= */
+(function () {
+  'use strict';
+  if (window.__I18N_ES_EN__) return;
+  window.__I18N_ES_EN__ = true;
+
+  var LS_KEY = 'hvi_pca_trainer:lang';
+
+  /* ------------------------------ frases exactas ------------------------------ */
+  var EXACT = {
+    /* --- acceso / sesión --- */
+    'Iniciar sesión': 'Log in',
+    'Crear cuenta': 'Create account',
+    'Continuar con Google': 'Continue with Google',
+    'Continuar con Apple': 'Continue with Apple',
+    'Requieren un servidor propio — no disponibles en este archivo. Usa nombre y clave locales abajo.':
+      'They require your own server — not available in this file. Use a local username and password below.',
+    'o': 'or',
+    'Tu contraseña se guarda cifrada (hash) en el servidor, nunca en texto plano.':
+      'Your password is stored hashed on the server, never as plain text.',
+    '¿No tienes cuenta?': "Don't have an account?",
+    'Crear una': 'Create one',
+    '¿Ya tienes cuenta?': 'Already have an account?',
+    'Inicia sesión': 'Log in',
+    'Continuar sin cuenta (no se guarda progreso)': 'Continue without an account (progress is not saved)',
+    'Nombre de usuario': 'Username',
+    'Contraseña': 'Password',
+    'Confirmar contraseña': 'Confirm password',
+    'Completa nombre y contraseña.': 'Enter your username and password.',
+    'Las contraseñas no coinciden.': 'Passwords do not match.',
+    'No se pudo conectar con el servidor. Revisa tu conexión e inténtalo de nuevo.':
+      'Could not reach the server. Check your connection and try again.',
+    'SESIÓN:': 'SESSION:',
+    'Cerrar sesión': 'Log out',
+    'Progreso guardado': 'Progress saved',
+    '⚠ No se pudo guardar (sin conexión)': '⚠ Could not save (offline)',
+
+    /* --- bancos --- */
+    'Elige el banco de preguntas con el que quieres practicar.': 'Choose the question bank you want to practice with.',
+    'preguntas': 'questions',
+    'materias': 'subjects',
+    'completadas': 'completed',
+    'tarjetas': 'cards',
+    'practicadas': 'practiced',
+    'vistas': 'seen',
+    'Reiniciar todo mi progreso': 'Reset all my progress',
+    'Habilitación de Vuelo por Instrumentos': 'Instrument Rating',
+    'Piloto Comercial de Avión': 'Commercial Pilot (Airplane)',
+    'Memory Items — acciones de memoria y reparto PF/PM': 'Memory Items — memory actions and PF/PM task sharing',
+    'Wizz Air Technical Interview — preguntas y respuestas': 'Wizz Air Technical Interview — questions and answers',
+
+    /* --- materias HVI / PCA (nombres de materia) --- */
+    'AIP-Chile Volumen I y II': 'AIP-Chile Volumes I and II',
+    'Fisiología': 'Physiology',
+    'Instrumentos de Vuelo': 'Flight Instruments',
+    'Meteorología': 'Meteorology',
+    'Procedimientos de Vuelo': 'Flight Procedures',
+    'Reglamentación': 'Regulations',
+    'Aerodinámica': 'Aerodynamics',
+    'Motores': 'Engines',
+    'Navegación': 'Navigation',
+
+    /* --- navegación y pantalla de materias --- */
+    '← Bancos': '← Banks',
+    '← Salir': '← Exit',
+    '← Materias': '← Subjects',
+    'Preguntas totales': 'Total questions',
+    'Materias completadas': 'Subjects completed',
+    'Promedio general': 'Overall average',
+    'Comenzar →': 'Start →',
+    'Continuar →': 'Continue →',
+    'Repetir ↻': 'Repeat ↻',
+
+    /* --- quiz --- */
+    'Siguiente →': 'Next →',
+    'Ir a pregunta': 'Go to question',
+    'Correcta': 'Correct',
+    'Incorrecta': 'Incorrect',
+    'Sin responder': 'Unanswered',
+    'Respondida · sin corregir': 'Answered · ungraded',
+    'CORRECTA': 'CORRECT',
+    'TU RESPUESTA': 'YOUR ANSWER',
+    'Pregunta': 'Question',
+    'Explicación': 'Explanation',
+    'Nota': 'Note',
+    'Comentarios': 'Comments',
+    'Responde la pregunta para ver la explicación.': 'Answer the question to see the explanation.',
+    'Todavía no hay explicación para esta pregunta.': 'There is no explanation for this question yet.',
+
+    /* --- notas y comentarios --- */
+    'Tus apuntes sobre esta pregunta. Se guardan solo en este navegador.': 'Your notes on this question. They are saved in this browser only.',
+    'Guardada': 'Saved',
+    'Vacía': 'Empty',
+    'Escribiendo…': 'Typing…',
+    'Borrar nota': 'Delete note',
+    'Reportar': 'Report',
+    'Borrar': 'Delete',
+    'TÚ': 'YOU',
+    'Compartido': 'Shared',
+    'Solo en este navegador': 'This browser only',
+    'Más votados': 'Top voted',
+    'Recientes': 'Latest',
+    'Publicar': 'Post',
+    'Nadie ha comentado esta pregunta.': 'Nobody has commented on this question yet.',
+    'Escribe el primer apunte abajo.': 'Write the first note below.',
+    'Aporta una regla mnemotécnica, una corrección o el porqué de la alternativa correcta.':
+      'Add a mnemonic, a correction, or the reason behind the correct option.',
+
+    /* --- simulacro / informe --- */
+    '✈ Modo simulacro — sin corrección hasta terminar': '✈ Mock exam mode — no grading until you finish',
+    '✈ Test A320 — sin corrección hasta terminar': '✈ A320 test — no grading until you finish',
+    'Terminar examen': 'Finish exam',
+    'Terminar test': 'Finish test',
+    'Revisar simulacro': 'Review mock exam',
+    'Revisar test': 'Review test',
+    '↻ Nuevo simulacro': '↻ New mock exam',
+    '↻ Nuevo test': '↻ New test',
+    'INFORME DE DESEMPEÑO': 'PERFORMANCE REPORT',
+    'Aciertos': 'Correct',
+    'Tiempo': 'Time',
+    'Prom. / pregunta': 'Avg. / question',
+    '↻ Repetir materia': '↻ Repeat subject',
+    'Revisar falladas': 'Review missed',
+    'Volver a materias': 'Back to subjects',
+    'Sin errores — 100% de acierto en esta materia.': 'No mistakes — 100% correct in this subject.',
+
+    /* --- A320 TECH · Test 100 --- */
+    'Tests aleatorios · todas las materias': 'Random tests · all subjects',
+    'Vistas': 'Seen',
+    'Sin ver': 'Unseen',
+    'Avance': 'Progress',
+    'Todo visto ✓': 'All seen ✓',
+    '↺ Reiniciar vistas': '↺ Reset seen',
+    'Vuelve a marcar todas las preguntas como sin ver': 'Marks all questions as unseen again',
+    'Detalle por materia': 'Breakdown by subject',
+
+    /* --- A320 Memory Items --- */
+    'Estudiar con tarjetas': 'Study with flashcards',
+    'Practicar como': 'Practice as',
+    'Ambos': 'Both',
+    'Reiniciar estadísticas': 'Reset statistics',
+    'Diseño: automático': 'Layout: automatic',
+    'Diseño: columna': 'Layout: column',
+    '← Salir (se guarda)': '← Exit (saved)',
+    'Cerrar': 'Close',
+    'Empezar de nuevo': 'Start over',
+    'Continuar': 'Continue',
+    'Otra ronda': 'Another round',
+    'Ver lista': 'View list',
+    'Ronda completa': 'Round complete',
+    'No la sabía': "I didn't know it",
+    'La sabía': 'I knew it',
+    'Ver acciones': 'Show actions',
+    'Ver respuesta': 'Show answer',
+    'sin practicar': 'not practiced',
+    'Salir': 'Exit',
+    'Recita en voz alta las acciones de memoria de este ítem.': 'Say this item’s memory actions out loud.',
+    'Recita las acciones y callouts de CAPT y F/O (el reparto de esta maniobra es por asiento).':
+      'Recite the CAPT and F/O actions and callouts (task sharing for this maneuver is by seat).',
+    'Recita tus acciones y callouts como': 'Recite your actions and callouts as',
+    '. Al revelar se resalta tu columna.': '. Your column is highlighted when you reveal.',
+    'Maniobra (FCTM) — no es memory item': 'Maneuver (FCTM) — not a memory item',
+    'Maniobra (FCTM)': 'Maneuver (FCTM)',
+    'Notas de entrenamiento': 'Training notes',
+    'Diferencias con FCOM/FCTM': 'Differences from FCOM/FCTM',
+    'NOTA —': 'NOTE —',
+    'El reparto de esta maniobra es por asiento (CAPT / F-O), no por PF / PM.':
+      'Task sharing for this maneuver is by seat (CAPT / F-O), not PF / PM.',
+
+    /* --- Tech Int --- */
+    'Respuesta propia — ver fuente': 'Own answer — see source',
+    'Intenta responderla en voz alta antes de revelar la respuesta.': 'Try answering out loud before revealing the answer.',
+    'Preguntas 1–61 · aerodinámica, performance, sistemas, meteo, instrumentos':
+      'Questions 1–61 · aerodynamics, performance, systems, meteo, instruments',
+    'Preguntas 62–151 · sin respuesta en la fuente, contestadas aquí':
+      'Questions 62–151 · unanswered in the source, answered here'
+  };
+
+  var MESES = { ene: 'Jan', feb: 'Feb', mar: 'Mar', abr: 'Apr', may: 'May', jun: 'Jun',
+                jul: 'Jul', ago: 'Aug', sep: 'Sep', oct: 'Oct', nov: 'Nov', dic: 'Dec' };
+
+  function plural(n, uno, otro) { return String(n) === '1' ? uno : otro; }
+
+  /* ------------------------------ patrones (con números) ------------------------------ */
+  /* Se prueban contra el texto recortado (sin colapsar espacios interiores), así
+     un contenido pegado detrás de un prefijo traducido se conserva tal cual. */
+  var PATRONES = [
+    [/^CUENTA EN LA NUBE · (\d+) PREGUNTAS EN (\d+) BANCOS$/, function (m) { return 'CLOUD ACCOUNT · ' + m[1] + ' QUESTIONS IN ' + m[2] + ' BANKS'; }],
+    [/^Invitado( +\(sin guardar\))?$/, function (m) { return 'Guest' + (m[1] ? ' (not saved)' : ''); }],
+    [/^Error del servidor \((\d+)\)\.$/, function (m) { return 'Server error (' + m[1] + ').'; }],
+
+    [/^(\d+) preguntas$/, function (m) { return m[1] + ' ' + plural(m[1], 'question', 'questions'); }],
+    [/^(\d+) preguntas · (\d+) vistas$/, function (m) { return m[1] + ' questions · ' + m[2] + ' seen'; }],
+    [/^✈ Simulacro (\d+)$/, function (m) { return '✈ Mock exam ' + m[1]; }],
+    [/^Examen de (\d+) preguntas al azar, sin corrección hasta el final$/, function (m) { return m[1] + '-question random exam, no grading until the end'; }],
+    [/^ÚLT\. (.+)$/, function (m) { return 'LAST ' + m[1]; }],
+    [/^EN CURSO · (.+)$/, function (m) { return 'IN PROGRESS · ' + m[1]; }],
+
+    [/^ACIERTOS (.+)$/, function (m) { return 'CORRECT ' + m[1]; }],
+    [/^RESPONDIDAS (.+)$/, function (m) { return 'ANSWERED ' + m[1]; }],
+    [/^PREGUNTA (.+)$/, function (m) { return 'QUESTION ' + m[1]; }],
+    [/^Pregunta (\d+)$/, function (m) { return 'Question ' + m[1]; }],
+    [/^✗ TU RESPUESTA: ([\s\S]*)$/, function (m) { return '✗ YOUR ANSWER: ' + m[1]; }],
+    [/^✓ CORRECTA: ([\s\S]*)$/, function (m) { return '✓ CORRECT: ' + m[1]; }],
+    [/^SIM ([A-Z0-9]+)$/, function (m) { return 'MOCK ' + m[1]; }],
+    [/^Simulacro · (.+)$/, function (m) { return 'Mock exam · ' + T(m[1]); }],
+    [/^Repaso · (.+)$/, function (m) { return 'Review · ' + T(m[1]); }],
+
+    [/^⟳ Practicar falladas \((\d+)\)$/, function (m) { return '⟳ Practice missed (' + m[1] + ')'; }],
+    [/^⟳ (\d+) falladas$/, function (m) { return '⟳ ' + m[1] + ' missed'; }],
+    [/^Practicar solo las (\d+) preguntas erradas en este test$/, function (m) { return 'Practice only the ' + m[1] + ' questions you missed in this test'; }],
+    [/^Repasar falladas \((\d+)\)$/, function (m) { return 'Review missed (' + m[1] + ')'; }],
+
+    [/^(\d{2}) (ene|feb|mar|abr|may|jun|jul|ago|sep|oct|nov|dic) (\d{4}) · (\d{2}:\d{2})$/,
+      function (m) { return m[1] + ' ' + MESES[m[2]] + ' ' + m[3] + ' · ' + m[4]; }],
+
+    /* A320 TECH · Test 100 */
+    [/^Test (\d+) · Aleatorio · A320$/, function (m) { return 'Test ' + m[1] + ' · Random · A320'; }],
+    [/^Test (\d+) · Sin ver · A320$/, function (m) { return 'Test ' + m[1] + ' · Unseen · A320'; }],
+    [/^✈ Test (\d+) aleatorio$/, function (m) { return '✈ Random ' + m[1] + ' test'; }],
+    [/^✈ Test (\d+) sin ver$/, function (m) { return '✈ Unseen ' + m[1] + ' test'; }],
+    [/^✈ Test corto sin ver · (\d+)$/, function (m) { return '✈ Short unseen test · ' + m[1]; }],
+    [/^(\d+) preguntas al azar de todas las materias, vistas o no$/, function (m) { return m[1] + ' random questions from all subjects, seen or not'; }],
+    [/^Solo preguntas que aún no has visto \((\d+) en este test\)$/, function (m) { return 'Only questions you have not seen yet (' + m[1] + ' in this test)'; }],
+    [/^Cuenta como “vista” cada pregunta que respondes en este banco \((.+?)\)\. Reiniciar no borra tus resultados por materia\.(?: (\d+) enunciados repetidos entre materias cuentan como una sola pregunta\.)?$/,
+      function (m) {
+        var que = m[1] === 'tests, simulacros y práctica por materia' ? 'tests, mock exams and per-subject practice'
+                : m[1] === 'tests y simulacros' ? 'tests and mock exams' : m[1];
+        return 'Each question you answer in this bank counts as “seen” (' + que + '). Resetting does not delete your per-subject results.' +
+          (m[2] ? ' ' + m[2] + ' repeated question texts across subjects count as a single question.' : '');
+      }],
+
+    /* A320 Memory Items / Tech Int */
+    [/^Continuar ronda( de repaso)? \((.+)\)$/, function (m) { return 'Resume round' + (m[1] ? ' (review)' : '') + ' (' + m[2] + ')'; }],
+    [/^Continuar \((.+)\)$/, function (m) { return 'Continue (' + m[1] + ')'; }],
+    [/^(\d+) ok · (\d+) fallos?$/, function (m) { return m[1] + ' ok · ' + m[2] + ' ' + plural(m[2], 'miss', 'misses'); }],
+    [/^(\d+) sabidas · (\d+) por repasar$/, function (m) { return m[1] + ' known · ' + m[2] + ' to review'; }],
+    [/^(\d+) bien preparadas · (\d+) por repasar$/, function (m) { return m[1] + ' well prepared · ' + m[2] + ' to review'; }],
+    [/^Fuente: ([\s\S]*)$/, function (m) { return 'Source: ' + m[1]; }]
+  ];
+
+  /* --------------------------- diálogos confirm / alert --------------------------- */
+  var DIALOGOS = [
+    [/^¿Reiniciar todo tu progreso guardado \(HVI y PCA\)\?$/, 'Reset all your saved progress (HVI and PCA)?'],
+    [/^Quedan (\d+) pregunta\(s\) sin responder\.\nSe contarán como incorrectas\. ¿Terminar el (simulacro|test)\?$/,
+      function (m) { return m[1] + ' question(s) left unanswered.\nThey will be counted as incorrect. Finish the ' + (m[2] === 'test' ? 'test' : 'mock exam') + '?'; }],
+    [/^¿Borrar tu comentario\?$/, 'Delete your comment?'],
+    [/^Reportar todavía no está conectado\. Por ahora avísame directamente si ves un comentario fuera de lugar\.$/,
+      'Reporting is not connected yet. For now, tell me directly if you see an inappropriate comment.'],
+    [/^¿Reiniciar las estadísticas de los memory items del A320\? También se borra la ronda de tarjetas a medio terminar\.$/,
+      'Reset the A320 memory item statistics? This also clears any half-finished flashcard round.'],
+    [/^¿Reiniciar las estadísticas de "(.*)"\? Esto también borra la ronda de tarjetas a medio terminar, si hay una\.$/,
+      function (m) { return 'Reset the statistics for "' + m[1] + '"? This also clears any half-finished flashcard round.'; }],
+    [/^No quedan preguntas sin ver en el banco A320 TECH\.\nPuedes reiniciar el registro de vistas para empezar de nuevo\.$/,
+      'No unseen questions are left in the A320 TECH bank.\nYou can reset the seen record to start over.'],
+    [/^¿Reiniciar el registro de preguntas vistas del banco A320 TECH\?\n\nHoy hay (\d+) de (\d+) marcadas como vistas; todas pasarán a "sin ver"\.\nTus resultados por materia no se tocan\.$/,
+      function (m) { return 'Reset the seen-questions record for the A320 TECH bank?\n\nRight now ' + m[1] + ' of ' + m[2] + ' are marked as seen; all will go back to "unseen".\nYour per-subject results are not touched.'; }]
+  ];
+
+  /* ------------------------------- motor de traducción ------------------------------- */
+  function norm(s) { return String(s).replace(/ /g, ' ').replace(/\s+/g, ' ').trim(); }
+  var tiene = Object.prototype.hasOwnProperty;
+
+  /* devuelve la traducción, o null si no hay */
+  function traducir(s) {
+    var t = String(s).replace(/ /g, ' ').trim();
+    if (!t) return null;
+    var n = norm(t);
+    if (tiene.call(EXACT, n)) return EXACT[n];
+    for (var i = 0; i < PATRONES.length; i++) {
+      var m = PATRONES[i][0].exec(t);
+      if (m) return PATRONES[i][1](m);
+    }
+    if (t.indexOf(' — ') > 0) {                  // «Banco — Nombre largo»
+      var partes = t.split(' — '), cambio = false;
+      var out = partes.map(function (p) { var r = traducir(p); if (r !== null) { cambio = true; return r; } return p; });
+      if (cambio) return out.join(' — ');
+    }
+    return null;
+  }
+  function T(s) { var r = traducir(s); return r === null ? s : r; }
+
+  function traducirMensaje(msg) {
+    var s = String(msg);
+    for (var i = 0; i < DIALOGOS.length; i++) {
+      var m = DIALOGOS[i][0].exec(s);
+      if (m) return typeof DIALOGOS[i][1] === 'function' ? DIALOGOS[i][1](m) : DIALOGOS[i][1];
+    }
+    var r = traducir(s);
+    return r === null ? s : r;
+  }
+
+  /* ------------------------------ estado y aplicación ------------------------------ */
+  var lang = 'es';
+  try { var g = window.localStorage.getItem(LS_KEY); if (g === 'en' || g === 'es') lang = g; } catch (e) { /* sin storage */ }
+
+  var nodos = new WeakMap();   // nodo de texto → {es, en}
+  var attrs = new WeakMap();   // elemento → { attr: {es, en} }
+  var inversa = {};            // texto inglés producido → español original (para revertir restos)
+  var ATTRS = ['placeholder', 'title', 'aria-label'];
+
+  /* zonas de CONTENIDO: nunca se traducen */
+  var CONTENIDO = '#langSwitch, textarea, script, style, #qStem, .opt .txt, #panel-exp .exp, #panel-exp .expsrc, .rstem, .cmtbody, .cmt .who';
+  function enContenido(el) {
+    return !!(el && el.closest && el.closest(CONTENIDO));
+  }
+
+  function aEn(texto) {
+    var lead = (texto.match(/^\s*/) || [''])[0], trail = (texto.match(/\s*$/) || [''])[0];
+    var r = traducir(texto);
+    if (r === null || r === norm(texto)) return null;
+    return lead + r + trail;
+  }
+
+  function procesarTexto(nodo) {
+    if (!nodo || nodo.nodeType !== 3) return;
+    var padre = nodo.parentNode;
+    if (!padre || enContenido(padre.nodeType === 1 ? padre : padre.parentNode)) return;
+    var v = nodo.nodeValue, rec = nodos.get(nodo);
+    if (lang === 'en') {
+      if (rec && rec.en === v) return;
+      var en = aEn(v);
+      if (en !== null && en !== v) {
+        nodos.set(nodo, { es: v, en: en });
+        inversa[norm(en)] = norm(v);
+        nodo.nodeValue = en;
+      } else if (rec) nodos.delete(nodo);
+    } else {
+      if (rec && rec.en === v) { nodo.nodeValue = rec.es; nodos.delete(nodo); return; }
+      var k = norm(v);
+      if (k && tiene.call(inversa, k)) {          // resto inglés de un restaurador que leyó el texto ya traducido
+        var lead = (v.match(/^\s*/) || [''])[0], trail = (v.match(/\s*$/) || [''])[0];
+        nodo.nodeValue = lead + inversa[k] + trail;
+      }
+    }
+  }
+
+  function procesarAtributos(el) {
+    if (!el || el.nodeType !== 1 || enContenido(el)) return;
+    var rec = attrs.get(el);
+    ATTRS.forEach(function (a) {
+      var v = el.getAttribute(a);
+      if (v === null) return;
+      var r = rec && rec[a];
+      if (lang === 'en') {
+        if (r && r.en === v) return;
+        var en = aEn(v);
+        if (en !== null && en !== v) {
+          if (!rec) { rec = {}; attrs.set(el, rec); }
+          rec[a] = { es: v, en: en };
+          inversa[norm(en)] = norm(v);
+          el.setAttribute(a, en);
+        } else if (r) delete rec[a];
+      } else if (r && r.en === v) {
+        el.setAttribute(a, r.es);
+        delete rec[a];
+      } else if (inversa[norm(v)] !== undefined && v) {
+        el.setAttribute(a, inversa[norm(v)]);
+      }
+    });
+  }
+
+  function recorrer(raiz) {
+    if (!raiz) return;
+    if (raiz.nodeType === 3) { procesarTexto(raiz); return; }
+    if (raiz.nodeType !== 1 && raiz.nodeType !== 9) return;
+    if (raiz.nodeType === 1) procesarAtributos(raiz);
+    var w = document.createTreeWalker(raiz, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, null);
+    var n;
+    while ((n = w.nextNode())) {
+      if (n.nodeType === 3) procesarTexto(n); else procesarAtributos(n);
+    }
+  }
+
+  var observador = null;
+  function observar() {
+    if (observador || typeof MutationObserver !== 'function') return;
+    observador = new MutationObserver(function (lista) {
+      for (var i = 0; i < lista.length; i++) {
+        var r = lista[i];
+        if (r.type === 'childList') {
+          for (var j = 0; j < r.addedNodes.length; j++) recorrer(r.addedNodes[j]);
+        } else if (r.type === 'characterData') {
+          procesarTexto(r.target);
+        } else if (r.type === 'attributes') {
+          procesarAtributos(r.target);
+        }
+      }
+    });
+    observador.observe(document.body, {
+      childList: true, subtree: true, characterData: true,
+      attributes: true, attributeFilter: ATTRS
+    });
+  }
+
+  function aplicar() {
+    document.documentElement.setAttribute('lang', lang);
+    recorrer(document.body);
+    pintarSelector();
+  }
+
+  function fijarIdioma(nuevo, guardar) {
+    if (nuevo !== 'es' && nuevo !== 'en') return lang;
+    lang = nuevo;
+    if (guardar !== false) { try { window.localStorage.setItem(LS_KEY, lang); } catch (e) { /* sin storage */ } }
+    aplicar();
+    return lang;
+  }
+
+  /* ------------------------------- cuadros de diálogo ------------------------------- */
+  var _confirm = window.confirm, _alert = window.alert;
+  window.confirm = function (msg) {
+    return _confirm.call(window, lang === 'en' ? traducirMensaje(msg) : msg);
+  };
+  window.alert = function (msg) {
+    return _alert.call(window, lang === 'en' ? traducirMensaje(msg) : msg);
+  };
+
+  /* ---------------------------------- selector ---------------------------------- */
+  function inyectarSelector() {
+    if (document.getElementById('langSwitch')) return;
+    var css = document.createElement('style');
+    css.id = 'langSwitchCss';
+    css.textContent = [
+      '#langSwitch{position:fixed; top:8px; right:12px; z-index:9000; display:inline-flex; gap:0;',
+      '  background:var(--panel); border:1px solid var(--hair); border-radius:999px; padding:2px;',
+      '  box-shadow:0 4px 14px rgba(0,0,0,.35); font-family:var(--f-mono);}',
+      '#langSwitch button{background:none; border:none; color:var(--dim); font-family:inherit; font-size:11px;',
+      '  font-weight:700; letter-spacing:.08em; padding:5px 11px; border-radius:999px; cursor:pointer; min-width:38px;}',
+      '#langSwitch button:hover{color:var(--text);}',
+      '#langSwitch button[aria-pressed="true"]{background:var(--amber); color:#2b1a02;}',
+      '#langSwitch button:focus-visible{outline:2px solid var(--cyan); outline-offset:2px;}',
+      '#app{padding-top:46px;}'
+    ].join('\n');
+    document.head.appendChild(css);
+
+    var box = document.createElement('div');
+    box.id = 'langSwitch';
+    box.setAttribute('role', 'group');
+    box.setAttribute('aria-label', 'Language / Idioma');
+    box.innerHTML =
+      '<button type="button" data-lang="es" title="Español" aria-label="Español">ES</button>' +
+      '<button type="button" data-lang="en" title="English" aria-label="English">EN</button>';
+    box.addEventListener('click', function (ev) {
+      var b = ev.target.closest ? ev.target.closest('button[data-lang]') : null;
+      if (b) fijarIdioma(b.getAttribute('data-lang'));
+    });
+    document.body.appendChild(box);
+  }
+  function pintarSelector() {
+    var box = document.getElementById('langSwitch');
+    if (!box) return;
+    Array.prototype.forEach.call(box.querySelectorAll('button[data-lang]'), function (b) {
+      b.setAttribute('aria-pressed', b.getAttribute('data-lang') === lang ? 'true' : 'false');
+    });
+  }
+
+  /* ----------------------------------- arranque ----------------------------------- */
+  function iniciar() {
+    inyectarSelector();
+    observar();
+    aplicar();
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', iniciar);
+  else iniciar();
+
+  window.I18N = {
+    get lang() { return lang; },
+    set: fijarIdioma,
+    toggle: function () { return fijarIdioma(lang === 'es' ? 'en' : 'es'); },
+    t: function (s) { return lang === 'en' ? T(s) : s; },
+    _traducir: traducir,
+    _mensaje: traducirMensaje
+  };
+
+  console.log('[i18n] selector de idioma instalado — idioma actual: ' + lang);
+})();
+
 </script>
 </body>
 </html>

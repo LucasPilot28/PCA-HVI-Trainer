@@ -20796,6 +20796,19 @@ intentarSesionGuardada(); (function () {
       progreso al servidor y se recupera en cualquier dispositivo.
    4. REINICIAR VISTAS    — vacía el registro (con confirmación). No toca los
       resultados por materia.
+   5. MODO EXAMEN / ESTUDIO — selector en el panel. EXAMEN (por defecto): sin
+      corrección hasta «Terminar test». ESTUDIO: corrección inmediata al responder
+      y explicación desbloqueada en cada pregunta, igual que en las materias
+      (el test termina solo al responder todas, o antes con «Terminar test»).
+      La elección se recuerda en este navegador. Ambos modos cuentan las vistas.
+   6. TEST DE FALLADAS    — igual que «Practicar falladas» de las materias: cada pregunta
+      que fallas en un Test 100 entra en una lista (`estado.a320tests.falladas`, viaja
+      con el progreso) y sale de ella cuando la aciertas. El botón del panel arma un test
+      (máx. N_TEST) con las pendientes, siempre con corrección inmediata y explicación.
+      Desde el informe de cualquier Test 100, «Practicar falladas (N)» arma un test solo
+      con las falladas de ese test. En modo Examen las falladas se registran al terminar
+      (no antes: aún puedes cambiar la respuesta); en modo Estudio, al responder.
+      «Reiniciar vistas» NO vacía esta lista.
 
    IDENTIDAD DE PREGUNTA
    ---------------------
@@ -20808,7 +20821,9 @@ intentarSesionGuardada(); (function () {
 
    CONSOLA
    -------
-     A320Test100.iniciar('todas' | 'nuevas')   A320Test100.reiniciarVistas(true)
+     A320Test100.iniciar('todas' | 'nuevas', 'examen' | 'estudio')
+     A320Test100.iniciar('falladas')           A320Test100.falladas()
+     A320Test100.reiniciarVistas(true)
      A320Test100.stats()                       A320Test100.vistas()
    ============================================================================= */
 (function () {
@@ -20861,11 +20876,14 @@ intentarSesionGuardada(); (function () {
     });
   })();
 
+  var POR_ID = {};
+  POOL.forEach(function (x) { POR_ID[x.id] = x; });
+
   /* --------------------------------- estado --------------------------------- */
   var dirty = false;
   var timer = null;
 
-  function vacio() { return { v: 1, vistas: {}, sembrado: false }; }
+  function vacio() { return { v: 1, vistas: {}, falladas: {}, sembrado: false }; }
 
   function normalizar(raw) {
     var out = vacio();
@@ -20875,6 +20893,9 @@ intentarSesionGuardada(); (function () {
         var n = raw.vistas[id];
         if (typeof n === 'number' && isFinite(n) && n > 0) out.vistas[id] = n;
       });
+    }
+    if (raw.falladas && typeof raw.falladas === 'object') {
+      Object.keys(raw.falladas).forEach(function (id) { if (raw.falladas[id]) out.falladas[id] = 1; });
     }
     out.sembrado = !!raw.sembrado;
     return out;
@@ -20904,6 +20925,7 @@ intentarSesionGuardada(); (function () {
     if (!e || typeof e !== 'object' || !e.vistas || typeof e.vistas !== 'object') {
       e = estado.a320tests = vacio();
     }
+    if (!e.falladas || typeof e.falladas !== 'object') e.falladas = {};   // progreso guardado antes de existir la lista
     if (!e.sembrado) {
       e.sembrado = true;
       if (CONTAR_PRACTICA) sembrar(e);
@@ -20930,6 +20952,41 @@ intentarSesionGuardada(); (function () {
     if (!t100) refrescarPanel();
   }
 
+  /* ---------------------------------- falladas ---------------------------------- */
+  /* Lista de preguntas (por id) cuya última respuesta en un Test 100 fue incorrecta. */
+  function pendientes() {
+    var f = est().falladas;
+    return Object.keys(f).filter(function (id) { return f[id] && POR_ID[id]; });
+  }
+  function registrar(id, ok) {
+    var f = est().falladas;
+    if (ok) {
+      if (!f[id]) return;
+      delete f[id];
+    } else {
+      if (f[id]) return;
+      f[id] = 1;
+    }
+    dirty = true;
+    programarGuardado();
+  }
+  /* Ids de las respondidas mal en un test (las sin responder no cuentan, igual que en las materias). */
+  function falladasDeTest(tema, e) {
+    var out = [];
+    tema.preguntas.forEach(function (p, i) {
+      var r = e.respuestas[i];
+      if (r !== null && r !== undefined && r !== p.correct) out.push(tema._ids[i]);
+    });
+    return out;
+  }
+  /* Modo Examen: se registran al terminar (antes aún se puede cambiar la respuesta). */
+  function registrarTest(tema, e) {
+    tema.preguntas.forEach(function (p, i) {
+      var r = e.respuestas[i];
+      if (r !== null && r !== undefined) registrar(tema._ids[i], r === p.correct);
+    });
+  }
+
   /* ------------------------------- estadísticas ------------------------------ */
   function stats() {
     var e = est();
@@ -20944,6 +21001,7 @@ intentarSesionGuardada(); (function () {
     });
     return {
       total: POOL.length, vistas: vistas, restantes: POOL.length - vistas,
+      falladas: pendientes().length,
       duplicadas: DUPLICADAS, porMateria: porMateria
     };
   }
@@ -20999,8 +21057,28 @@ intentarSesionGuardada(); (function () {
     return barajar(elegidas);
   }
 
+  /* Test de falladas: `ids` limita a un subconjunto (p. ej. las de un informe); sin él, toda la lista.
+     Siempre se filtra contra las pendientes, así lo ya acertado no vuelve a salir. */
+  function construirFalladas(ids) {
+    var f = est().falladas;
+    var base = ids || Object.keys(f);
+    var vistos = {};
+    var lista = base.filter(function (id) {
+      if (!f[id] || !POR_ID[id] || vistos[id]) return false;
+      vistos[id] = true;
+      return true;
+    });
+    return barajar(lista).slice(0, N_TEST).map(function (id) { return POR_ID[id]; });
+  }
+
   /* ------------------------------- test en curso ------------------------------ */
-  var t100 = null;   // {virtual, modo, revelado}
+  var t100 = null;   // {virtual, modo ('todas'|'nuevas'|'falladas'), estilo ('examen'|'estudio'), revelado, fuente}
+  var LS_ESTILO = 'hvi_pca_trainer:t100estilo';
+  function leerEstilo() {
+    try { return window.localStorage.getItem(LS_ESTILO) === 'estudio' ? 'estudio' : 'examen'; }
+    catch (e) { return 'examen'; }
+  }
+  function guardarEstilo(v) { try { window.localStorage.setItem(LS_ESTILO, v); } catch (e) { /* sin storage */ } }
   var textoBarraOriginal = null;
   var textoRepetirOriginal = null;
 
@@ -21019,17 +21097,22 @@ intentarSesionGuardada(); (function () {
       }
     }
     if (t100) {
-      document.body.classList.remove('modo-examen', 'modo-t100', 't100-revelado');
+      document.body.classList.remove('modo-examen', 'modo-t100', 't100-activo', 't100-revelado');
       restaurarTextos();
     }
     t100 = null;
+  }
+
+  /* El botón «Repetir materia» (no confundirlo con «Practicar falladas», que también es ámbar). */
+  function botonRepetir() {
+    return document.querySelector('#screen-results .resbtns button[onclick*="repetirMateria"]');
   }
 
   function restaurarTextos() {
     var bar = document.querySelector('#examBar span');
     if (bar && textoBarraOriginal !== null) bar.innerHTML = textoBarraOriginal;
     textoBarraOriginal = null;
-    var b = document.querySelector('#screen-results .resbtns .btn-amber');
+    var b = botonRepetir();
     if (b && textoRepetirOriginal !== null) b.innerHTML = textoRepetirOriginal;
     textoRepetirOriginal = null;
   }
@@ -21046,18 +21129,24 @@ intentarSesionGuardada(); (function () {
     });
   }
 
-  function iniciar(modo) {
-    modo = (modo === 'nuevas') ? 'nuevas' : 'todas';
-    purgar();
-    bancoActual = BK;
-    var sel = construir(modo);
+  function iniciar(modo, estilo, ids) {
+    modo = (modo === 'nuevas' || modo === 'falladas') ? modo : 'todas';
+    if (modo === 'falladas') estilo = 'estudio';   // como el repaso de las materias: corrección y explicación en cada pregunta
+    else estilo = (estilo === 'estudio' || estilo === 'examen') ? estilo : leerEstilo();
+    /* Se arma ANTES de purgar: si no hay nada que armar, el test en curso (o su informe) queda intacto. */
+    var sel = (modo === 'falladas') ? construirFalladas(ids) : construir(modo);
     if (!sel.length) {
-      alert('No quedan preguntas sin ver en el banco A320 TECH.\nPuedes reiniciar el registro de vistas para empezar de nuevo.');
+      alert(modo === 'falladas'
+        ? 'No tienes preguntas falladas pendientes en los tests del banco A320 TECH.\nSe agregan al fallar una pregunta y se quitan al acertarla.'
+        : 'No quedan preguntas sin ver en el banco A320 TECH.\nPuedes reiniciar el registro de vistas para empezar de nuevo.');
       refrescarPanel();
       return false;
     }
+    purgar();
+    bancoActual = BK;
     var n = sel.length;
-    var nombre = 'Test ' + n + ' · ' + (modo === 'nuevas' ? 'Sin ver' : 'Aleatorio') + ' · A320';
+    var nombre = 'Test ' + n + ' · ' + (modo === 'falladas' ? 'Falladas' : (modo === 'nuevas' ? 'Sin ver' : 'Aleatorio')) +
+                 ' · A320' + (estilo === 'estudio' && modo !== 'falladas' ? ' · Estudio' : '');
     var virtual = {
       nombre: nombre,
       preguntas: sel.map(function (x) { return x.p; }),
@@ -21071,17 +21160,20 @@ intentarSesionGuardada(); (function () {
       respuestas: new Array(n).fill(null),
       index: 0, startTime: Date.now(), finished: false, lastPct: null, lastTime: null
     };
-    t100 = { virtual: vi, modo: modo, revelado: false };
+    t100 = { virtual: vi, modo: modo, estilo: estilo, revelado: false, fuente: (modo === 'falladas' && ids) ? ids.slice() : null };
     temaActual = vi;
 
-    document.body.classList.add('modo-examen', 'modo-t100');
+    document.body.classList.add('t100-activo');
     document.body.classList.remove('t100-revelado');
-    var bar = document.querySelector('#examBar span');
-    if (bar) {
-      if (textoBarraOriginal === null) textoBarraOriginal = bar.innerHTML;
-      bar.innerHTML = '&#9992; Test A320 — sin corrección hasta terminar';
+    if (estilo === 'examen') {
+      document.body.classList.add('modo-examen', 'modo-t100');
+      var bar = document.querySelector('#examBar span');
+      if (bar) {
+        if (textoBarraOriginal === null) textoBarraOriginal = bar.innerHTML;
+        bar.innerHTML = '&#9992; Test A320 — sin corrección hasta terminar';
+      }
+      marcarExplicacion();
     }
-    marcarExplicacion();
     showScreen('screen-quiz');
     renderPregunta();
     return true;
@@ -21095,16 +21187,23 @@ intentarSesionGuardada(); (function () {
     if (faltan > 0) {
       if (!confirm('Quedan ' + faltan + ' pregunta(s) sin responder.\nSe contarán como incorrectas. ¿Terminar el test?')) return;
     }
-    t100.revelado = true;
-    document.body.classList.remove('modo-examen', 'modo-t100');
-    document.body.classList.add('t100-revelado');
-    var b = document.querySelector('#screen-results .resbtns .btn-amber');
-    if (b) {
-      if (textoRepetirOriginal === null) textoRepetirOriginal = b.innerHTML;
-      b.innerHTML = '&#8635; Nuevo test';
-    }
+    marcarRevelado();
     finalizarMateria();
     flush();
+  }
+
+  /* Estado «terminado»: se llama al terminar a mano o, en modo estudio, al responder la última. */
+  function marcarRevelado() {
+    t100.revelado = true;
+    document.body.classList.remove('modo-examen', 'modo-t100', 't100-activo');
+    document.body.classList.add('t100-revelado');
+    var tema = temaT100();
+    if (tema) registrarTest(tema, estado[BK][temaActual]);   // idempotente; en Estudio ya se registró al responder
+    var b = botonRepetir();
+    if (b) {
+      if (textoRepetirOriginal === null) textoRepetirOriginal = b.innerHTML;
+      b.innerHTML = (t100.modo === 'falladas') ? '&#8635; Repetir falladas' : '&#8635; Nuevo test';
+    }
   }
 
   function revisar() {
@@ -21150,6 +21249,8 @@ intentarSesionGuardada(); (function () {
       '.t100-btns .btn{padding:12px 16px;}',
       '.t100-btns .btn[disabled]{opacity:.45; cursor:not-allowed; filter:none;}',
       '.t100-btns .t100-reset{margin-left:auto;}',
+      '.t100-btns .t100-fall{background:var(--amber-dim); color:var(--amber); border:1px solid var(--amber);}',
+      '.t100-btns .t100-fall:hover:not([disabled]){background:var(--amber); color:var(--bg);}',
       '.t100-card details{margin-top:14px; border-top:1px solid var(--hair); padding-top:10px;}',
       '.t100-card summary{cursor:pointer; font-family:var(--f-mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim);}',
       '.t100-card summary:hover{color:var(--text);}',
@@ -21159,13 +21260,21 @@ intentarSesionGuardada(); (function () {
       '.t100-row .n{overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}',
       '.t100-row .c{font-family:var(--f-mono); font-size:11.5px; color:var(--dim);}',
       '.t100-row .t100-bar{grid-column:1 / -1; height:3px; margin:0;}',
+      '.t100-mode{display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:0 0 12px;}',
+      '.t100-modelbl{font-family:var(--f-mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim);}',
+      '.t100-seg{display:inline-flex; background:var(--panel2); border:1px solid var(--hair); border-radius:999px; padding:2px;}',
+      '.t100-seg button{background:none; border:none; color:var(--dim); font-family:var(--f-mono); font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; padding:6px 14px; border-radius:999px; cursor:pointer;}',
+      '.t100-seg button:hover{color:var(--text);}',
+      '.t100-seg button[aria-pressed="true"]{background:var(--cyan); color:#04262a;}',
+      '.t100-seg button:focus-visible{outline:2px solid var(--cyan); outline-offset:2px;}',
+      '.t100-modehint{font-size:11.5px; color:var(--dim);}',
       '.t100-note{margin-top:12px; font-size:11.5px; color:var(--dim); line-height:1.45;}',
       /* sin explicación durante el test: por estructura, no por texto, para que
          sobreviva a los re-renders de las pestañas (comentarios, notas) */
       'body.modo-t100 #qTabs .qtab:nth-child(2), body.modo-t100 #panel-exp{display:none !important;}',
       /* botones propios del modo test */
       '#t100EndBtn{display:none; margin-right:auto;}',
-      'body.modo-t100 #t100EndBtn{display:inline-flex;}',
+      'body.t100-activo #t100EndBtn{display:inline-flex;}',
       'body.modo-t100 #examEndBtn{display:none !important;}',
       '#t100ReviewBtn{display:none;}',
       'body.t100-revelado #t100ReviewBtn{display:inline-flex;}'
@@ -21210,10 +21319,13 @@ intentarSesionGuardada(); (function () {
       panel.className = 't100-card';
       grid.parentNode.insertBefore(panel, grid);
       panel.addEventListener('click', function (ev) {
+        var st = ev.target.closest ? ev.target.closest('[data-t100estilo]') : null;
+        if (st) { guardarEstilo(st.getAttribute('data-t100estilo')); refrescarPanel(); return; }
         var el = ev.target.closest ? ev.target.closest('[data-t100]') : null;
         if (!el || el.disabled) return;
         var acc = el.getAttribute('data-t100');
-        if (acc === 'todas' || acc === 'nuevas') iniciar(acc);
+        if (acc === 'todas' || acc === 'nuevas') iniciar(acc, leerEstilo());
+        else if (acc === 'falladas') iniciar('falladas', 'estudio');
         else if (acc === 'reset') reiniciarVistas(false);
       });
     }
@@ -21235,18 +21347,33 @@ intentarSesionGuardada(); (function () {
              '<div class="t100-bar"><div style="width:' + p + '%"></div></div></div>';
     }).join('');
 
+    var estiloSel = leerEstilo();
     panel.innerHTML =
       '<div class="t100-head"><span class="t100-tag">TEST ' + N_TEST + '</span>' +
         '<span class="t100-title">Tests aleatorios · todas las materias</span></div>' +
+      '<div class="t100-mode"><span class="t100-modelbl">Modo</span>' +
+        '<div class="t100-seg" role="group" aria-label="Modo">' +
+          '<button type="button" data-t100estilo="examen" aria-pressed="' + (estiloSel === 'examen') + '">Examen</button>' +
+          '<button type="button" data-t100estilo="estudio" aria-pressed="' + (estiloSel === 'estudio') + '">Estudio</button>' +
+        '</div>' +
+        '<span class="t100-modehint">' + (estiloSel === 'estudio'
+          ? 'Corrección inmediata y explicación en cada pregunta'
+          : 'Sin corrección hasta terminar') + '</span></div>' +
       '<div class="t100-stats">' +
         '<div>Vistas<b>' + s.vistas + '/' + s.total + '</b></div>' +
         '<div>Sin ver<b>' + s.restantes + '</b></div>' +
+        '<div>Falladas<b>' + s.falladas + '</b></div>' +
         '<div>Avance<b>' + pct + '%</b></div></div>' +
       '<div class="t100-bar"><div style="width:' + pct + '%"></div></div>' +
       '<div class="t100-btns">' +
         '<button class="btn btn-cyan" data-t100="todas" title="' + nTodas + ' preguntas al azar de todas las materias, vistas o no">✈ Test ' + nTodas + ' aleatorio</button>' +
         '<button class="btn btn-amber" data-t100="nuevas"' + (s.restantes === 0 ? ' disabled' : '') +
           ' title="Solo preguntas que aún no has visto (' + nNuevas + ' en este test)">' + etqNuevas + '</button>' +
+        '<button class="btn t100-fall" data-t100="falladas"' + (s.falladas === 0 ? ' disabled' : '') +
+          ' title="' + (s.falladas === 0
+            ? 'Aún no has fallado ninguna pregunta en un Test 100'
+            : s.falladas + ' falladas pendientes: test de ' + Math.min(N_TEST, s.falladas) + ' preguntas con corrección inmediata. Se quitan al acertarlas.') + '">' +
+          '⟳ Test de falladas · ' + s.falladas + '</button>' +
         '<button class="btn btn-ghost t100-reset" data-t100="reset"' + (s.vistas === 0 ? ' disabled' : '') +
           ' title="Vuelve a marcar todas las preguntas como sin ver">↺ Reiniciar vistas</button>' +
       '</div>' +
@@ -21255,7 +21382,8 @@ intentarSesionGuardada(); (function () {
         (CONTAR_PRACTICA ? ' (tests, simulacros y práctica por materia)' : ' (tests y simulacros)') +
         '. Reiniciar no borra tus resultados por materia.' +
         (s.duplicadas ? ' ' + s.duplicadas + ' enunciados repetidos entre materias cuentan como una sola pregunta.' : '') +
-      '</div>';
+      '</div>' +
+      '<div class="t100-note">Falladas: las que fallas en un Test 100; salen de la lista cuando las aciertas. Reiniciar vistas no las borra.</div>';
   }
 
   /* ----------------------- enganches sobre el motor y módulos ----------------------- */
@@ -21314,6 +21442,17 @@ intentarSesionGuardada(); (function () {
       if (t100.revelado) return;
       var e = estado[BK][temaActual];
       var qi = e.index, antes = e.respuestas[qi];
+      if (t100.estilo === 'estudio') {
+        /* corrección inmediata: lo hace el motor (igual que en las materias) */
+        if (antes !== null) return;
+        _elegir.apply(this, arguments);
+        if (e.respuestas[qi] !== null) {
+          marcarVista(tema._ids[qi]);
+          registrar(tema._ids[qi], e.respuestas[qi] === tema.preguntas[qi].correct);
+        }
+        if (e.finished && !t100.revelado) { marcarRevelado(); flush(); }  // la última respuesta cierra el test
+        return;
+      }
       e.respuestas[qi] = oi;
       if (antes === null) marcarVista(tema._ids[qi]);
       renderPregunta();
@@ -21343,10 +21482,10 @@ intentarSesionGuardada(); (function () {
     var filas = document.querySelectorAll('#qOpts .opt');
     var lbl2 = document.getElementById('tapeLabel2');
     if (lbl2) {
-      var cod = t100.revelado ? (bancos[BK].codigos[bancos[BK].temas[tema._tis[qi]].nombre] || '') : '';
+      var cod = (t100.revelado || t100.estilo === 'estudio') ? (bancos[BK].codigos[bancos[BK].temas[tema._tis[qi]].nombre] || '') : '';
       lbl2.textContent = 'TEST' + (cod ? ' · ' + cod : '');
     }
-    if (!t100.revelado) {
+    if (!t100.revelado && t100.estilo === 'examen') {
       if (qBlock) qBlock.className = 'q';
       Array.prototype.forEach.call(filas, function (row, oi) {
         row.classList.remove('correct', 'incorrect');
@@ -21373,21 +21512,40 @@ intentarSesionGuardada(); (function () {
       var nb = document.getElementById('nextBtn');
       if (nb) nb.style.visibility = (qi < total - 1) ? 'visible' : 'hidden';
       marcarExplicacion();
-    } else {
+    } else if (t100.revelado) {
       if (qBlock) qBlock.className = 'q answered';
       Array.prototype.forEach.call(filas, function (row) {
         row.classList.remove('picked');
         row.onclick = null;
       });
     }
+    /* modo estudio en curso: se deja el dibujo del motor (corrección y explicación inmediatas) */
   };
 
-  /* "Repetir materia" en el informe → nuevo test del mismo tipo. */
+  /* "Repetir materia" en el informe → nuevo test del mismo tipo (en falladas: las que aún siguen pendientes). */
   var _repetir = window.repetirMateria;
   window.repetirMateria = function () {
-    if (temaT100()) { iniciar(t100.modo); return; }
+    if (temaT100()) { iniciar(t100.modo, t100.estilo, t100.fuente); return; }
     return _repetir.apply(this, arguments);
   };
+
+  /* Informe de un Test 100: «Practicar falladas (N)» (botón del módulo de repaso) arma un test de
+     falladas con las de ESTE test, en vez de crear la materia temporal de repaso, que no cuenta en la lista. */
+  var _renderResultados = window.renderResultados;
+  if (typeof _renderResultados === 'function') {
+    window.renderResultados = function () {
+      var r = _renderResultados.apply(this, arguments);
+      try {
+        var tema = temaT100();
+        var btn = document.getElementById('btnRepasoFalladas');
+        if (tema && btn && btn.style.display !== 'none') {
+          var ids = falladasDeTest(tema, estado[BK][temaActual]);
+          btn.onclick = function () { iniciar('falladas', 'estudio', ids); };
+        }
+      } catch (err) { console.warn('[a320 test100]', err); }
+      return r;
+    };
+  }
 
   /* ----------------------------------- arranque ----------------------------------- */
   /* Red de seguridad: si este módulo se pegó en un script aparte y la sesión ya
@@ -21413,16 +21571,18 @@ intentarSesionGuardada(); (function () {
 
   window.A320Test100 = {
     iniciar: iniciar,
+    estilo: leerEstilo,
+    fijarEstilo: function (v) { guardarEstilo(v === 'estudio' ? 'estudio' : 'examen'); refrescarPanel(); },
     reiniciarVistas: reiniciarVistas,
     stats: stats,
     vistas: function () { return Object.keys(est().vistas); },
+    falladas: pendientes,
     _calcularCupos: calcularCupos,
     _construir: construir
   };
 
   console.log('[a320 test100] instalado: ' + POOL.length + ' preguntas únicas en ' + REAL_N + ' materias (' + DUPLICADAS + ' enunciados repetidos).');
 })();
-
 
 /* =============================================================================
    SELECTOR DE IDIOMA DE LA INTERFAZ · ES / EN
@@ -21591,6 +21751,16 @@ intentarSesionGuardada(); (function () {
     '↺ Reiniciar vistas': '↺ Reset seen',
     'Vuelve a marcar todas las preguntas como sin ver': 'Marks all questions as unseen again',
     'Detalle por materia': 'Breakdown by subject',
+    'Modo': 'Mode',
+    'Examen': 'Exam',
+    'Estudio': 'Study',
+    'Sin corrección hasta terminar': 'No grading until you finish',
+    'Corrección inmediata y explicación en cada pregunta': 'Instant correction and explanation on every question',
+    'Falladas': 'Missed',
+    '↻ Repetir falladas': '↻ Repeat missed',
+    'Aún no has fallado ninguna pregunta en un Test 100': 'You have not missed any question in a Test 100 yet',
+    'Falladas: las que fallas en un Test 100; salen de la lista cuando las aciertas. Reiniciar vistas no las borra.':
+      'Missed: the questions you get wrong in a Test 100; they leave the list when you get them right. Resetting seen does not clear them.',
 
     /* --- A320 Memory Items --- */
     'Estudiar con tarjetas': 'Study with flashcards',
@@ -21673,8 +21843,11 @@ intentarSesionGuardada(); (function () {
       function (m) { return m[1] + ' ' + MESES[m[2]] + ' ' + m[3] + ' · ' + m[4]; }],
 
     /* A320 TECH · Test 100 */
-    [/^Test (\d+) · Aleatorio · A320$/, function (m) { return 'Test ' + m[1] + ' · Random · A320'; }],
-    [/^Test (\d+) · Sin ver · A320$/, function (m) { return 'Test ' + m[1] + ' · Unseen · A320'; }],
+    [/^Test (\d+) · (Aleatorio|Sin ver|Falladas) · A320( · Estudio)?$/,
+      function (m) { return 'Test ' + m[1] + ' · ' + (m[2] === 'Aleatorio' ? 'Random' : (m[2] === 'Falladas' ? 'Missed' : 'Unseen')) + ' · A320' + (m[3] ? ' · Study' : ''); }],
+    [/^⟳ Test de falladas · (\d+)$/, function (m) { return '⟳ Missed-questions test · ' + m[1]; }],
+    [/^(\d+) falladas pendientes: test de (\d+) preguntas con corrección inmediata\. Se quitan al acertarlas\.$/,
+      function (m) { return m[1] + ' missed pending: ' + m[2] + '-question test with instant correction. They leave the list when you get them right.'; }],
     [/^✈ Test (\d+) aleatorio$/, function (m) { return '✈ Random ' + m[1] + ' test'; }],
     [/^✈ Test (\d+) sin ver$/, function (m) { return '✈ Unseen ' + m[1] + ' test'; }],
     [/^✈ Test corto sin ver · (\d+)$/, function (m) { return '✈ Short unseen test · ' + m[1]; }],
@@ -21709,6 +21882,8 @@ intentarSesionGuardada(); (function () {
       'Reset the A320 memory item statistics? This also clears any half-finished flashcard round.'],
     [/^¿Reiniciar las estadísticas de "(.*)"\? Esto también borra la ronda de tarjetas a medio terminar, si hay una\.$/,
       function (m) { return 'Reset the statistics for "' + m[1] + '"? This also clears any half-finished flashcard round.'; }],
+    [/^No tienes preguntas falladas pendientes en los tests del banco A320 TECH\.\nSe agregan al fallar una pregunta y se quitan al acertarla\.$/,
+      'You have no pending missed questions in the A320 TECH bank tests.\nQuestions are added when you get one wrong and removed when you get it right.'],
     [/^No quedan preguntas sin ver en el banco A320 TECH\.\nPuedes reiniciar el registro de vistas para empezar de nuevo\.$/,
       'No unseen questions are left in the A320 TECH bank.\nYou can reset the seen record to start over.'],
     [/^¿Reiniciar el registro de preguntas vistas del banco A320 TECH\?\n\nHoy hay (\d+) de (\d+) marcadas como vistas; todas pasarán a "sin ver"\.\nTus resultados por materia no se tocan\.$/,

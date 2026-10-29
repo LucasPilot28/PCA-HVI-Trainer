@@ -20769,115 +20769,156 @@ intentarSesionGuardada(); (function () {
 })();
 
 /* =============================================================================
-   A320 TECH · TEST 100 — tests aleatorios de 100 preguntas + registro de vistas
+   TEST 100 · TODOS LOS BANCOS — tests aleatorios de 100 preguntas + vistas + falladas
    -----------------------------------------------------------------------------
-   Módulo autónomo (IIFE). Se instala DESPUÉS de banco_a320_tech y de los módulos
-   de Simulacro y Repaso de falladas: pegar al FINAL del último bloque de script,
-   justo antes de su etiqueta de cierre (igual que los demás módulos), para que los
-   enganches queden puestos antes de que se restaure la sesión guardada.
-   No modifica el motor ni ningún otro módulo: solo envuelve
-   funciones existentes (migrarEstado, renderMaterias, renderBancos, elegir,
-   renderPregunta, repetirMateria, guardarProgresoAhora, cerrarSesion).
+   Módulo autónomo (IIFE). Funciona en CUALQUIER banco de preguntas (HVI, PCA, WIZZ,
+   A320 LIM, A320 TECH, ATPL, ATPL v2, WIZZ DAY 1 y los que añadas después: se detecta
+   solo, no hay lista fija). Cada banco tiene su propio registro de vistas y de falladas.
+   Se instala DESPUÉS de los bancos "originales" y de los módulos de Simulacro y Repaso
+   de falladas: pegar al FINAL del último bloque de script principal, justo antes de su
+   etiqueta de cierre, para que los enganches queden puestos antes de que se restaure la
+   sesión guardada. Los bancos que se registran en scripts posteriores (p. ej. Wizz
+   Day 1) también funcionan: todo se calcula la primera vez que se abre el banco.
+   No modifica el motor ni ningún otro módulo: solo envuelve funciones existentes
+   (migrarEstado, renderMaterias, renderBancos, elegir, renderPregunta, renderResultados,
+   repetirMateria, guardarProgresoAhora, cerrarSesion).
 
-   QUÉ HACE
-   --------
+   QUÉ HACE (en cada banco)
+   ------------------------
    1. TEST 100 ALEATORIO  — arma un examen de 100 preguntas al azar con
       representación de TODAS las materias del banco (reparto proporcional al
       tamaño de cada materia, con un mínimo de MIN_MATERIA por materia), mezcladas
-      en orden aleatorio. Mismo flujo que el Simulacro: sin corrección hasta
-      "Terminar test"; luego informe de desempeño y revisión con explicaciones.
+      en orden aleatorio. Si el banco tiene menos de 100, usa todas. Mismo flujo que el
+      Simulacro: sin corrección hasta "Terminar test"; luego informe y revisión.
    2. TEST 100 SIN VER    — igual, pero solo con preguntas que aún no se han
       visto. Si quedan menos de 100, genera un test corto con todas las que
       quedan (el título lo dice).
    3. REGISTRO DE VISTAS  — una pregunta cuenta como "vista" cuando la respondes
-      en el banco A320 TECH: en un Test 100, en un Simulacro de materia o en la
-      práctica normal por materia (cambia CONTAR_PRACTICA para excluir esta
-      última). Se guarda dentro de `estado.a320tests`, así que viaja con el
-      progreso al servidor y se recupera en cualquier dispositivo.
-   4. REINICIAR VISTAS    — vacía el registro (con confirmación). No toca los
-      resultados por materia.
-   5. MODO EXAMEN / ESTUDIO — selector en el panel. EXAMEN (por defecto): sin
-      corrección hasta «Terminar test». ESTUDIO: corrección inmediata al responder
-      y explicación desbloqueada en cada pregunta, igual que en las materias
-      (el test termina solo al responder todas, o antes con «Terminar test»).
-      La elección se recuerda en este navegador. Ambos modos cuentan las vistas.
+      en ese banco: en un Test 100, en un Simulacro de materia o en la práctica
+      normal por materia (cambia CONTAR_PRACTICA para excluir esta última). Se guarda
+      dentro de `estado.tests100[banco]`, así que viaja con el progreso al servidor.
+      La primera vez que abres un banco, lo ya respondido en la práctica se cuenta como
+      visto (una sola vez).
+   4. REINICIAR VISTAS    — vacía el registro de ESE banco (con confirmación). No toca
+      los resultados por materia ni la lista de falladas.
+   5. MODO EXAMEN / ESTUDIO — selector en el panel (se recuerda en este navegador y
+      vale para todos los bancos). EXAMEN (por defecto): sin corrección hasta «Terminar
+      test». ESTUDIO: corrección inmediata y explicación desbloqueada en cada pregunta.
    6. TEST DE FALLADAS    — igual que «Practicar falladas» de las materias: cada pregunta
-      que fallas en un Test 100 entra en una lista (`estado.a320tests.falladas`, viaja
-      con el progreso) y sale de ella cuando la aciertas. El botón del panel arma un test
-      (máx. N_TEST) con las pendientes, siempre con corrección inmediata y explicación.
-      Desde el informe de cualquier Test 100, «Practicar falladas (N)» arma un test solo
-      con las falladas de ese test. En modo Examen las falladas se registran al terminar
-      (no antes: aún puedes cambiar la respuesta); en modo Estudio, al responder.
-      «Reiniciar vistas» NO vacía esta lista.
+      que fallas en un Test 100 entra en la lista del banco (`estado.tests100[banco].falladas`)
+      y sale cuando la aciertas. El botón del panel arma un test (máx. N_TEST) con las
+      pendientes, siempre con corrección inmediata y explicación. Desde el informe de un
+      Test 100, «Practicar falladas (N)» arma un test solo con las falladas de ese test.
+
+   DATOS GUARDADOS
+   ---------------
+   `estado.tests100 = { <banco>: {v, vistas:{id:n}, falladas:{id:1}, sembrado} }`.
+   Migración automática: el antiguo `estado.a320tests` (solo A320 TECH) pasa a
+   `estado.tests100.a320tech` al cargar; no se pierde nada.
 
    IDENTIDAD DE PREGUNTA
    ---------------------
    Hash estable del ENUNCIADO (nunca el índice), así el registro sobrevive a
-   reordenamientos y a la rotación de opciones. Los enunciados repetidos entre
-   materias cuentan como una sola pregunta.
+   reordenamientos. Si dos preguntas del mismo banco comparten enunciado pero tienen
+   OPCIONES distintas, son preguntas distintas (la segunda lleva un sufijo con el hash
+   de sus opciones). Solo cuentan como una las idénticas en enunciado y opciones.
 
    NO TOCA enunciados, opciones ni claves de respuesta: los tests usan las mismas
    referencias a los objetos de pregunta del banco.
 
    CONSOLA
    -------
-     A320Test100.iniciar('todas' | 'nuevas', 'examen' | 'estudio')
-     A320Test100.iniciar('falladas')           A320Test100.falladas()
-     A320Test100.reiniciarVistas(true)
-     A320Test100.stats()                       A320Test100.vistas()
+     Test100.bancos()                          Test100.stats('hvi')
+     Test100.iniciar('pca', 'todas' | 'nuevas' | 'falladas', 'examen' | 'estudio')
+     Test100.falladas('pca')                   Test100.vistas('pca')
+     Test100.reiniciarVistas('pca', true)
+     A320Test100.*  (atajo antiguo, equivale a Test100.* con el banco 'a320tech')
    ============================================================================= */
 (function () {
   'use strict';
-  if (window.__A320_TEST100__) return;
-  window.__A320_TEST100__ = true;
+  if (window.__TEST100__) return;
+  window.__TEST100__ = true;
 
-  if (typeof bancos === 'undefined' || !bancos || !bancos.a320tech) {
-    console.warn('[a320 test100] bancos.a320tech no encontrado; carga este módulo DESPUÉS de banco_a320_tech.');
+  if (typeof bancos === 'undefined' || !bancos) {
+    console.warn('[test100] `bancos` no encontrado; carga este módulo DESPUÉS del script principal.');
     return;
   }
 
   /* ------------------------------ configuración ------------------------------ */
-  var BK = 'a320tech';
   var TAG = '_esTest100';
   var N_TEST = 100;            // preguntas por test
   var MIN_MATERIA = 2;         // mínimo por materia (si hay disponibles)
   var CONTAR_PRACTICA = true;  // true: la práctica/simulacro por materia también cuenta como "vista"
   var GUARDADO_MS = 800;       // espera antes de guardar tras responder
+  var BK_LEGACY = 'a320tech';  // el registro antiguo `estado.a320tests` era de este banco
 
-  var REAL_N = bancos[BK].temas.length; // materias reales (antes de añadir virtuales)
+  /* ------------------------------ qué bancos valen ------------------------------ */
+  /* Cualquier banco con materias de preguntas {q, ops, correct}. Se evalúa al usarlo,
+     no al instalar, porque otros módulos registran sus bancos más tarde. */
+  function soportado(bk) {
+    var b = bk && bancos[bk];
+    if (!b || !Array.isArray(b.temas) || !b.temas.length) return false;
+    for (var i = 0; i < b.temas.length; i++) {
+      var t = b.temas[i];
+      if (t && Array.isArray(t.preguntas) && t.preguntas.length) {
+        var p = t.preguntas[0];
+        return !!p && typeof p.q === 'string' && Array.isArray(p.ops);
+      }
+    }
+    return false;
+  }
+  function listaBancos() { return Object.keys(bancos).filter(soportado); }
+  function nombreBanco(bk) { return (bancos[bk] && bancos[bk].nombre) || bk; }
+
+  /* Materias virtuales (Simulacro, Repaso, este módulo) siempre van al final. */
+  function esVirtual(t) { return !!(t && (t[TAG] || t._esExamen || t._repaso)); }
+  function nReales(bk) {
+    var ts = bancos[bk].temas, n = 0;
+    for (var i = 0; i < ts.length; i++) { if (esVirtual(ts[i])) break; n++; }
+    return n;
+  }
 
   /* --------------------------- identidad de pregunta --------------------------- */
-  var _idCache = (typeof WeakMap === 'function') ? new WeakMap() : null;
-  function idDe(preg) {
-    if (_idCache && _idCache.has(preg)) return _idCache.get(preg);
-    var s = String(preg.q), h1 = 5381, h2 = 2166136261;
+  function hash(s) {
+    s = String(s);
+    var h1 = 5381, h2 = 2166136261;
     for (var i = 0; i < s.length; i++) {
       var c = s.charCodeAt(i);
       h1 = (((h1 << 5) + h1) + c) >>> 0;
       h2 = Math.imul(h2 ^ c, 16777619) >>> 0;
     }
-    var id = h1.toString(36) + h2.toString(36);
-    if (_idCache) _idCache.set(preg, id);
-    return id;
+    return h1.toString(36) + h2.toString(36);
   }
+  var _idCache = new WeakMap();
 
-  /* Pool de preguntas únicas por enunciado, con su materia de origen. */
-  var POOL = [];          // [{p, ti, id}]
-  var DUPLICADAS = 0;
-  (function construirPool() {
-    var vistos = {};
-    bancos[BK].temas.forEach(function (t, ti) {
-      t.preguntas.forEach(function (p) {
-        var id = idDe(p);
-        if (vistos[id]) { DUPLICADAS++; return; }
-        vistos[id] = true;
-        POOL.push({ p: p, ti: ti, id: id });
+  /* Pool de preguntas únicas del banco (por enunciado + opciones), con su materia de origen.
+     Se arma una vez por banco y fija también el id de cada objeto de pregunta. */
+  var _pools = {};
+  function pool(bk) {
+    if (_pools[bk]) return _pools[bk];
+    var out = { lista: [], porId: {}, duplicadas: 0, nReales: nReales(bk) };
+    var vistos = {};   // hash(enunciado) -> { hash(opciones): id }
+    bancos[bk].temas.slice(0, out.nReales).forEach(function (t, ti) {
+      (t.preguntas || []).forEach(function (p) {
+        var base = hash(p.q);
+        var sig = hash((p.ops || []).map(String).sort().join('\u0001'));
+        var g = vistos[base] || (vistos[base] = {});
+        if (g[sig]) { out.duplicadas++; _idCache.set(p, g[sig]); return; }
+        var id = Object.keys(g).length ? base + '.' + sig : base;   // 1.ª con ese enunciado: id clásico
+        g[sig] = id;
+        _idCache.set(p, id);
+        var x = { p: p, ti: ti, id: id };
+        out.lista.push(x);
+        out.porId[id] = x;
       });
     });
-  })();
-
-  var POR_ID = {};
-  POOL.forEach(function (x) { POR_ID[x.id] = x; });
+    _pools[bk] = out;
+    return out;
+  }
+  function idDe(preg, bk) {
+    if (!_idCache.has(preg)) pool(bk);
+    return _idCache.has(preg) ? _idCache.get(preg) : hash(preg.q);
+  }
 
   /* --------------------------------- estado --------------------------------- */
   var dirty = false;
@@ -20901,17 +20942,27 @@ intentarSesionGuardada(); (function () {
     return out;
   }
 
-  /* Primera vez (usuarios con progreso previo): las preguntas ya respondidas en
-     la práctica por materia se cuentan como vistas. Ocurre una sola vez. */
-  function sembrar(e) {
-    var est = (typeof estado !== 'undefined' && estado) ? estado[BK] : null;
+  /* Progreso guardado → { banco: registro }. Incluye la migración del antiguo `a320tests`. */
+  function normalizarTodo(prog) {
+    var out = {};
+    var src = (prog && prog.tests100 && typeof prog.tests100 === 'object') ? prog.tests100 : {};
+    Object.keys(src).forEach(function (bk) { out[bk] = normalizar(src[bk]); });
+    if (!out[BK_LEGACY] && prog && prog.a320tests) out[BK_LEGACY] = normalizar(prog.a320tests);
+    return out;
+  }
+
+  /* Primera vez que se abre un banco (usuarios con progreso previo): las preguntas ya
+     respondidas en la práctica por materia se cuentan como vistas. Una sola vez. */
+  function sembrar(bk, e) {
+    var est = (typeof estado !== 'undefined' && estado) ? estado[bk] : null;
     if (!Array.isArray(est)) return;
-    for (var ti = 0; ti < REAL_N; ti++) {
-      var es = est[ti], t = bancos[BK].temas[ti];
-      if (!es || !Array.isArray(es.respuestas) || !t || t[TAG]) continue;
+    var n = nReales(bk);
+    for (var ti = 0; ti < n; ti++) {
+      var es = est[ti], t = bancos[bk].temas[ti];
+      if (!es || !Array.isArray(es.respuestas) || !t || esVirtual(t)) continue;
       t.preguntas.forEach(function (p, qi) {
         if (es.respuestas[qi] !== null && es.respuestas[qi] !== undefined) {
-          var id = idDe(p);
+          var id = idDe(p, bk);
           e.vistas[id] = Math.max(1, e.vistas[id] || 0);
         }
       });
@@ -20919,16 +20970,17 @@ intentarSesionGuardada(); (function () {
     dirty = true;
   }
 
-  function est() {
+  function est(bk) {
     if (typeof estado === 'undefined' || !estado) return vacio();
-    var e = estado.a320tests;
-    if (!e || typeof e !== 'object' || !e.vistas || typeof e.vistas !== 'object') {
-      e = estado.a320tests = vacio();
-    }
-    if (!e.falladas || typeof e.falladas !== 'object') e.falladas = {};   // progreso guardado antes de existir la lista
+    var all = estado.tests100;
+    if (!all || typeof all !== 'object') all = estado.tests100 = {};
+    var e = all[bk];
+    if (!e && bk === BK_LEGACY && estado.a320tests) e = all[bk] = normalizar(estado.a320tests);
+    if (!e || typeof e !== 'object' || !e.vistas || typeof e.vistas !== 'object') e = all[bk] = vacio();
+    if (!e.falladas || typeof e.falladas !== 'object') e.falladas = {};   // guardado antes de existir la lista
     if (!e.sembrado) {
       e.sembrado = true;
-      if (CONTAR_PRACTICA) sembrar(e);
+      if (CONTAR_PRACTICA) sembrar(bk, e);
     }
     return e;
   }
@@ -20944,8 +20996,8 @@ intentarSesionGuardada(); (function () {
     clearTimeout(timer);
     if (dirty) { dirty = false; guardarYa(); }
   }
-  function marcarVista(id) {
-    var e = est();
+  function marcarVista(bk, id) {
+    var e = est(bk);
     e.vistas[id] = (e.vistas[id] || 0) + 1;
     dirty = true;
     programarGuardado();
@@ -20954,12 +21006,12 @@ intentarSesionGuardada(); (function () {
 
   /* ---------------------------------- falladas ---------------------------------- */
   /* Lista de preguntas (por id) cuya última respuesta en un Test 100 fue incorrecta. */
-  function pendientes() {
-    var f = est().falladas;
-    return Object.keys(f).filter(function (id) { return f[id] && POR_ID[id]; });
+  function pendientes(bk) {
+    var f = est(bk).falladas, po = pool(bk).porId;
+    return Object.keys(f).filter(function (id) { return f[id] && po[id]; });
   }
-  function registrar(id, ok) {
-    var f = est().falladas;
+  function registrar(bk, id, ok) {
+    var f = est(bk).falladas;
     if (ok) {
       if (!f[id]) return;
       delete f[id];
@@ -20980,29 +21032,29 @@ intentarSesionGuardada(); (function () {
     return out;
   }
   /* Modo Examen: se registran al terminar (antes aún se puede cambiar la respuesta). */
-  function registrarTest(tema, e) {
+  function registrarTest(bk, tema, e) {
     tema.preguntas.forEach(function (p, i) {
       var r = e.respuestas[i];
-      if (r !== null && r !== undefined) registrar(tema._ids[i], r === p.correct);
+      if (r !== null && r !== undefined) registrar(bk, tema._ids[i], r === p.correct);
     });
   }
 
   /* ------------------------------- estadísticas ------------------------------ */
-  function stats() {
-    var e = est();
-    var porMateria = bancos[BK].temas.slice(0, REAL_N).map(function (t) {
+  function stats(bk) {
+    var e = est(bk), po = pool(bk);
+    var porMateria = bancos[bk].temas.slice(0, po.nReales).map(function (t) {
       return { nombre: t.nombre, total: 0, vistas: 0 };
     });
     var vistas = 0;
-    POOL.forEach(function (x) {
+    po.lista.forEach(function (x) {
       var m = porMateria[x.ti];
       m.total++;
       if (e.vistas[x.id]) { m.vistas++; vistas++; }
     });
     return {
-      total: POOL.length, vistas: vistas, restantes: POOL.length - vistas,
-      falladas: pendientes().length,
-      duplicadas: DUPLICADAS, porMateria: porMateria
+      banco: bk, total: po.lista.length, vistas: vistas, restantes: po.lista.length - vistas,
+      falladas: pendientes(bk).length,
+      duplicadas: po.duplicadas, porMateria: porMateria
     };
   }
 
@@ -21039,10 +21091,11 @@ intentarSesionGuardada(); (function () {
     return q;
   }
 
-  function construir(modo) {
-    var e = est();
-    var porMateria = bancos[BK].temas.slice(0, REAL_N).map(function () { return []; });
-    POOL.forEach(function (x) {
+  function construir(bk, modo) {
+    var e = est(bk), po = pool(bk);
+    var porMateria = [];
+    for (var i = 0; i < po.nReales; i++) porMateria.push([]);
+    po.lista.forEach(function (x) {
       if (modo === 'nuevas' && e.vistas[x.id]) return;
       porMateria[x.ti].push(x);
     });
@@ -21059,20 +21112,20 @@ intentarSesionGuardada(); (function () {
 
   /* Test de falladas: `ids` limita a un subconjunto (p. ej. las de un informe); sin él, toda la lista.
      Siempre se filtra contra las pendientes, así lo ya acertado no vuelve a salir. */
-  function construirFalladas(ids) {
-    var f = est().falladas;
+  function construirFalladas(bk, ids) {
+    var f = est(bk).falladas, po = pool(bk).porId;
     var base = ids || Object.keys(f);
     var vistos = {};
     var lista = base.filter(function (id) {
-      if (!f[id] || !POR_ID[id] || vistos[id]) return false;
+      if (!f[id] || !po[id] || vistos[id]) return false;
       vistos[id] = true;
       return true;
     });
-    return barajar(lista).slice(0, N_TEST).map(function (id) { return POR_ID[id]; });
+    return barajar(lista).slice(0, N_TEST).map(function (id) { return po[id]; });
   }
 
   /* ------------------------------- test en curso ------------------------------ */
-  var t100 = null;   // {virtual, modo ('todas'|'nuevas'|'falladas'), estilo ('examen'|'estudio'), revelado, fuente}
+  var t100 = null;   // {bk, virtual, modo ('todas'|'nuevas'|'falladas'), estilo ('examen'|'estudio'), revelado, fuente}
   var LS_ESTILO = 'hvi_pca_trainer:t100estilo';
   function leerEstilo() {
     try { return window.localStorage.getItem(LS_ESTILO) === 'estudio' ? 'estudio' : 'examen'; }
@@ -21083,19 +21136,23 @@ intentarSesionGuardada(); (function () {
   var textoRepetirOriginal = null;
 
   function temaT100() {
-    if (!t100 || bancoActual !== BK) return null;
-    var t = bancos[BK].temas[temaActual];
+    if (!t100 || bancoActual !== t100.bk) return null;
+    var t = bancos[t100.bk].temas[temaActual];
     return (t && t[TAG]) ? t : null;
   }
 
+  /* Quita la materia virtual de cualquier banco (solo puede haber una, pero no se asume). */
   function purgar() {
-    var temas = bancos[BK].temas;
-    for (var i = temas.length - 1; i >= 0; i--) {
-      if (temas[i] && temas[i][TAG]) {
-        temas.splice(i, 1);
-        if (estado && Array.isArray(estado[BK])) estado[BK].splice(i, 1);
+    Object.keys(bancos).forEach(function (bk) {
+      var temas = bancos[bk].temas;
+      if (!Array.isArray(temas)) return;
+      for (var i = temas.length - 1; i >= 0; i--) {
+        if (temas[i] && temas[i][TAG]) {
+          temas.splice(i, 1);
+          if (typeof estado !== 'undefined' && estado && Array.isArray(estado[bk])) estado[bk].splice(i, 1);
+        }
       }
-    }
+    });
     if (t100) {
       document.body.classList.remove('modo-examen', 'modo-t100', 't100-activo', 't100-revelado');
       restaurarTextos();
@@ -21129,24 +21186,26 @@ intentarSesionGuardada(); (function () {
     });
   }
 
-  function iniciar(modo, estilo, ids) {
+  function iniciar(bk, modo, estilo, ids) {
+    if (!soportado(bk)) { console.warn('[test100] banco no soportado: ' + bk); return false; }
     modo = (modo === 'nuevas' || modo === 'falladas') ? modo : 'todas';
     if (modo === 'falladas') estilo = 'estudio';   // como el repaso de las materias: corrección y explicación en cada pregunta
     else estilo = (estilo === 'estudio' || estilo === 'examen') ? estilo : leerEstilo();
+    var nb = nombreBanco(bk);
     /* Se arma ANTES de purgar: si no hay nada que armar, el test en curso (o su informe) queda intacto. */
-    var sel = (modo === 'falladas') ? construirFalladas(ids) : construir(modo);
+    var sel = (modo === 'falladas') ? construirFalladas(bk, ids) : construir(bk, modo);
     if (!sel.length) {
       alert(modo === 'falladas'
-        ? 'No tienes preguntas falladas pendientes en los tests del banco A320 TECH.\nSe agregan al fallar una pregunta y se quitan al acertarla.'
-        : 'No quedan preguntas sin ver en el banco A320 TECH.\nPuedes reiniciar el registro de vistas para empezar de nuevo.');
+        ? 'No tienes preguntas falladas pendientes en los tests del banco ' + nb + '.\nSe agregan al fallar una pregunta y se quitan al acertarla.'
+        : 'No quedan preguntas sin ver en el banco ' + nb + '.\nPuedes reiniciar el registro de vistas para empezar de nuevo.');
       refrescarPanel();
       return false;
     }
     purgar();
-    bancoActual = BK;
+    bancoActual = bk;
     var n = sel.length;
     var nombre = 'Test ' + n + ' · ' + (modo === 'falladas' ? 'Falladas' : (modo === 'nuevas' ? 'Sin ver' : 'Aleatorio')) +
-                 ' · A320' + (estilo === 'estudio' && modo !== 'falladas' ? ' · Estudio' : '');
+                 ' · ' + nb + (estilo === 'estudio' && modo !== 'falladas' ? ' · Estudio' : '');
     var virtual = {
       nombre: nombre,
       preguntas: sel.map(function (x) { return x.p; }),
@@ -21154,13 +21213,13 @@ intentarSesionGuardada(); (function () {
       _tis: sel.map(function (x) { return x.ti; })
     };
     virtual[TAG] = true;
-    bancos[BK].temas.push(virtual);
-    var vi = bancos[BK].temas.length - 1;
-    estado[BK][vi] = {
+    bancos[bk].temas.push(virtual);
+    var vi = bancos[bk].temas.length - 1;
+    estado[bk][vi] = {
       respuestas: new Array(n).fill(null),
       index: 0, startTime: Date.now(), finished: false, lastPct: null, lastTime: null
     };
-    t100 = { virtual: vi, modo: modo, estilo: estilo, revelado: false, fuente: (modo === 'falladas' && ids) ? ids.slice() : null };
+    t100 = { bk: bk, virtual: vi, modo: modo, estilo: estilo, revelado: false, fuente: (modo === 'falladas' && ids) ? ids.slice() : null };
     temaActual = vi;
 
     document.body.classList.add('t100-activo');
@@ -21170,7 +21229,7 @@ intentarSesionGuardada(); (function () {
       var bar = document.querySelector('#examBar span');
       if (bar) {
         if (textoBarraOriginal === null) textoBarraOriginal = bar.innerHTML;
-        bar.innerHTML = '&#9992; Test A320 — sin corrección hasta terminar';
+        bar.innerHTML = '&#9992; Test ' + nb + ' — sin corrección hasta terminar';
       }
       marcarExplicacion();
     }
@@ -21182,7 +21241,7 @@ intentarSesionGuardada(); (function () {
   function terminar() {
     var tema = temaT100();
     if (!tema || t100.revelado) return;
-    var e = estado[BK][temaActual];
+    var e = estado[t100.bk][temaActual];
     var faltan = tema.preguntas.length - contarRespondidas(e);
     if (faltan > 0) {
       if (!confirm('Quedan ' + faltan + ' pregunta(s) sin responder.\nSe contarán como incorrectas. ¿Terminar el test?')) return;
@@ -21198,7 +21257,7 @@ intentarSesionGuardada(); (function () {
     document.body.classList.remove('modo-examen', 'modo-t100', 't100-activo');
     document.body.classList.add('t100-revelado');
     var tema = temaT100();
-    if (tema) registrarTest(tema, estado[BK][temaActual]);   // idempotente; en Estudio ya se registró al responder
+    if (tema) registrarTest(t100.bk, tema, estado[t100.bk][temaActual]);   // idempotente; en Estudio ya se registró al responder
     var b = botonRepetir();
     if (b) {
       if (textoRepetirOriginal === null) textoRepetirOriginal = b.innerHTML;
@@ -21208,20 +21267,21 @@ intentarSesionGuardada(); (function () {
 
   function revisar() {
     if (!t100 || !t100.revelado) return;
-    estado[BK][temaActual].index = 0;
+    estado[t100.bk][temaActual].index = 0;
     showScreen('screen-quiz');
     renderPregunta();
   }
 
   /* ------------------------------ reinicio de vistas ------------------------------ */
-  function reiniciarVistas(silencioso) {
+  function reiniciarVistas(bk, silencioso) {
+    if (!soportado(bk)) return false;
     if (!silencioso) {
-      var s = stats();
-      if (!confirm('¿Reiniciar el registro de preguntas vistas del banco A320 TECH?\n\n' +
+      var s = stats(bk);
+      if (!confirm('¿Reiniciar el registro de preguntas vistas del banco ' + nombreBanco(bk) + '?\n\n' +
                    'Hoy hay ' + s.vistas + ' de ' + s.total + ' marcadas como vistas; todas pasarán a "sin ver".\n' +
                    'Tus resultados por materia no se tocan.')) return false;
     }
-    var e = est();
+    var e = est(bk);
     e.vistas = {};
     e.sembrado = true;     // no volver a sembrar desde la práctica ya hecha
     dirty = false;
@@ -21322,17 +21382,17 @@ intentarSesionGuardada(); (function () {
         var st = ev.target.closest ? ev.target.closest('[data-t100estilo]') : null;
         if (st) { guardarEstilo(st.getAttribute('data-t100estilo')); refrescarPanel(); return; }
         var el = ev.target.closest ? ev.target.closest('[data-t100]') : null;
-        if (!el || el.disabled) return;
+        if (!el || el.disabled || !soportado(bancoActual)) return;
         var acc = el.getAttribute('data-t100');
-        if (acc === 'todas' || acc === 'nuevas') iniciar(acc, leerEstilo());
-        else if (acc === 'falladas') iniciar('falladas', 'estudio');
-        else if (acc === 'reset') reiniciarVistas(false);
+        if (acc === 'todas' || acc === 'nuevas') iniciar(bancoActual, acc, leerEstilo());
+        else if (acc === 'falladas') iniciar(bancoActual, 'falladas', 'estudio');
+        else if (acc === 'reset') reiniciarVistas(bancoActual, false);
       });
     }
-    if (bancoActual !== BK) { panel.style.display = 'none'; return; }
+    if (!soportado(bancoActual)) { panel.style.display = 'none'; return; }
     panel.style.display = '';
 
-    var s = stats();
+    var s = stats(bancoActual);
     var pct = s.total ? Math.round(s.vistas * 100 / s.total) : 0;
     var nNuevas = Math.min(N_TEST, s.restantes);
     var etqNuevas = s.restantes === 0
@@ -21381,31 +21441,31 @@ intentarSesionGuardada(); (function () {
       '<div class="t100-note">Cuenta como “vista” cada pregunta que respondes en este banco' +
         (CONTAR_PRACTICA ? ' (tests, simulacros y práctica por materia)' : ' (tests y simulacros)') +
         '. Reiniciar no borra tus resultados por materia.' +
-        (s.duplicadas ? ' ' + s.duplicadas + ' enunciados repetidos entre materias cuentan como una sola pregunta.' : '') +
+        (s.duplicadas ? ' ' + s.duplicadas + ' preguntas idénticas (mismo enunciado y opciones) cuentan como una sola.' : '') +
       '</div>' +
       '<div class="t100-note">Falladas: las que fallas en un Test 100; salen de la lista cuando las aciertas. Reiniciar vistas no las borra.</div>';
   }
 
   /* ----------------------- enganches sobre el motor y módulos ----------------------- */
 
-  /* El registro de vistas viaja dentro de `estado`: hay que conservarlo al cargar. */
+  /* El registro viaja dentro de `estado`: hay que conservarlo al cargar. */
   var _migrar = window.migrarEstado;
   if (typeof _migrar === 'function') {
     window.migrarEstado = function (prog) {
       var out = _migrar.apply(this, arguments) || {};
-      out.a320tests = normalizar(prog && prog.a320tests);
+      out.tests100 = normalizarTodo(prog);
       return out;
     };
   }
 
-  /* Nunca guardar la materia virtual del test dentro de estado[BK]. */
+  /* Nunca guardar la materia virtual del test dentro de estado[banco]. */
   var _guardar = window.guardarProgresoAhora;
   window.guardarProgresoAhora = function () {
-    var arr = (typeof estado !== 'undefined' && estado) ? estado[BK] : null;
+    var arr = (t100 && typeof estado !== 'undefined' && estado) ? estado[t100.bk] : null;
     var quitada = null, pos = -1;
     if (t100 && Array.isArray(arr)) {
       pos = t100.virtual;
-      var tv = bancos[BK].temas[pos];
+      var tv = bancos[t100.bk].temas[pos];
       if (tv && tv[TAG] && arr[pos]) quitada = arr.splice(pos, 1)[0];
     }
     try { return _guardar.apply(this, arguments); }
@@ -21417,7 +21477,7 @@ intentarSesionGuardada(); (function () {
     purgar();
     var r = _renderMaterias.apply(this, arguments);
     flush();
-    try { montarBotonesQuiz(); refrescarPanel(); } catch (err) { console.warn('[a320 test100]', err); }
+    try { montarBotonesQuiz(); refrescarPanel(); } catch (err) { console.warn('[test100]', err); }
     return r;
   };
 
@@ -21434,36 +21494,38 @@ intentarSesionGuardada(); (function () {
     window.cerrarSesion = function () { purgar(); return _cerrar.apply(this, arguments); };
   }
 
-  /* Responder: dentro de un Test 100 sin corrección; en el resto del banco, contar como vista. */
+  /* Responder: dentro de un Test 100 con su propio criterio; en el resto de bancos, contar como vista. */
   var _elegir = window.elegir;
   window.elegir = function (oi) {
     var tema = temaT100();
     if (tema) {
       if (t100.revelado) return;
-      var e = estado[BK][temaActual];
+      var bk = t100.bk;
+      var e = estado[bk][temaActual];
       var qi = e.index, antes = e.respuestas[qi];
       if (t100.estilo === 'estudio') {
         /* corrección inmediata: lo hace el motor (igual que en las materias) */
         if (antes !== null) return;
         _elegir.apply(this, arguments);
         if (e.respuestas[qi] !== null) {
-          marcarVista(tema._ids[qi]);
-          registrar(tema._ids[qi], e.respuestas[qi] === tema.preguntas[qi].correct);
+          marcarVista(bk, tema._ids[qi]);
+          registrar(bk, tema._ids[qi], e.respuestas[qi] === tema.preguntas[qi].correct);
         }
         if (e.finished && !t100.revelado) { marcarRevelado(); flush(); }  // la última respuesta cierra el test
         return;
       }
       e.respuestas[qi] = oi;
-      if (antes === null) marcarVista(tema._ids[qi]);
+      if (antes === null) marcarVista(bk, tema._ids[qi]);
       renderPregunta();
       return;
     }
-    if (CONTAR_PRACTICA && bancoActual === BK && estado && Array.isArray(estado[BK])) {
-      var t = bancos[BK].temas[temaActual], es = estado[BK][temaActual];
+    var bkp = bancoActual;
+    if (CONTAR_PRACTICA && soportado(bkp) && estado && Array.isArray(estado[bkp])) {
+      var t = bancos[bkp].temas[temaActual], es = estado[bkp][temaActual];
       if (t && es && !t[TAG]) {
         var i = es.index, prev = es.respuestas[i], preg = t.preguntas[i];
         var res = _elegir.apply(this, arguments);
-        if (preg && prev === null && es.respuestas[i] !== null) marcarVista(idDe(preg));
+        if (preg && prev === null && es.respuestas[i] !== null) marcarVista(bkp, idDe(preg, bkp));
         return res;
       }
     }
@@ -21476,13 +21538,16 @@ intentarSesionGuardada(); (function () {
     _renderPregunta.apply(this, arguments);
     var tema = temaT100();
     if (!tema) return;
-    var e = estado[BK][temaActual];
+    var bk = t100.bk;
+    var e = estado[bk][temaActual];
     var qi = e.index, total = tema.preguntas.length;
     var qBlock = document.getElementById('qBlock');
     var filas = document.querySelectorAll('#qOpts .opt');
     var lbl2 = document.getElementById('tapeLabel2');
     if (lbl2) {
-      var cod = (t100.revelado || t100.estilo === 'estudio') ? (bancos[BK].codigos[bancos[BK].temas[tema._tis[qi]].nombre] || '') : '';
+      var cods = bancos[bk].codigos || {};
+      var tOrig = bancos[bk].temas[tema._tis[qi]];
+      var cod = (t100.revelado || t100.estilo === 'estudio') ? (cods[tOrig && tOrig.nombre] || '') : '';
       lbl2.textContent = 'TEST' + (cod ? ' · ' + cod : '');
     }
     if (!t100.revelado && t100.estilo === 'examen') {
@@ -21525,7 +21590,7 @@ intentarSesionGuardada(); (function () {
   /* "Repetir materia" en el informe → nuevo test del mismo tipo (en falladas: las que aún siguen pendientes). */
   var _repetir = window.repetirMateria;
   window.repetirMateria = function () {
-    if (temaT100()) { iniciar(t100.modo, t100.estilo, t100.fuente); return; }
+    if (temaT100()) { iniciar(t100.bk, t100.modo, t100.estilo, t100.fuente); return; }
     return _repetir.apply(this, arguments);
   };
 
@@ -21539,10 +21604,11 @@ intentarSesionGuardada(); (function () {
         var tema = temaT100();
         var btn = document.getElementById('btnRepasoFalladas');
         if (tema && btn && btn.style.display !== 'none') {
-          var ids = falladasDeTest(tema, estado[BK][temaActual]);
-          btn.onclick = function () { iniciar('falladas', 'estudio', ids); };
+          var bk = t100.bk;
+          var ids = falladasDeTest(tema, estado[bk][temaActual]);
+          btn.onclick = function () { iniciar(bk, 'falladas', 'estudio', ids); };
         }
-      } catch (err) { console.warn('[a320 test100]', err); }
+      } catch (err) { console.warn('[test100]', err); }
       return r;
     };
   }
@@ -21551,14 +21617,14 @@ intentarSesionGuardada(); (function () {
   /* Red de seguridad: si este módulo se pegó en un script aparte y la sesión ya
      se restauró antes de instalarlo, `estado` perdió el registro; lo recuperamos. */
   try {
-    if (typeof estado !== 'undefined' && estado && !estado.a320tests &&
+    if (typeof estado !== 'undefined' && estado && !estado.tests100 &&
         typeof perfilActual !== 'undefined' && perfilActual && perfilActual.persistente &&
         typeof apiMe === 'function') {
       apiMe().then(function (res) {
         var p = null;
         try { p = res && res.progress ? JSON.parse(res.progress) : null; } catch (err) { p = null; }
-        if (typeof estado !== 'undefined' && estado && !estado.a320tests) {
-          estado.a320tests = normalizar(p && p.a320tests);
+        if (typeof estado !== 'undefined' && estado && !estado.tests100) {
+          estado.tests100 = normalizarTodo(p);
           refrescarPanel();
         }
       }).catch(function () { /* sin red: seguimos con registro vacío */ });
@@ -21569,19 +21635,32 @@ intentarSesionGuardada(); (function () {
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', montar);
   else montar();
 
-  window.A320Test100 = {
+  window.Test100 = {
+    bancos: listaBancos,
     iniciar: iniciar,
     estilo: leerEstilo,
     fijarEstilo: function (v) { guardarEstilo(v === 'estudio' ? 'estudio' : 'examen'); refrescarPanel(); },
     reiniciarVistas: reiniciarVistas,
     stats: stats,
-    vistas: function () { return Object.keys(est().vistas); },
+    vistas: function (bk) { return Object.keys(est(bk).vistas); },
     falladas: pendientes,
     _calcularCupos: calcularCupos,
     _construir: construir
   };
+  /* Atajo antiguo (cuando solo existía el A320 TECH). */
+  window.A320Test100 = {
+    iniciar: function (modo, estilo, ids) { return iniciar('a320tech', modo, estilo, ids); },
+    estilo: leerEstilo,
+    fijarEstilo: window.Test100.fijarEstilo,
+    reiniciarVistas: function (silencioso) { return reiniciarVistas('a320tech', silencioso); },
+    stats: function () { return stats('a320tech'); },
+    vistas: function () { return window.Test100.vistas('a320tech'); },
+    falladas: function () { return pendientes('a320tech'); },
+    _calcularCupos: calcularCupos,
+    _construir: function (modo) { return construir('a320tech', modo); }
+  };
 
-  console.log('[a320 test100] instalado: ' + POOL.length + ' preguntas únicas en ' + REAL_N + ' materias (' + DUPLICADAS + ' enunciados repetidos).');
+  console.log('[test100] instalado (bancos disponibles ahora: ' + listaBancos().join(', ') + '; los que se registren después se detectan al abrirlos).');
 })();
 
 /* =============================================================================
@@ -21790,6 +21869,10 @@ intentarSesionGuardada(); (function () {
     'Maniobra (FCTM) — no es memory item': 'Maneuver (FCTM) — not a memory item',
     'Maniobra (FCTM)': 'Maneuver (FCTM)',
     'Notas de entrenamiento': 'Training notes',
+    'Notas — sin daño': 'Notes — no damage',
+    'Notas — con daño': 'Notes — with damage',
+    'Notas — estrategia estándar': 'Notes — standard strategy',
+    'Notas — estrategia de obstáculos': 'Notes — obstacle strategy',
     'Diferencias con FCOM/FCTM': 'Differences from FCOM/FCTM',
     'NOTA —': 'NOTE —',
     'El reparto de esta maniobra es por asiento (CAPT / F-O), no por PF / PM.':
@@ -21843,8 +21926,9 @@ intentarSesionGuardada(); (function () {
       function (m) { return m[1] + ' ' + MESES[m[2]] + ' ' + m[3] + ' · ' + m[4]; }],
 
     /* A320 TECH · Test 100 */
-    [/^Test (\d+) · (Aleatorio|Sin ver|Falladas) · A320( · Estudio)?$/,
-      function (m) { return 'Test ' + m[1] + ' · ' + (m[2] === 'Aleatorio' ? 'Random' : (m[2] === 'Falladas' ? 'Missed' : 'Unseen')) + ' · A320' + (m[3] ? ' · Study' : ''); }],
+    [/^Test (\d+) · (Aleatorio|Sin ver|Falladas) · (.+?)( · Estudio)?$/,
+      function (m) { return 'Test ' + m[1] + ' · ' + (m[2] === 'Aleatorio' ? 'Random' : (m[2] === 'Falladas' ? 'Missed' : 'Unseen')) + ' · ' + m[3] + (m[4] ? ' · Study' : ''); }],
+    [/^✈ Test (.+) — sin corrección hasta terminar$/, function (m) { return '✈ ' + m[1] + ' test — no grading until you finish'; }],
     [/^⟳ Test de falladas · (\d+)$/, function (m) { return '⟳ Missed-questions test · ' + m[1]; }],
     [/^(\d+) falladas pendientes: test de (\d+) preguntas con corrección inmediata\. Se quitan al acertarlas\.$/,
       function (m) { return m[1] + ' missed pending: ' + m[2] + '-question test with instant correction. They leave the list when you get them right.'; }],
@@ -21853,12 +21937,12 @@ intentarSesionGuardada(); (function () {
     [/^✈ Test corto sin ver · (\d+)$/, function (m) { return '✈ Short unseen test · ' + m[1]; }],
     [/^(\d+) preguntas al azar de todas las materias, vistas o no$/, function (m) { return m[1] + ' random questions from all subjects, seen or not'; }],
     [/^Solo preguntas que aún no has visto \((\d+) en este test\)$/, function (m) { return 'Only questions you have not seen yet (' + m[1] + ' in this test)'; }],
-    [/^Cuenta como “vista” cada pregunta que respondes en este banco \((.+?)\)\. Reiniciar no borra tus resultados por materia\.(?: (\d+) enunciados repetidos entre materias cuentan como una sola pregunta\.)?$/,
+    [/^Cuenta como “vista” cada pregunta que respondes en este banco \((.+?)\)\. Reiniciar no borra tus resultados por materia\.(?: (\d+) preguntas idénticas \(mismo enunciado y opciones\) cuentan como una sola\.)?$/,
       function (m) {
         var que = m[1] === 'tests, simulacros y práctica por materia' ? 'tests, mock exams and per-subject practice'
                 : m[1] === 'tests y simulacros' ? 'tests and mock exams' : m[1];
         return 'Each question you answer in this bank counts as “seen” (' + que + '). Resetting does not delete your per-subject results.' +
-          (m[2] ? ' ' + m[2] + ' repeated question texts across subjects count as a single question.' : '');
+          (m[2] ? ' ' + m[2] + ' identical questions (same text and options) count as one.' : '');
       }],
 
     /* A320 Memory Items / Tech Int */
@@ -21882,12 +21966,12 @@ intentarSesionGuardada(); (function () {
       'Reset the A320 memory item statistics? This also clears any half-finished flashcard round.'],
     [/^¿Reiniciar las estadísticas de "(.*)"\? Esto también borra la ronda de tarjetas a medio terminar, si hay una\.$/,
       function (m) { return 'Reset the statistics for "' + m[1] + '"? This also clears any half-finished flashcard round.'; }],
-    [/^No tienes preguntas falladas pendientes en los tests del banco A320 TECH\.\nSe agregan al fallar una pregunta y se quitan al acertarla\.$/,
-      'You have no pending missed questions in the A320 TECH bank tests.\nQuestions are added when you get one wrong and removed when you get it right.'],
-    [/^No quedan preguntas sin ver en el banco A320 TECH\.\nPuedes reiniciar el registro de vistas para empezar de nuevo\.$/,
-      'No unseen questions are left in the A320 TECH bank.\nYou can reset the seen record to start over.'],
-    [/^¿Reiniciar el registro de preguntas vistas del banco A320 TECH\?\n\nHoy hay (\d+) de (\d+) marcadas como vistas; todas pasarán a "sin ver"\.\nTus resultados por materia no se tocan\.$/,
-      function (m) { return 'Reset the seen-questions record for the A320 TECH bank?\n\nRight now ' + m[1] + ' of ' + m[2] + ' are marked as seen; all will go back to "unseen".\nYour per-subject results are not touched.'; }]
+    [/^No tienes preguntas falladas pendientes en los tests del banco (.+)\.\nSe agregan al fallar una pregunta y se quitan al acertarla\.$/,
+      function (m) { return 'You have no pending missed questions in the ' + m[1] + ' bank tests.\nQuestions are added when you get one wrong and removed when you get it right.'; }],
+    [/^No quedan preguntas sin ver en el banco (.+)\.\nPuedes reiniciar el registro de vistas para empezar de nuevo\.$/,
+      function (m) { return 'No unseen questions are left in the ' + m[1] + ' bank.\nYou can reset the seen record to start over.'; }],
+    [/^¿Reiniciar el registro de preguntas vistas del banco (.+)\?\n\nHoy hay (\d+) de (\d+) marcadas como vistas; todas pasarán a "sin ver"\.\nTus resultados por materia no se tocan\.$/,
+      function (m) { return 'Reset the seen-questions record for the ' + m[1] + ' bank?\n\nRight now ' + m[2] + ' of ' + m[3] + ' are marked as seen; all will go back to "unseen".\nYour per-subject results are not touched.'; }]
   ];
 
   /* ------------------------------- motor de traducción ------------------------------- */

@@ -22649,5 +22649,36 @@ intentarSesionGuardada(); (function () {
 })();
 
 </script>
+<!-- ===== Enlace a Pilot Aptitude Practice (/pilot-practice/) ===== -->
+<script>
+(function () {
+  function tilePractice() {
+    var grid = document.getElementById('bancoGrid');
+    if (!grid || grid.querySelector('.pp-tile')) return;
+    var a = document.createElement('a');
+    a.className = 'bancotile pp-tile';
+    a.href = 'pilot-practice/';
+    a.style.textDecoration = 'none';
+    a.style.display = 'block';
+    a.innerHTML =
+      '<span class="btag">APTITUD</span>' +
+      '<div class="bname">Pilot Practice</div>' +
+      '<div class="blong">Tests cognitivos, memoria, espacial, CRM y simulador</div>' +
+      '<div class="bstats">' +
+        '<div><b>13</b>tests</div>' +
+      '</div>';
+    grid.appendChild(a);
+  }
+  if (typeof window.renderBancos === 'function') {
+    var _rb = window.renderBancos;
+    window.renderBancos = function () {
+      var r = _rb.apply(this, arguments);
+      try { tilePractice(); } catch (err) { console.warn('[pilot-practice]', err); }
+      return r;
+    };
+  }
+  try { if (document.getElementById('bancoGrid') && document.getElementById('bancoGrid').children.length) tilePractice(); } catch (e) {}
+})();
+</script>
 </body>
 </html>

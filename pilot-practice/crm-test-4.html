@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>[hidden]{display:none!important}img{max-width:100%}body{margin:0}</style>
+<title>CRM Practice Test 4</title>
+</head>
+<body>
+
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap">
+<style>
+:root{--bg:#f3f4f6;--card:#fff;--fg:#17202a;--muted:#5b6673;--line:#d6dbe1;--accent:#7a1f6e;--accent-fg:#fff;--good:#1a7f45;--ok:#2f6fb5;--warn:#a86a00;--bad:#c23030;--chip:#e8ebef;--c1:#2c3e50;--c2:#1295b8;--c3:#6f5f86;--c4:#7a1f6e}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101418;--card:#181e25;--fg:#e6eaee;--muted:#98a4b1;--line:#2a333d;--accent:#c765b8;--accent-fg:#14090f;--good:#4cc47d;--ok:#6aa9ec;--warn:#e0a63a;--bad:#ff7070;--chip:#232b34;--c1:#8fa6bd;--c2:#3fc0e0;--c3:#a595c0;--c4:#c765b8;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#101418;--card:#181e25;--fg:#e6eaee;--muted:#98a4b1;--line:#2a333d;--accent:#c765b8;--accent-fg:#14090f;--good:#4cc47d;--ok:#6aa9ec;--warn:#e0a63a;--bad:#ff7070;--chip:#232b34;--c1:#8fa6bd;--c2:#3fc0e0;--c3:#a595c0;--c4:#c765b8;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font:16px/1.55 Inter,system-ui,sans-serif;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:22px 56px}
+.wrap{max-width:860px;margin:0 auto}
+.eyebrow{font:600 12px/1 Inter,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+h1{font:700 30px/1.15 "Space Grotesk",Inter,sans-serif;margin:6px 0 4px;text-wrap:balance}
+h2{font:700 21px/1.2 "Space Grotesk",Inter,sans-serif;margin:26px 0 8px}
+h3{font:600 16px/1.3 Inter,sans-serif;margin:18px 0 6px}
+p{margin:8px 0}.muted{color:var(--muted)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px 22px;margin-top:16px}
+button{font:600 15px Inter,sans-serif;border-radius:9px;border:1px solid var(--line);background:var(--card);color:var(--fg);padding:10px 18px;cursor:pointer}
+button.pri{background:var(--accent);border-color:var(--accent);color:var(--accent-fg)}
+button:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin-top:18px}
+.prog{height:6px;background:var(--chip);border-radius:99px;overflow:hidden;margin-top:14px}.prog i{display:block;height:100%;background:var(--accent);width:0}
+.meta{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.scen{font-size:17px;margin:12px 0 14px}
+.opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;font-weight:400;line-height:1.5;margin-top:10px;padding:13px 15px}
+.opt .dot{flex:none;width:18px;height:18px;border-radius:50%;border:2px solid var(--muted);margin-top:3px}
+.opt.sel{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}.opt.sel .dot{border-color:var(--accent);background:radial-gradient(var(--accent) 45%,transparent 50%)}
+.tasks{list-style:none;padding:0;margin:10px 0}.tasks li{padding:9px 12px;border:1px solid var(--line);border-radius:9px;margin-top:8px}
+.tasks b{font-family:ui-monospace,Menlo,monospace;margin-right:8px}
+input.ord{font:600 20px ui-monospace,Menlo,monospace;letter-spacing:.3em;width:9.5em;max-width:100%;padding:9px 12px;border:1px solid var(--line);border-radius:9px;background:var(--bg);color:var(--fg)}
+.scale{display:grid;grid-template-columns:repeat(10,1fr);gap:2px;min-width:0}.scale i{height:14px;border:1px solid var(--line);background:var(--card)}
+.sr{display:grid;grid-template-columns:minmax(120px,210px) 1fr 44px;gap:12px;align-items:center;padding:7px 0;border-bottom:1px solid var(--line);font-size:14px}
+.sr.ov{font-weight:700}.sr span:last-child{text-align:right;font-variant-numeric:tabular-nums}
+.tag{display:inline-block;font:600 12px Inter,sans-serif;padding:3px 9px;border-radius:99px;background:var(--chip);margin-right:6px}
+.rv{border-top:1px solid var(--line);padding:14px 0}.rv .q{font-weight:600}
+.rv ul{list-style:none;padding:0;margin:8px 0}.rv li{padding:7px 10px;border-left:4px solid var(--line);margin-top:6px;font-size:14.5px;background:var(--bg);border-radius:0 6px 6px 0}
+.rv li.r3{border-color:var(--good)}.rv li.r2{border-color:var(--ok)}.rv li.r1{border-color:var(--warn)}.rv li.r0{border-color:var(--bad)}
+.rv li.you{outline:2px solid var(--accent);outline-offset:1px}
+.rv .lab{font:600 11.5px Inter,sans-serif;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);display:block}
+.why{font-size:14.5px;color:var(--muted)}
+details summary{cursor:pointer;font-weight:600}
+@media (max-width:560px){.sr{grid-template-columns:1fr 44px}.sr .scale{grid-column:1/-1;order:3}h1{font-size:25px}.card{padding:16px}}
+</style>
+
+<div class="wrap">
+  <div class="eyebrow">Practice set · First Officer</div>
+  <h1>CRM Practice Test 4</h1>
+  <p class="muted">Crew Resource Management: 45 scenarios and 5 prioritisation tasks, scored on Cooperation, Leadership, Situational Awareness and Decision Making.</p>
+  <div id="app"></div>
+</div>
+
+<script>
+const ATTR={C:['Cooperation','--c1'],L:['Leadership','--c2'],S:['Situational Awareness','--c3'],D:['Decision Making','--c4']};
+/* options are written best -> least effective (3,2,1,0 points) and shuffled when shown */
+const SC=[
+/* ---- Cooperation ---- */
+{a:"C",s:"Team building and maintaining",q:"Yesterday's flight with this Captain ended with a tense disagreement about a fuel decision. Today you are rostered together again and meet in the crew room. You decide to -",o:[
+"Greet them openly, say you would like today to start fresh, and ask whether there is anything from yesterday worth clearing up before the briefing.",
+"Greet them normally and keep everything strictly professional and procedural for the day, without referring to yesterday.",
+"Wait to see how the Captain behaves towards you first and match their tone, since they are the senior crew member and it is for them to decide whether the matter is closed.",
+"Ask crewing whether a swap is possible, without speaking to the Captain."],why:"Unspoken tension closes down communication. A short, blame-free offer to clear the air rebuilds the working relationship before it is needed in the air."},
+{a:"C",s:"Team building and maintaining",q:"At the pre-flight briefing the four cabin crew share a first language that you and the Captain do not speak, and they are chatting and joking in it. You decide to -",o:[
+"Join in warmly, show interest, and suggest that everything operational is said in English so that all six of you share the same picture.",
+"Let them continue; ask the senior crew member to translate anything that turns out to be operationally important.",
+"Stay with the Captain and the paperwork; the cabin crew are clearly a team already.",
+"Tell them that company rules require English at all times while on duty and that the conversation should stop."],why:"Keep the atmosphere friendly and protect the shared mental model. A common language for operational matters is an invitation, not a reprimand."},
+{a:"C",s:"Team building and maintaining",q:"Halfway through the day your Captain is replaced by another for the last two sectors. The cabin crew stay the same and have worked well with you all morning. When the new Captain arrives, you decide to -",o:[
+"Introduce them to each crew member, summarise how the day has gone including any open issues, and ask how they like to work so that everyone can adjust.",
+"Give the new Captain a full handover on the aircraft, the technical log and the weather, and leave the cabin crew to introduce themselves when the Captain goes back to brief them.",
+"Carry on as before; the crew already has a rhythm and the Captain will fit into it.",
+"Tell the cabin crew privately what you have heard about this Captain so that they know what to expect."],why:"A crew change resets the team. Bridging the newcomer into an existing group, and sharing the state of the day, rebuilds it in a minute."},
+{a:"C",s:"Considering others",q:"Before the flight the Captain mentions that a parent was taken to hospital last night, then adds 'I am fine, let us get on with it'. You decide to -",o:[
+"Say you are glad they told you, ask them to tell you if their mind drifts, and agree that you will both call out anything the other misses, without making a drama of it.",
+"Say you are sorry to hear it and move on to the briefing as they asked.",
+"Avoid the subject completely so as not to upset them, and quietly double-check everything they do during the flight.",
+"Mention it to the senior cabin crew member so that the crew can go easy on the Captain today."],why:"Consider the person and the operation together: acknowledge it, keep the door open and agree mutual back-up. Passing on personal news without consent breaks trust."},
+{a:"C",s:"Considering others",q:"In the climb a cabin crew member calls the flight deck, clearly shaken, after being verbally abused by a passenger. The workload is low. You decide to -",o:[
+"Listen, thank them for telling you, inform the Captain, ask the senior crew member to support them, and call back later to see how they are and whether the passenger has settled.",
+"Listen, tell them they did the right thing, and ask them to report it to the senior crew member, who is responsible for the cabin.",
+"Tell them to give the passenger a firm warning in the Captain's name.",
+"Tell them that the flight deck cannot deal with passenger behaviour during the climb and to call back in the cruise if it happens again, since nothing safety-related has actually occurred yet."],why:"Take the person seriously first, then bring in the people who can help, then close the loop."},
+{a:"C",s:"Considering others",q:"During a busy arrival you answered the Captain sharply. Nothing was said at the time. You are now parked at the gate with the checklists complete. You decide to -",o:[
+"Raise it yourself: apologise for the tone, explain that you were loaded, and ask whether there is something you could do differently when it gets busy.",
+"Apologise briefly for having been a bit short with them.",
+"Say nothing about it but make an effort to be especially friendly on the next sector.",
+"Leave it; they were not exactly polite either, and it is normal on a busy approach."],why:"Being aware of the effect of your own behaviour, owning it and asking for the other person's view keeps communication open."},
+{a:"C",s:"Supporting others",q:"Your Captain is very senior but has just converted to this aircraft type. In the cruise they are searching the flight management computer for a page and getting frustrated. You decide to -",o:[
+"Offer help without taking over: 'Shall I show you the way I get there?', then let them press the keys.",
+"Tell them the key presses from your seat.",
+"Reach across and bring up the page for them so that the frustration ends quickly, then explain what you did.",
+"Leave them to find it; working it out alone is how it will stick, and offering help to a senior Captain could seem disrespectful."],why:"Good support offers help in a way that respects the other person and leaves them more capable, not sidelined."},
+{a:"C",s:"Supporting others",q:"The Captain has gone to the terminal. The refueller, who speaks little English, seems unsure about the fuel figure you gave him verbally. You decide to -",o:[
+"Write the figure and units down for him, have him show you the figure he will set, check the uplift against the gauges afterwards, and tell the Captain what happened.",
+"Repeat the figure slowly and clearly, and check the gauges when he has finished.",
+"Repeat the figure and leave it to him; refuellers do this all day.",
+"Ask him to wait until the Captain returns, as fuel is the Captain's responsibility."],why:"Support people outside the flight deck too: remove the language barrier, confirm understanding and verify the result."},
+{a:"C",s:"Supporting others",q:"The Captain's landing was firm and bounced. While taxiing in, they are muttering angrily at themselves. You decide to -",o:[
+"Keep the focus on the taxi for now, then at the gate be supportive and factual, and go through together whether a report or an inspection is required.",
+"Reassure them straight away that it was not that bad and that everyone has landings like that.",
+"Stay completely silent, during the taxi and afterwards; they will not want to talk about it.",
+"Lighten the mood with a joke about it over the interphone to the cabin crew."],why:"Support means protecting the current task first, then helping the person and the follow-up actions. Early reassurance is kind but adds distraction on the taxiway."},
+{a:"C",s:"Conflict solving",q:"You suggest loading extra fuel for forecast storms. The Captain disagrees and says 'my decision, end of discussion'. The planned fuel is legal. You are still uneasy. You decide to -",o:[
+"Accept that the decision is theirs, state calmly the one fact that worries you most, and ask to agree a point en route where you will both review fuel against the weather.",
+"Accept the decision and say no more, but watch the fuel very closely during the flight.",
+"Repeat your arguments more forcefully until the Captain understands that you will not let it go.",
+"Accept it, then message a colleague in operations to say you were overruled, so that it is on record."],why:"It is about what is right, not who is right. State the concern once, clearly, and look for a way forward that both can accept. Going behind the Captain's back destroys trust."},
+{a:"C",s:"Conflict solving",q:"During boarding, two cabin crew are arguing audibly in the forward galley and passengers are starting to notice. The senior crew member is at the rear. You decide to -",o:[
+"Tell the Captain, ask the senior crew member to come forward and deal with it, and check with them later that it is resolved.",
+"Step into the galley and calmly ask both to leave it until after the flight.",
+"Close the flight deck door; it is a cabin matter and you have your own preparation to do.",
+"Go into the galley and make clear, in front of the passengers if necessary, that this behaviour is unprofessional and will be reported to their manager after the flight."],why:"Resolve conflict through the right person and follow it up. Stepping in yourself helps in the moment but bypasses the cabin leader; a public reprimand escalates it."},
+{a:"C",s:"Conflict solving",q:"Returning from the walk-around, you are stopped at the gate by a passenger who is angry about the two-hour delay. You decide to -",o:[
+"Listen, acknowledge the frustration, give the honest information you have, and say what will happen next and who will update them.",
+"Politely direct them to the gate staff, who handle passenger information.",
+"Say that you are not able to talk now and continue to the aircraft.",
+"Explain at some length that the delay is caused by air traffic control and the company's scheduling, not by the crew, and that you are as frustrated about it as they are."],why:"Listening and acknowledging defuses most conflict. Arguing about whose fault it is, or brushing the person off, feeds it."},
+/* ---- Leadership ---- */
+{a:"L",s:"Use of authority and assertiveness",q:"During an engine failure checklist the Captain's hand moves towards the master switch of the healthy engine. You decide to -",o:[
+"Say 'Stop' loudly, state which engine has failed, and insist that you both confirm the control before it is moved.",
+"Ask 'Are you sure that is the correct one?'",
+"Look at the engine indications again to be certain you are right before you say anything, since an incorrect challenge at this moment could confuse matters further.",
+"Say nothing; the Captain will confirm before moving it, as the procedure requires."],why:"An irreversible action about to go wrong needs one unmistakable word, then the facts, then a confirmed action. A question takes too long."},
+{a:"L",s:"Use of authority and assertiveness",q:"The reported visibility is below the minimum for the approach. The Captain says 'let us go down and have a look, it is often better than they report'. You decide to -",o:[
+"State that the visibility is below minima and that you are not prepared to continue past the approach ban point, and propose holding or diverting.",
+"Ask whether company rules actually allow an approach in these conditions.",
+"Agree to have a look, but say that you will call the go-around at the minimum if nothing is visible, and brief the missed approach with extra care.",
+"Agree; the Captain knows this airport and the reports are often pessimistic."],why:"A limit is a limit. State it, state your position and offer a legal alternative. Agreeing 'to have a look' is already the violation."},
+{a:"L",s:"Use of authority and assertiveness",q:"The Captain is flying the approach manually. At 800 feet the aircraft drifts half a dot low on the glide path and you see them start to correct. You decide to -",o:[
+"Make the standard deviation call, watch the correction, and be ready to call a go-around if a limit is exceeded.",
+"Wait two or three seconds to see the correction take effect, and call only if it does not improve.",
+"Call for a go-around immediately; any deviation below the glide path is unacceptable.",
+"Take control and correct the flight path yourself."],why:"Assertiveness is graded. The standard call is the right first step; a go-around call or taking control are for exceeded limits or no response, not for a deviation that is being corrected."},
+{a:"L",s:"Maintaining standards",q:"The before take-off checklist has been called complete. While lining up you realise that you forgot one of your own flow items and that the checklist did not catch it. You decide to -",o:[
+"Say so at once, correct it, and suggest holding position to run the checklist again.",
+"Correct it and tell the Captain what you have done.",
+"Correct it quietly; it is done now, and mentioning it on the runway would only be a distraction and would make the Captain doubt the rest of your preparation.",
+"Leave it for the after take-off checklist to catch."],why:"Standards include owning your own errors openly. A missed item that the checklist did not catch means the checklist needs to be done again."},
+{a:"L",s:"Maintaining standards",q:"Climbing through 4,000 feet in busy airspace, the Captain starts telling you about their holiday plans. You decide to -",o:[
+"Say with a smile, 'Tell me above ten thousand', and carry on monitoring.",
+"Give short answers so that the conversation fades out.",
+"Join in, but keep your eyes on the instruments and one ear on the radio so that nothing is missed.",
+"Join in fully; the workload is low and it is good for the atmosphere."],why:"Keep the sterile flight deck standard with a light touch. The standard and the relationship both survive."},
+{a:"L",s:"Maintaining standards",q:"It is raining hard and the slot is tight. The Captain says 'the engineer has been round the aircraft, skip the walk-around and sign for it'. You decide to -",o:[
+"Say that you will do the walk-around now, that it takes five minutes, and that you will not sign for a check you have not done.",
+"Suggest a shortened walk-around covering only the most critical items.",
+"Ask the engineer what they looked at, and rely on that if it sounds thorough, noting in the technical log that the exterior check was done by engineering.",
+"Sign; the Captain has authorised it and the engineer has seen the aircraft."],why:"Do the required check and remove the reason for skipping it. Signing for something you did not do is never a time-saving option."},
+{a:"L",s:"Planning and coordination",q:"The aircraft has just been de-iced in light snow. There is a long queue for the runway. Before leaving the de-icing pad, you decide to -",o:[
+"Agree with the Captain the time at which the holdover protection ends, ask ATC how long the queue is, agree what you will do if the time runs out, and warn the cabin crew of a possible return.",
+"Note the holdover time and tell the Captain if it is getting close.",
+"Taxi out and look at the wings from the cabin before take-off if the queue turns out to be long.",
+"Taxi out; the fluid was applied by professionals and the snow is only light."],why:"Plan against a known time limit before it bites: the limit, the information, the fallback and everyone affected."},
+{a:"L",s:"Planning and coordination",q:"You are pilot flying into an airport you have never visited. The Captain has been there many times. Preparing the approach briefing, you decide to -",o:[
+"Brief it yourself, then ask the Captain to add local threats you may have missed, and agree the specific things you want them to watch for you.",
+"Give a thorough briefing from the charts, covering every detail of the arrival, the approach, the missed approach and the taxi routing, so that the Captain can see you are fully prepared.",
+"Ask the Captain to give the briefing, since they know the airport.",
+"Suggest that the Captain flies the sector instead."],why:"Leading a plan includes using the knowledge in the other seat and assigning the monitoring. A long solo briefing leaves the best source of information unused."},
+{a:"L",s:"Planning and coordination",q:"After a diversion you are parked at an airport where the company has no staff. Fuel, a new flight plan, the passengers, the cabin crew and operations all need attention. You decide to -",o:[
+"List the tasks with the Captain, split them between you and the senior cabin crew member, and set a time to regroup and confirm where everything stands.",
+"Ask the Captain what they would like you to do and get on with it.",
+"Start arranging fuel yourself straight away, since it will be needed whatever happens.",
+"Wait for operations to call with instructions."],why:"Coordination is making the plan visible: who does what, by when, and a point to check it."},
+{a:"L",s:"Workload management",q:"Fifteen minutes before the top of descent, the Captain is absorbed in trying to make the flight deck printer work. The approach has not been briefed. You decide to -",o:[
+"Point out the time to the top of descent, suggest the printer is written up after landing, and propose doing the briefing now.",
+"Set up the approach yourself and brief the Captain when they have finished.",
+"Help with the printer so that it is solved quickly and you can both move on.",
+"Wait; the Captain knows how much time there is."],why:"Managing workload includes helping a colleague out of a low-priority task. Give the time, offer a way to park it, and move to what matters."},
+{a:"L",s:"Workload management",q:"It is 4 a.m. in a quiet cruise. You notice that you have read the same line of the flight log three times, and the Captain has not spoken for a while. You decide to -",o:[
+"Say that you are getting drowsy, ask how they are, and agree a plan to manage it, such as controlled rest if permitted, a cabin crew check call and something to keep you both engaged.",
+"Stand up, have some water and turn the lights up, without mentioning why.",
+"Push through; top of descent is in an hour and the workload will wake you up.",
+"Rest your eyes for a few minutes while the Captain is monitoring."],why:"Low workload is a workload problem too. Say it, check the other pilot and manage it together; unannounced rest is the worst case."},
+{a:"L",s:"Workload management",q:"You are pilot monitoring at 4,000 feet on the approach when a company message arrives asking for the fuel figure for the next sector. You decide to -",o:[
+"Tell the Captain it is non-urgent and that you will answer it at the gate, and carry on monitoring.",
+"Send a quick 'stand by' reply and return to monitoring.",
+"Answer it now; it takes twenty seconds and the approach is stable.",
+"Ask the Captain to work out the figure in their head while you type the reply, so that it is dealt with before landing and does not delay the turnaround."],why:"Defer what can wait and say so aloud, so that the other pilot knows nothing is being worked on behind their back."},
+/* ---- Situational awareness ---- */
+{a:"S",s:"System awareness",q:"The performance application gives a take-off speed that feels lower than you would expect for today's weight. The Captain's tablet shows the same figure. You decide to -",o:[
+"Say that it looks low, check the inputs against the load sheet and runway together, and both recalculate before accepting it.",
+"Run your own calculation again.",
+"Accept it but add a few knots to be safe.",
+"Accept it; two tablets agreeing is the cross-check, and the software has been validated by the company."],why:"A gross-error check is a feeling worth voicing. Two devices fed the same wrong input will agree; the inputs are what need checking."},
+{a:"S",s:"System awareness",q:"The Captain is flying with the autopilot engaged. In level flight you see the speed slowly falling below the target with the thrust at idle. You decide to -",o:[
+"Call 'speed' at once and say what the mode annunciator shows.",
+"Ask 'Are you happy with the speed?'",
+"Watch for a few more seconds to work out why it is happening before you say anything, so that you can give the Captain the cause as well as the symptom.",
+"Leave it; the automatic thrust will recover the speed."],why:"Call the energy state first and the mode second. Understanding why can wait until the speed is recovering."},
+{a:"S",s:"System awareness",q:"The technical log shows that a component was replaced overnight. During your flight deck preparation you find a switch in an unusual position. You decide to -",o:[
+"Tell the Captain, check the log or ask engineering whether the position is intended, then set it by the procedure and scan the rest of the panels with extra care.",
+"Set it to the normal position and tell the Captain.",
+"Set it to the normal position and continue your flow.",
+"Leave it where it is; the engineers will have set it deliberately."],why:"An unexpected switch position after maintenance is a clue about the state of the aircraft. Find out why before changing or accepting it."},
+{a:"S",s:"External environment",q:"On a busy frequency you notice another aircraft with a callsign very similar to yours. You decide to -",o:[
+"Tell the Captain, use your full callsign in every read-back, and tell ATC about the similarity.",
+"Listen to each call with extra care.",
+"Rely on ATC, who can see both aircraft on their screen and will notice if the wrong one responds.",
+"Take no special action; callsign confusion is unlikely if you are paying attention."],why:"Spot the threat, share it in the flight deck and with ATC, and tighten your own radio discipline."},
+{a:"S",s:"External environment",q:"In an area known for satellite navigation interference, the map display shifts and the two position sources disagree. You decide to -",o:[
+"Call it out, cross-check the position against ground aids and ATC radar, agree which source you will navigate on, and review what it means for terrain warnings and the planned approach.",
+"Tell the Captain and carry out the procedure for deselecting the satellite input.",
+"Monitor it to see whether it recovers once you are out of the area.",
+"Disregard it; it is common in this region and the aircraft will sort itself out."],why:"Awareness is more than the procedure: confirm where you are by independent means, tell ATC and think ahead to what else depends on that position."},
+{a:"S",s:"External environment",q:"From your window at the gate you see a baggage belt vehicle touch the fuselage lightly as it backs away. The driver leaves. You decide to -",o:[
+"Tell the Captain and ask for an engineering inspection before departure.",
+"Go down and look at the area yourself, and decide from what you see.",
+"Ask the dispatcher whether anybody on the ground noticed anything.",
+"Take no action; it was a light touch and the vehicle has a rubber bumper."],why:"What you saw is information nobody else may have. Share it and get it inspected by someone qualified; your own look is not an inspection."},
+{a:"S",s:"Anticipation and time awareness",q:"You enter the hold and ATC says 'expect a delay of twenty minutes'. You decide to -",o:[
+"Work out with the Captain the time and the fuel at which you must leave for the alternate, tell ATC how long you can hold, and get the alternate's weather now.",
+"Note the fuel and check it again in ten minutes.",
+"Wait for the next update from ATC before doing anything.",
+"Relax; twenty minutes is well within the extra fuel you loaded."],why:"Turn the delay into a hard limit and prepare the exit before you need it. Estimated delays grow."},
+{a:"S",s:"Anticipation and time awareness",q:"You have briefed runway 27. In the descent the latest weather shows the wind swinging round to favour runway 09, but ATC has said nothing. You decide to -",o:[
+"Tell the Captain and brief the other runway now as a contingency, including the landing distance and taxi route.",
+"Mention it to the Captain and deal with it if ATC announces a change.",
+"Look at the charts for the other runway yourself, just in case.",
+"Wait; ATC decides the runway in use."],why:"Use spare capacity now for a change you can see coming. A late runway change is far easier when it has already been briefed."},
+{a:"S",s:"Anticipation and time awareness",q:"You are number two for departure and the cabin has not yet been reported secure. You decide to -",o:[
+"Tell the Captain, call the cabin for a time estimate, and warn ATC now that you may not be ready at the holding point.",
+"Call the cabin and ask them to hurry up.",
+"Wait for the 'cabin secure' call; it nearly always comes in time.",
+"Accept the line-up clearance when it comes to protect the slot; the call will arrive while you are lining up."],why:"See the conflict coming, tell everyone it affects and avoid passing pressure to the cabin. Lining up with an unsecured cabin is plan continuation at its worst."},
+/* ---- Decision making ---- */
+{a:"D",s:"Problem diagnosis",q:"Shortly after take-off the cabin crew report a loud whistling noise near one of the doors. You decide to -",o:[
+"Ask when it started, exactly where it is and whether it is changing, check the pressurisation indications with the Captain, and consider the possible causes together before deciding anything.",
+"Tell the Captain and check the pressurisation page.",
+"Ask the cabin crew to keep listening and to call back if it gets louder.",
+"Reassure them that door seals often whistle and that it is nothing to worry about."],why:"Gather the facts from the people who have them, match them against the indications and diagnose as a crew before choosing an action."},
+{a:"D",s:"Problem diagnosis",q:"At a cruise fuel check the fuel on board is 400 kg below the plan. At the previous check it was on plan. You decide to -",o:[
+"Tell the Captain, repeat the calculation together, and compare tank quantities, fuel used and fuel flows to separate a leak from wind, level or indication effects.",
+"Tell the Captain and check it again at the next waypoint.",
+"Check it again yourself at the next waypoint before mentioning it.",
+"Put it down to stronger headwinds than forecast."],why:"A sudden change needs an explanation, not an assumption. Use every independent source of evidence and work it through together."},
+{a:"D",s:"Problem diagnosis",q:"An engine's oil pressure indication starts to fluctuate. The Captain says straight away, 'that is a sensor fault, ignore it'. You decide to -",o:[
+"Ask what else would confirm that, look at oil temperature, quantity and the other engine parameters together, and consult the checklist before concluding.",
+"Agree that it is probably the sensor, but suggest keeping an eye on it.",
+"Propose shutting the engine down as a precaution, since an engine without oil pressure can be destroyed within minutes and it is better to be safe.",
+"Accept the Captain's diagnosis and return to your other tasks."],why:"Test the first explanation against the other evidence. Both accepting it untested and jumping to a shutdown skip the diagnosis."},
+{a:"D",s:"Option generation",q:"Forty minutes after departure the cabin crew report an intoxicated passenger who is refusing instructions. The Captain asks, 'what can we do?' You decide to -",o:[
+"Set out the range, from stopping alcohol and a formal warning to reseating people, restraint, police on arrival and diversion, and ask the senior crew member which they think will work.",
+"Recommend that the police meet the aircraft on arrival.",
+"Offer to go back and speak to the passenger yourself.",
+"Recommend an immediate diversion; a disruptive passenger is a threat to the aircraft, and it is not worth waiting to see whether the situation gets worse before acting."],why:"When asked for options, give several, graded, and bring in the person closest to the problem. One answer, however sensible, is not option generation."},
+{a:"D",s:"Option generation",q:"Passengers are on board when a two-hour slot delay is announced. It is a hot day and the auxiliary power unit is unserviceable, so the cabin is warming up. You decide to -",o:[
+"Work through the choices with the Captain, the senior crew member and the handling agent: ground air, disembarking, asking ATC for an improvement, and their effect on passengers and crew duty time.",
+"Propose disembarking the passengers and explain why.",
+"Ask the Captain what they would like to do.",
+"Wait; slots often improve, and disembarking would lose the one you have."],why:"Collect the options from everyone who holds a piece of the picture, and look at the consequences of each."},
+{a:"D",s:"Option generation",q:"ATC tells you that the airspace ahead will close in thirty minutes and offers a re-route that adds twenty-five minutes. Your fuel is planned tightly. You decide to -",o:[
+"Compare the choices with the Captain before answering: the re-route with fuel recalculated, a different level or routing, a fuel stop en route, or returning.",
+"Accept the re-route and recalculate the fuel straight afterwards.",
+"Ask ATC what other aircraft are doing.",
+"Ask to increase speed in order to get through before the airspace closes."],why:"A minute spent comparing options before accepting is cheaper than discovering afterwards that the accepted one does not work."},
+{a:"D",s:"Risk assessment",q:"A loader mentions that one of the pallets 'smelled of solvent'. The cargo paperwork shows no dangerous goods. You decide to -",o:[
+"Tell the Captain and hold the departure until the loading supervisor has identified the item and confirmed the paperwork.",
+"Ask the loader to check with their supervisor, and carry on preparing while you wait to hear.",
+"Note it, and pay particular attention to the cargo smoke detection during the flight.",
+"Depart; the paperwork is the official record and it is clean."],why:"An unexplained hazard in the hold is assessed on the ground, where you can still do something about it. Clean paperwork does not explain a smell."},
+{a:"D",s:"Risk assessment",q:"The cabin crew report that a passenger's phone has slipped into the seat mechanism. It is stuck and is not hot. You decide to -",o:[
+"Treat it as a possible battery fire: tell the Captain, have the seat left untouched and the phone watched with fire equipment at hand, follow the procedure, and note where you could land if it heats up.",
+"Ask the crew to retrieve it carefully and report back.",
+"Ask the crew to keep an eye on it.",
+"Take no action; it is not hot, and phones fall into seats every day."],why:"Assess what it could become, not only what it is now. Moving the seat is what crushes the battery, so retrieving it is the riskier 'active' choice."},
+{a:"D",s:"Risk assessment",q:"It is your sector to fly. The crosswind is gusting close to the limit on a wet runway and you have little experience in such conditions. You decide to -",o:[
+"Tell the Captain honestly how your experience compares with the conditions, check the limits that apply to you, and decide together who should land or whether another runway is better.",
+"Suggest that the Captain flies this one.",
+"Fly it, and ask the Captain to be ready to take over if needed.",
+"Fly it without comment; it is your sector, the wind is within the aircraft's limits, and conditions like these are exactly what you need to gain experience."],why:"You are part of the risk. Put your own limits on the table with the facts and make it a joint decision."},
+{a:"D",s:"Outcome review",q:"You chose a descent plan that left the aircraft high, and it ended in a go-around. The second approach was normal. At the gate, you decide to -",o:[
+"Raise it yourself: go through what you knew and when, and ask the Captain what they saw and what cue would have made them speak earlier.",
+"Apologise and say that you will plan the descent earlier next time.",
+"Wait to see whether the Captain brings it up.",
+"Point out that the late descent clearance from ATC left you no realistic chance of making the profile."],why:"Reviewing your own decision openly, and asking for the other view, is how the crew learns. An apology alone closes the subject without learning."},
+{a:"D",s:"Outcome review",q:"You agreed with the Captain to hold for fifteen minutes for the weather to improve. Ten minutes have passed. You decide to -",o:[
+"Prompt a check: state the fuel and the latest weather, and ask whether the plan still holds and what you will do at fifteen minutes.",
+"Give the Captain the updated fuel figure.",
+"Wait until the fifteen minutes are up, as agreed.",
+"Suggest extending the hold a little; the weather is nearly good enough, and it would be a pity to divert just before it clears."],why:"Review the decision while it is running, against the facts, before the limit arrives. 'A little longer' is how limits disappear."},
+{a:"D",s:"Outcome review",q:"You landed from an approach that was right on the edge of the stabilisation criteria. On the taxiway the Captain says 'great landing!' At the gate, you decide to -",o:[
+"Thank them, say that at 500 feet you were at the limit and probably should have gone around, and ask how they saw it and what you would both call next time.",
+"Mention that the approach felt a bit rushed.",
+"Accept the compliment; the landing was good and the Captain was happy.",
+"Say nothing; raising it could lead to a report being filed."],why:"A good outcome can hide a poor decision. Review the process honestly even when nobody is asking."}
+];
+const PR=[
+{q:"A rapid loss of cabin pressure occurs in the cruise -",o:["Put on your oxygen mask","Establish communication with the other pilot","Start the emergency descent","Tell air traffic control and declare an emergency"],why:"Protect yourself, make sure the crew can talk, fly the descent, then communicate. In practice the last two are done almost together."},
+{q:"A terrain 'PULL UP' warning sounds during a night descent -",o:["Fly the terrain escape manoeuvre","Monitor height and climb rate and call the trend","Tell air traffic control once clear of the terrain","Review how the situation developed and file a report"],why:"Aviate with the memory actions, monitor, communicate when safe, analyse afterwards."},
+{q:"Lightning strikes the aircraft, the autopilot disconnects and the displays flicker -",o:["Fly the aircraft manually and keep it on a safe path","Check the systems and indications for damage","Tell air traffic control what has happened","Ask the cabin crew to check the cabin and passengers"],why:"Control first, then the state of the aircraft, then ATC, then the cabin."},
+{q:"A laser is shone into the flight deck on final approach -",o:["Look away from the light and keep the aircraft on a stable path","Check with the other pilot whether either of you has affected vision","Report the laser to air traffic control","Complete the incident report after landing"],why:"Protect your eyes and the flight path, check the crew, communicate, then the paperwork."},
+{q:"While taxiing to the stand, the cabin crew report that a passenger has collapsed -",o:["Continue to taxi safely as cleared","Ask air traffic control for medical services to meet the aircraft","Tell the cabin crew how long it will be until the doors open","Complete the report of the event"],why:"The aircraft is still moving, so control comes first. Then get help on its way, inform the cabin, and write it up last."}
+];
+const RNG=(()=>{let a=(Date.now()^(Math.random()*2**32))>>>0;return()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}})();
+const shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(RNG()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+/* build one run: scenarios shuffled, options shuffled, 2 unscored... none */
+let Qs=[],cur=-1,t0=0;
+function build(){const sc=shuf(SC).map(x=>({type:'s',x,ord:shuf([0,1,2,3]),ans:null}));
+  const pr=shuf(PR).map(x=>{let ord;do{ord=shuf([0,1,2,3])}while(ord.join('')==='0123');return{type:'p',x,ord,ans:''}});Qs=[...sc,...pr];cur=-1}
+const app=document.getElementById('app');
+function intro(){app.innerHTML=`<div class="card"><h2 style="margin-top:0">Instructions</h2>
+  <p><b>Section 1 (45 questions).</b> Each question describes a situation from the right-hand seat. Choose the one option that best reflects what you would prefer to do. Several options are usually reasonable; they differ in how far they go. In this set the best option is not always the longest one, and a few options go too far rather than not far enough.</p>
+  <p><b>Section 2 (5 questions).</b> Four tasks are listed. Type the letters in priority order, highest first, in lower case with no spaces: for example <b>dcba</b>.</p>
+  <p class="muted">There is no time limit, but the real test is usually done at about 30 to 40 seconds per question, around 30 minutes in total. The order of the questions and options changes every time you start. The scenarios and the scoring are my own, new for this set and written to the same four attributes as the report you shared; they are not the publisher's questions or its scoring key.</p>
+  <div class="row"><span></span><button class="pri" id="go">Start the test</button></div></div>`;
+  document.getElementById('go').onclick=()=>{build();t0=Date.now();cur=0;render()}}
+function render(){const q=Qs[cur],n=Qs.length,sec=q.type==='s'?'Section 1 · Scenarios':'Section 2 · Prioritisation';
+  let body;
+  if(q.type==='s')body=`<p class="scen">${esc(q.x.q)}</p>`+q.ord.map((k,i)=>`<button class="opt${q.ans===i?' sel':''}" data-i="${i}"><span class="dot"></span><span>${esc(q.x.o[k])}</span></button>`).join('');
+  else body=`<p class="scen">Put these tasks in order of priority. Assume you are the only person available to deal with them.</p><p><b>${esc(q.x.q)}</b></p><ul class="tasks">${q.ord.map((k,i)=>`<li><b>${'abcd'[i]}.</b>${esc(q.x.o[k])}</li>`).join('')}</ul>
+    <p class="muted" style="font-size:14px">Type the letters a to d, highest priority first, lower case, no spaces.</p><input class="ord" id="ord" maxlength="4" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Priority order" value="${esc(q.ans)}"><span class="muted" id="ordmsg" style="margin-left:10px;font-size:14px"></span>`;
+  app.innerHTML=`<div class="card"><div class="meta"><span>${sec}</span><span>Question ${cur+1} of ${n}</span></div><div class="prog"><i style="width:${(cur/n*100).toFixed(1)}%"></i></div>${body}
+    <div class="row"><button id="bk" ${cur?'':'disabled'}>Back</button><button class="pri" id="nx">${cur===n-1?'Finish':'Next'}</button></div></div>`;
+  const nx=document.getElementById('nx');
+  const valid=()=>q.type==='s'?q.ans!==null:/^[abcd]{4}$/.test(q.ans)&&new Set(q.ans).size===4;
+  nx.disabled=!valid();
+  app.querySelectorAll('.opt').forEach(b=>b.onclick=()=>{q.ans=+b.dataset.i;app.querySelectorAll('.opt').forEach(o=>o.classList.toggle('sel',o===b));nx.disabled=false});
+  const inp=document.getElementById('ord');if(inp){inp.oninput=()=>{q.ans=inp.value.toLowerCase().replace(/[^abcd]/g,'');inp.value=q.ans;nx.disabled=!valid();document.getElementById('ordmsg').textContent=q.ans.length===4&&!valid()?'Use each letter once.':''};inp.focus()}
+  document.getElementById('bk').onclick=()=>{cur--;render()};
+  nx.onclick=()=>{if(cur===n-1)results();else{cur++;render()}};
+  window.scrollTo({top:0})}
+const scale=(v,col)=>`<div class="scale" role="img" aria-label="${v} out of 10">${[...Array(10)].map((_,i)=>`<i style="${i+1===v?`background:var(${col});border-color:var(${col})`:Math.abs(i+1-v)===1?`background:color-mix(in srgb,var(${col}) 35%,var(--card))`:''}"></i>`).join('')}</div>`;
+const sten=p=>Math.max(1,Math.min(10,Math.round(1+p*9)));
+function prScore(q){const pos=[];[...q.ans].forEach((ch,rank)=>{pos[q.ord['abcd'.indexOf(ch)]]=rank});let ok=0;for(let i=0;i<4;i++)for(let j=i+1;j<4;j++)if(pos[i]<pos[j])ok++;return ok/6}
+function results(){const S=Qs.filter(q=>q.type==='s'),P=Qs.filter(q=>q.type==='p');const pts=q=>3-q.ord[q.ans];
+  const mins=Math.round((Date.now()-t0)/60000);let h=`<div class="card"><h2 style="margin-top:0">Your profile</h2><p class="muted">Finished in about ${mins} minute${mins===1?'':'s'}. Each bar runs from 1 (left) to 10 (right). The right-hand end is the behaviour the assessment looks for: working with the crew, speaking up, planning ahead and following procedures.</p>`;
+  for(const a of Object.keys(ATTR)){const qs=S.filter(q=>q.x.a===a),ov=qs.reduce((s,q)=>s+pts(q),0)/(qs.length*3),col=ATTR[a][1];
+    h+=`<h3 style="color:var(${col})">${ATTR[a][0]}</h3><div class="sr ov"><span>Overall</span>${scale(sten(ov),col)}<span>${sten(ov)}/10</span></div>`;
+    for(const sub of [...new Set(qs.map(q=>q.x.s))]){const g=qs.filter(q=>q.x.s===sub),v=sten(g.reduce((s,q)=>s+pts(q),0)/(g.length*3));h+=`<div class="sr"><span>${sub}</span>${scale(v,col)}<span>${v}/10</span></div>`}}
+  const pv=sten(P.reduce((s,q)=>s+prScore(q),0)/P.length);
+  h+=`<h3 style="color:var(--accent)">Prioritisation</h3><div class="sr ov"><span>Overall</span>${scale(pv,'--accent')}<span>${pv}/10</span></div>`;
+  const cnt=[0,0,0,0];S.forEach(q=>cnt[pts(q)]++);
+  h+=`<p style="margin-top:16px"><span class="tag">Most effective: ${cnt[3]}</span><span class="tag">Good: ${cnt[2]}</span><span class="tag">Weak: ${cnt[1]}</span><span class="tag">Least effective: ${cnt[0]}</span></p>
+  <p class="muted" style="font-size:14px">These scores come from my own rating of each option against the four attributes. Treat them as practice feedback, not as a prediction of your real result.</p>
+  <div class="row"><span></span><button class="pri" id="again">Take it again (new order)</button></div></div>`;
+  const LAB=['Least effective','Weak','Good','Most effective'];
+  const weak=S.filter(q=>pts(q)<3);
+  const item=(q,i)=>`<div class="rv"><div class="q">${i+1}. ${esc(q.x.q)}</div><div class="muted" style="font-size:13px">${ATTR[q.x.a][0]} · ${q.x.s}</div><ul>${[0,1,2,3].map(k=>`<li class="r${3-k}${q.ord[q.ans]===k?' you':''}"><span class="lab">${LAB[3-k]}${q.ord[q.ans]===k?' · your answer':''}</span>${esc(q.x.o[k])}</li>`).join('')}</ul><div class="why">${esc(q.x.why)}</div></div>`;
+  h+=`<div class="card"><h2 style="margin-top:0">Questions to review (${weak.length})</h2>${weak.length?'<p class="muted">These are the scenarios where you did not choose the option I rated most effective.</p>'+weak.map(q=>item(q,Qs.indexOf(q))).join(''):'<p>You chose the most effective option in every scenario.</p>'}</div>`;
+  h+=`<div class="card"><h2 style="margin-top:0">Prioritisation review</h2>${P.map(q=>{const rec=[0,1,2,3].map(k=>'abcd'[q.ord.indexOf(k)]).join('');return `<div class="rv"><div class="q">${esc(q.x.q)}</div><ul class="tasks">${q.ord.map((k,i)=>`<li><b>${'abcd'[i]}.</b>${esc(q.x.o[k])}</li>`).join('')}</ul><p>Your order: <b>${esc(q.ans)}</b> · Suggested order: <b>${rec}</b> ${q.ans===rec?'✓':''}</p><div class="why">${esc(q.x.why)}</div></div>`}).join('')}</div>`;
+  const rest=S.filter(q=>pts(q)===3);
+  if(rest.length)h+=`<div class="card"><details><summary>All other scenarios (${rest.length})</summary>${rest.map(q=>item(q,Qs.indexOf(q))).join('')}</details></div>`;
+  app.innerHTML=h;document.getElementById('again').onclick=()=>{intro();window.scrollTo({top:0})};window.scrollTo({top:0})}
+window.__crm={Qs:()=>Qs,SC,PR,results};
+intro();
+</script>
+
+</body>
+</html>

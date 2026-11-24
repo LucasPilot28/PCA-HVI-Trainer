@@ -1,0 +1,781 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<style>[hidden]{display:none!important}img{max-width:100%}body{margin:0}</style>
+<title>Cognitive Practice Test 7</title>
+</head>
+<body>
+
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@600;700&family=IBM+Plex+Mono:wght@500&family=Inter:wght@400;500;600&display=swap">
+<style>
+/* Layout: test console. Header strip, question navigator on the left, one question card on the right; figures sit on drawn panels like the real test. */
+:root{
+  --bg:#eef2f5;--surface:#ffffff;--surface-2:#f5f7f9;--ink:#132130;--muted:#566676;--line:#d6dee5;
+  --accent:#1d5fa6;--accent-ink:#ffffff;--accent-soft:#e2ecf7;--flag:#a86d00;--flag-soft:#fbf0d9;
+  --good:#1f7a45;--good-soft:#e1f1e7;--bad:#b3362c;--bad-soft:#f8e3e0;
+  --fig-bg:#ffffff;--fig-stroke:#141a20;--fig-text:#141a20;--fig-frame:#c7d1da;--fig-street:#d7dee4;--fig-block:#eef2f5;--fig-park:#cde6d3;
+  --panel:#0c1117;--panel-ink:#f1f5f8;--amber:#f2a516;
+  --c-red:#d83b2d;--c-blue:#2d6fd2;--c-yellow:#f0c22e;--c-green:#2f9a55;--c-purple:#7a4fc2;--c-orange:#e8822a;--c-grey:#8d97a3;--radar-bg:#06150c;--radar-ink:#3cc46a;--plate:#b69be6;--plate-edge:#5b3f99;
+  --f-display:"Barlow Semi Condensed","Arial Narrow",sans-serif;
+  --f-body:"Inter",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e141a;--surface:#151d25;--surface-2:#1b252f;--ink:#e4ebf1;--muted:#93a3b2;--line:#283542;
+  --accent:#6aa5e6;--accent-ink:#0b1622;--accent-soft:#1c2c3d;--flag:#e3a63a;--flag-soft:#33280f;
+  --good:#5cc68a;--good-soft:#173324;--bad:#ec7a6f;--bad-soft:#3a1d1b;
+  --fig-bg:#0f161d;--fig-stroke:#e6edf3;--fig-text:#e6edf3;--fig-frame:#2c3a48;--fig-street:#2c3946;--fig-block:#1a242e;--fig-park:#1d3a27;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e141a;--surface:#151d25;--surface-2:#1b252f;--ink:#e4ebf1;--muted:#93a3b2;--line:#283542;
+  --accent:#6aa5e6;--accent-ink:#0b1622;--accent-soft:#1c2c3d;--flag:#e3a63a;--flag-soft:#33280f;
+  --good:#5cc68a;--good-soft:#173324;--bad:#ec7a6f;--bad-soft:#3a1d1b;
+  --fig-bg:#0f161d;--fig-stroke:#e6edf3;--fig-text:#e6edf3;--fig-frame:#2c3a48;--fig-street:#2c3946;--fig-block:#1a242e;--fig-park:#1d3a27;
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55}
+.app{max-width:1120px;margin:0 auto;padding-block:20px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:grid;gap:16px}
+h1,h2,h3{font-family:var(--f-display);font-weight:700;line-height:1.15;text-wrap:balance;margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+
+.top{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:12px}
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.top h1{font-size:30px}
+.meta{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.secname{font-size:13px;color:var(--muted);font-weight:500}
+.timer{font-family:var(--f-mono);font-variant-numeric:tabular-nums;font-size:18px;background:var(--panel);color:var(--panel-ink);padding:6px 12px;border-radius:6px;min-width:84px;text-align:center}
+
+.layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:20px;align-items:start}
+nav{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px;display:grid;gap:2px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px)}
+.navsec{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:10px 10px 4px}
+.qbtn{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:none;border:0;border-radius:6px;padding:7px 10px;cursor:pointer;font-size:14px}
+.qbtn:hover:not(:disabled){background:var(--surface-2)}
+.qbtn:disabled{cursor:default;color:var(--muted)}
+.qbtn .dot{width:10px;height:10px;border-radius:50%;border:2px solid var(--line);flex:none}
+.qbtn.done .dot{background:var(--accent);border-color:var(--accent)}
+.qbtn.cur{background:var(--accent-soft);font-weight:600}
+.qbtn.good .dot{background:var(--good);border-color:var(--good)}
+.qbtn.bad .dot{background:var(--bad);border-color:var(--bad)}
+.qbtn .flagic{margin-left:auto;color:var(--flag)}
+
+main{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:24px;min-width:0;display:grid;gap:18px}
+.qhead{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline}
+.qhead h2{font-size:24px}
+.qhead .sec{font-size:13px;color:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--surface-2);color:var(--muted)}
+.chip.flag{background:var(--flag-soft);color:var(--flag)}
+.chip.good{background:var(--good-soft);color:var(--good)}
+.chip.bad{background:var(--bad-soft);color:var(--bad)}
+.prompt{font-size:17px;margin:0;max-width:65ch}
+.figwrap{max-width:600px;overflow-x:auto}
+.fig{display:block;width:100%;height:auto;max-width:100%}
+.fig.small{max-width:300px}
+
+fieldset{border:0;margin:0;padding:0;display:grid;gap:8px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.opt{display:flex;align-items:center;gap:12px;padding:10px 14px;border:1px solid var(--line);border-radius:8px;cursor:pointer;max-width:420px;background:var(--surface)}
+.opt:hover{border-color:var(--accent)}
+.opt input{position:absolute;opacity:0;pointer-events:none}
+.opt .box{width:20px;height:20px;border:2px solid var(--muted);border-radius:4px;flex:none;display:grid;place-items:center}
+.opt input:checked + .box{background:var(--accent);border-color:var(--accent)}
+.opt input:checked + .box::after{content:"";width:6px;height:11px;border:solid var(--accent-ink);border-width:0 2.5px 2.5px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.opt input:focus-visible + .box{outline:3px solid var(--accent);outline-offset:2px}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.mono{font-family:var(--f-mono);letter-spacing:.06em}
+
+.actions{display:flex;flex-wrap:wrap;gap:10px;align-items:center;border-top:1px solid var(--line);padding-top:16px}
+.actions .spacer{flex:1}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:9px 16px;font-weight:600;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.flagged{background:var(--flag-soft);border-color:var(--flag);color:var(--flag)}
+.btn:disabled{opacity:.45;cursor:default}
+
+.confirm{border:1px solid var(--flag);background:var(--flag-soft);border-radius:8px;padding:14px 16px;display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.confirm p{margin:0;flex:1 1 240px}
+
+.memo{border:1px dashed var(--line);border-radius:10px;padding:18px;display:grid;gap:12px;justify-items:start;background:var(--surface-2)}
+.countbar{height:6px;width:100%;max-width:300px;background:var(--line);border-radius:3px;overflow:hidden}
+.countbar i{display:block;height:100%;background:var(--amber);width:100%;animation:drain 5s linear forwards}
+@keyframes drain{to{width:0}}
+@media (prefers-reduced-motion: reduce){.countbar i{animation:none}}
+
+.intro{display:grid;gap:16px;max-width:68ch}
+.intro p{margin:0}
+.intro ul{margin:0;padding-left:20px;display:grid;gap:6px}
+.secgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}
+.secgrid div{border:1px solid var(--line);border-radius:8px;padding:10px 12px;background:var(--surface-2)}
+.secgrid b{display:block;font-family:var(--f-display);font-size:17px}
+.secgrid span{font-size:13px;color:var(--muted)}
+
+.score{display:flex;flex-wrap:wrap;gap:12px}
+.stat{border:1px solid var(--line);border-radius:10px;padding:12px 16px;min-width:140px;background:var(--surface-2)}
+.stat b{display:block;font-family:var(--f-display);font-size:30px;font-variant-numeric:tabular-nums;line-height:1.1}
+.stat span{font-size:13px;color:var(--muted)}
+.tablewrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:420px;font-variant-numeric:tabular-nums}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);font-size:14px}
+th{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:600}
+.rev{border:1px solid var(--line);border-radius:10px;padding:16px;display:grid;gap:12px;scroll-margin-top:16px}
+.rev.bad{border-left:4px solid var(--bad)}
+.rev.good{border-left:4px solid var(--good)}
+.rev .ans{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:14px}
+.rev .ans b{font-weight:600}
+.rev .exp{margin:0;max-width:70ch;color:var(--ink)}
+.toggle{display:flex;align-items:center;gap:8px;font-size:14px;cursor:pointer}
+
+@media (max-width:760px){
+  .layout{grid-template-columns:minmax(0,1fr)}
+  nav{position:static;display:flex;overflow-x:auto;gap:4px}
+  .navsec{display:none}
+  .qbtn{width:auto;flex:none;white-space:nowrap}
+  main{padding:16px}
+  .top h1{font-size:25px}
+}
+</style>
+
+<div class="app">
+  <header class="top">
+    <div>
+      <div class="eyebrow">Practice set · full length</div>
+      <h1>Cognitive Practice Test 7</h1>
+    </div>
+    <div class="meta">
+      <span class="secname" id="secname">34 questions · 6 sections</span>
+      <span class="timer" id="timer" aria-label="Elapsed time">00:00</span>
+    </div>
+  </header>
+  <div class="layout">
+    <nav id="nav" aria-label="Questions"></nav>
+    <main id="main" aria-live="polite"></main>
+  </div>
+</div>
+
+<script>
+const f=n=>Math.round(n*10)/10;
+const C={R:'var(--c-red)',B:'var(--c-blue)',Y:'var(--c-yellow)',G:'var(--c-green)',P:'var(--c-purple)',O:'var(--c-orange)',T:'var(--c-blue)',M:'var(--c-red)'};
+const STK='var(--fig-stroke)',TXT='var(--fig-text)',BG='var(--fig-bg)',PANEL='var(--panel)',PINK='var(--panel-ink)';
+const svg=(w,h,label,body,cls='')=>`<svg class="fig ${cls}" viewBox="0 0 ${w} ${h}" role="img" aria-label="${label}">${body}</svg>`;
+const frame=(w,h)=>`<rect x="1" y="1" width="${w-2}" height="${h-2}" rx="8" fill="${BG}" stroke="var(--fig-frame)" stroke-width="1.5"/>`;
+const lbl=(x,y,t,size=18,fill=TXT)=>`<text x="${x}" y="${y}" text-anchor="middle" font-size="${size}" font-weight="700" fill="${fill}" font-family="Barlow Semi Condensed, Arial Narrow, sans-serif">${t}</text>`;
+const txt=(x,y,t,size=13,anchor='middle',fill=TXT,extra='')=>`<text x="${x}" y="${y}" text-anchor="${anchor}" font-size="${size}" font-weight="600" fill="${fill}" font-family="Inter, system-ui, sans-serif" ${extra}>${t}</text>`;
+const ABCD='ABCD';
+
+function shp(t,cx,cy,r,fill,hollow,outline){
+  const a=hollow?`fill="none" stroke="${hollow===true?fill:hollow}" stroke-width="2.6"`:`fill="${fill}" stroke="${outline?STK:'none'}" stroke-width="${outline?1.5:0}"`;
+  if(t==='c')return `<circle cx="${cx}" cy="${cy}" r="${r}" ${a}/>`;
+  if(t==='s'){const h=f(r*0.86);return `<rect x="${f(cx-h)}" y="${f(cy-h)}" width="${f(2*h)}" height="${f(2*h)}" ${a}/>`}
+  return `<polygon points="${cx},${f(cy-r)} ${f(cx+r*0.95)},${f(cy+r*0.72)} ${f(cx-r*0.95)},${f(cy+r*0.72)}" ${a} stroke-linejoin="round"/>`;
+}
+function ngon(n,cx,cy,r,rot=0){let p=[];for(let k=0;k<n;k++){const a=(-90+rot+k*360/n)*Math.PI/180;p.push(`${f(cx+r*Math.cos(a))},${f(cy+r*Math.sin(a))}`)}return p.join(' ')}
+
+/* ---------- SRR 1: reflection ---------- */
+function reflPanel(x,y,sx,sy){
+  const cx=x+30,cy=y+45;
+  return `<rect x="${x}" y="${y}" width="60" height="90" fill="${BG}" stroke="${STK}" stroke-width="3"/><g transform="translate(${cx} ${cy}) scale(${sx} ${sy}) translate(${-cx} ${-cy})"><circle cx="${x+16}" cy="${y+17}" r="9" fill="${C.Y}" stroke="${STK}" stroke-width="1.5"/><polygon points="${x+2},${y+88} ${x+58},${y+88} ${x+58},${y+38}" fill="${C.B}"/></g>`;
+}
+function figRefl(){
+  const W=560,H=290;let b=frame(W,H);
+  b+=reflPanel(200,14,1,1)+`<line x1="280" y1="6" x2="280" y2="114" stroke="${C.R}" stroke-width="3"/>`;
+  b+=`<rect x="300" y="14" width="60" height="90" fill="${BG}" stroke="${STK}" stroke-width="3"/>`+lbl(330,72,'?',36);
+  [[-1,1],[-1,-1],[1,-1],[1,1]].forEach((s,i)=>{const x=90+i*110;b+=reflPanel(x,150,...s)+lbl(x+30,270,ABCD[i],20)});
+  return svg(W,H,'A panel reflected in a red line, with four options labelled A to D',b);
+}
+
+/* ---------- SRR 2: rotation ---------- */
+const ORIG=['BRY','GYR','YBG'];
+const ROPT=[['YRB','RYG','GBY'],['GBY','RGY','YRB'],['YGB','BYR','GRR'],['GBY','RYG','YRB']];
+function grid3(x,y,rows,cell,gap,pad){
+  const size=3*cell+2*gap+2*pad;
+  let s=`<rect x="${x}" y="${y}" width="${size}" height="${size}" fill="${BG}" stroke="${STK}" stroke-width="3"/>`;
+  rows.forEach((row,r)=>[...row].forEach((ch,c)=>{s+=`<rect x="${x+pad+c*(cell+gap)}" y="${y+pad+r*(cell+gap)}" width="${cell}" height="${cell}" fill="${C[ch]}"/>`}));
+  return s;
+}
+function figRot(){
+  const W=560,H=338;let b=frame(W,H);
+  b+=grid3(213,14,ORIG,34,6,10);
+  ROPT.forEach((rows,i)=>{const x=30+i*132;b+=grid3(x,184,rows,26,5,8)+lbl(x+52,320,ABCD[i],22)});
+  return svg(W,H,'A 3 by 3 colour grid and four options labelled A to D',b);
+}
+
+/* ---------- SRR 3: cube net ---------- */
+function isoCube(cx,cy,s,t,l,r){
+  const k=f(s*0.866),P=(pts,c)=>`<polygon points="${pts}" fill="${C[c]}" stroke="${STK}" stroke-width="2.5" stroke-linejoin="round"/>`;
+  return P(`${cx},${cy-s} ${cx+k},${cy-s/2} ${cx},${cy} ${cx-k},${cy-s/2}`,t)
+    +P(`${cx-k},${cy-s/2} ${cx},${cy} ${cx},${cy+s} ${cx-k},${cy+s/2}`,l)
+    +P(`${cx},${cy} ${cx+k},${cy-s/2} ${cx+k},${cy+s/2} ${cx},${cy+s}`,r);
+}
+function figCube(){
+  const W=560,H=356,s=46,x0=188,y0=18;let b=frame(W,H);
+  const sq=(c,r,col)=>`<rect x="${x0+c*s}" y="${y0+r*s}" width="${s}" height="${s}" fill="${C[col]}" stroke="${STK}" stroke-width="2.5"/>`;
+  b+=sq(2,0,'P')+sq(3,0,'G')+sq(0,1,'B')+sq(1,1,'R')+sq(2,1,'Y')+sq(0,2,'O');
+  const opts=[['Y','B','R'],['G','P','Y'],['G','Y','P'],['P','R','O']];
+  opts.forEach((o,i)=>{const cx=80+i*133;b+=isoCube(cx,252,44,...o)+lbl(cx,338,ABCD[i],22)});
+  return svg(W,H,'Cube net with six coloured faces, and four cubes labelled A to D',b);
+}
+
+/* ---------- SRR 4: named street map ---------- */
+function figMap(){
+  const W=460,H=390;let b=frame(W,H);const st='var(--fig-street)';
+  [80,220,360].forEach(x=>b+=`<rect x="${x-12}" y="36" width="24" height="288" fill="${st}"/>`);
+  [60,180,300].forEach(y=>b+=`<rect x="56" y="${y-12}" width="328" height="24" fill="${st}"/>`);
+  const sl=(x,y,t,rot)=>`<text x="${x}" y="${y}" text-anchor="middle" font-size="10.5" font-weight="600" fill="var(--muted)" font-family="Inter, system-ui, sans-serif" ${rot?`transform="rotate(-90 ${x} ${y})"`:''}>${t}</text>`;
+  b+=sl(150,64,'North Street')+sl(290,64,'North Street')+sl(150,184,'Bridge Street')+sl(290,184,'Bridge Street')+sl(150,304,'South Street')+sl(290,304,'South Street');
+  b+=sl(84,120,'West Road',1)+sl(84,240,'West Road',1)+sl(224,120,'Mill Lane',1)+sl(224,240,'Mill Lane',1)+sl(364,120,'East Road',1)+sl(364,240,'East Road',1);
+  const box=(x,y,w,h,name,fill)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${fill||'var(--fig-block)'}" stroke="${STK}" stroke-width="1.3"/>`+txt(x+w/2,y+h/2+5,name,13.5);
+  b+=box(96,76,52,88,'Library')+box(152,76,52,88,'Café');
+  b+=box(236,76,52,88,'Cinema')+box(292,76,52,88,'Hotel');
+  b+=box(96,196,108,88,'Park','var(--fig-park)');
+  b+=box(236,196,52,88,'School')+box(292,196,52,88,'Pool');
+  b+=`<polygon points="118,300 98,292 98,308" fill="var(--amber)" stroke="${STK}" stroke-width="1.2"/>`;
+  b+=`<line x1="430" y1="78" x2="430" y2="50" stroke="${STK}" stroke-width="2.5"/><polygon points="430,40 423,54 437,54" fill="${STK}"/>`+lbl(430,98,'N',18);
+  return svg(W,H,'Street map with named roads and buildings',b);
+}
+
+/* ---------- SRR 5: odd plate ---------- */
+function plate(cx,cy,rot,mirror){
+  const inner=`<rect x="-34" y="-34" width="68" height="68" rx="3" fill="var(--plate)" stroke="var(--plate-edge)" stroke-width="2"/><circle cx="-16" cy="-16" r="8" fill="${BG}" stroke="var(--plate-edge)" stroke-width="1.5"/><rect x="0" y="13" width="24" height="8" rx="2" fill="${BG}" stroke="var(--plate-edge)" stroke-width="1.5"/>`;
+  const t=`translate(${cx} ${cy}) rotate(${rot})${mirror?' scale(-1 1)':''}`;
+  return `<g transform="translate(5 6)"><g transform="${t}"><rect x="-34" y="-34" width="68" height="68" rx="3" fill="var(--plate-edge)"/></g></g><g transform="${t}">${inner}</g>`;
+}
+function figPlates(){
+  const W=560,H=200;let b=frame(W,H);
+  [[25,0],[150,0],[70,1],[250,0]].forEach((p,i)=>{const cx=80+i*133;b+=plate(cx,86,...p)+lbl(cx,182,ABCD[i],20)});
+  return svg(W,H,'Four square plates, each with a round hole and a slot, labelled A to D',b);
+}
+
+/* ---------- radar helpers ---------- */
+function radarBase(cx,cy,R){
+  let s=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="var(--radar-bg)" stroke="var(--radar-ink)" stroke-width="2"/>`;
+  [1/3,2/3].forEach(k=>s+=`<circle cx="${cx}" cy="${cy}" r="${f(R*k)}" fill="none" stroke="var(--radar-ink)" stroke-opacity=".45"/>`);
+  s+=`<line x1="${cx-R}" y1="${cy}" x2="${cx+R}" y2="${cy}" stroke="var(--radar-ink)" stroke-opacity=".35"/><line x1="${cx}" y1="${cy-R}" x2="${cx}" y2="${cy+R}" stroke="var(--radar-ink)" stroke-opacity=".35"/>`;
+  return s;
+}
+const contact=(x,y,r=5)=>`<circle cx="${f(x)}" cy="${f(y)}" r="${r}" fill="${C.R}" stroke="#fff" stroke-width="1"/>`;
+
+/* ---------- SRR 6: radar crossing ---------- */
+function figCross(){
+  const W=300,H=300;let b=`<rect x="0" y="0" width="${W}" height="${H}" rx="8" fill="var(--radar-bg)"/>`+radarBase(150,150,120);
+  b+=`<line x1="60" y1="220" x2="80" y2="200" stroke="${C.R}" stroke-width="3" stroke-opacity=".55" stroke-linecap="round"/>`+contact(80,200,6);
+  b+=`<line x1="232" y1="234" x2="220" y2="210" stroke="${C.R}" stroke-width="3" stroke-opacity=".55" stroke-linecap="round"/>`+contact(220,210,6);
+  [[200,140],[120,80],[170,110],[140,120]].forEach(([x,y],i)=>{b+=`<path d="M${x-5},${y-5} L${x+5},${y+5} M${x-5},${y+5} L${x+5},${y-5}" stroke="#fff" stroke-width="2"/>`+lbl(x+12,y-6,ABCD[i],15,'#fff')});
+  return svg(W,H,'Radar with two contacts and their trails, and four candidate crossing points A to D',b,'small');
+}
+
+/* ---------- Abstract 1: shapes per box ---------- */
+const AODD=[{n:4,rs:[16,12,14,10]},{n:3,rs:[15,11,17]},{n:5,rs:[12,15,10,13,11]},{n:5,rs:[14,11,16,12],count:4}];
+function figAOdd(){
+  const W=560,H=176;let b=frame(W,H);
+  const slots={3:[[30,32],[88,42],[56,94]],4:[[30,30],[88,32],[32,92],[90,90]],5:[[28,30],[90,30],[60,62],[28,94],[92,94]]};
+  AODD.forEach((o,i)=>{const bx=20+i*135,by=12,k=o.count||o.n;b+=`<rect x="${bx}" y="${by}" width="120" height="120" fill="${BG}" stroke="${STK}" stroke-width="2"/>`;
+    slots[k].forEach(([x,y],j)=>{b+=`<polygon points="${ngon(o.n,bx+x,by+y,o.rs[j],j*17)}" fill="var(--fig-stroke)"/>`});
+    b+=lbl(bx+60,162,ABCD[i],22)});
+  return svg(W,H,'Four boxes of dark polygons labelled A to D',b);
+}
+
+/* ---------- Abstract 2: two-row sequence ---------- */
+function seqPanel(x,y,n,ang,dark){
+  let s=`<rect x="${x}" y="${y}" width="80" height="70" fill="${BG}" stroke="${STK}" stroke-width="1.5"/><rect x="${x}" y="${y+70}" width="80" height="70" fill="${BG}" stroke="${STK}" stroke-width="1.5"/>`;
+  s+=`<polygon points="${ngon(n,x+40,y+36,22)}" fill="${C.R}"/>`;
+  s+=`<g transform="translate(${x+40} ${y+105}) rotate(${ang})"><line x1="0" y1="20" x2="0" y2="-8" stroke="${C.B}" stroke-width="5" stroke-linecap="round"/><polygon points="0,-24 -10,-8 10,-8" fill="${C.B}"/></g>`;
+  return s;
+}
+function figASeq(){
+  const W=560,H=372,xs=[70,175,280,385];let b=frame(W,H);
+  [[3,0],[4,-45],[5,-90]].forEach((p,i)=>b+=seqPanel(xs[i],12,...p));
+  b+=`<rect x="${xs[3]}" y="12" width="80" height="140" fill="${BG}" stroke="${STK}" stroke-width="1.5"/>`+lbl(xs[3]+40,96,'?',44);
+  b+=`<line x1="40" y1="170" x2="520" y2="170" stroke="var(--fig-frame)" stroke-width="1.5" stroke-dasharray="4 5"/>`;
+  [[6,135],[6,-135],[7,-135],[6,-90]].forEach((p,i)=>{b+=seqPanel(xs[i],186,...p)+lbl(xs[i]+40,358,ABCD[i],20)});
+  return svg(W,H,'Sequence of three two-part panels and a question mark, with four options labelled A to D',b);
+}
+
+/* ---------- Abstract 3: comparison ---------- */
+function dotGrid(x,y,rows,kind,cell=28){
+  let s=`<rect x="${x}" y="${y}" width="${3*cell+12}" height="${3*cell+12}" rx="4" fill="${BG}" stroke="${STK}" stroke-width="2"/>`;
+  rows.forEach((row,r)=>[...row].forEach((ch,c)=>{const cx=x+6+cell/2+c*cell,cy=y+6+cell/2+r*cell,rr=cell*0.36;
+    if(kind==='dot'){s+=ch==='H'?`<circle cx="${cx}" cy="${cy}" r="${f(rr)}" fill="none" stroke="${STK}" stroke-width="2"/>`:`<circle cx="${cx}" cy="${cy}" r="${f(rr)}" fill="${ch==='F'?STK:'var(--c-grey)'}"/>`}
+    else{s+=ch==='H'?`<polygon points="${ngon(5,cx,cy,rr+1)}" fill="none" stroke="${STK}" stroke-width="2"/>`:`<polygon points="${ngon(5,cx,cy,rr+1)}" fill="${C[ch]}"/>`}}));
+  return s;
+}
+const G1=['FGH','FHH','GFF'],G1M=['HGF','HHF','FFG'],G2=['TMH','HTT','MHT'];
+const G2OPT=[['MHT','HTT','TMH'],['HMT','TTH','THM'],['MHT','HTM','TTH'],['HMT','THH','THM']];
+function figComp(){
+  const W=560,H=436;let b=frame(W,H);
+  b+=dotGrid(140,12,G1,'dot')+txt(280,64,'is to:',18)+dotGrid(320,12,G1M,'dot');
+  b+=txt(280,128,'as',18);
+  b+=dotGrid(140,150,G2,'pent')+txt(280,202,'is to:',18)+`<rect x="320" y="150" width="96" height="96" rx="4" fill="${BG}" stroke="${STK}" stroke-width="2"/>`+lbl(368,212,'?',40);
+  b+=`<line x1="40" y1="268" x2="520" y2="268" stroke="var(--fig-frame)" stroke-width="1.5" stroke-dasharray="4 5"/>`;
+  G2OPT.forEach((g,i)=>{const x=40+i*130;b+=dotGrid(x,286,g,'pent')+lbl(x+48,418,ABCD[i],20)});
+  return svg(W,H,'Comparison: a grid of circles is to its changed version as a grid of pentagons is to which option, A to D',b);
+}
+
+/* ---------- Abstract 4: bar grid ---------- */
+function bars(x,y,n,col,w=62){let s='';const tot=n*6+(n-1)*4,x0=x+(w-tot)/2;for(let k=0;k<n;k++)s+=`<rect x="${f(x0+k*10)}" y="${y+12}" width="6" height="38" fill="${C[col]}"/>`;return s}
+const BARS=[[[1,'R'],[2,'R'],[3,'R']],[[2,'B'],[3,'B'],[4,'B']],[[3,'G'],[4,'G'],null]];
+const BOPT=[[5,'B'],[4,'G'],[5,'G'],[6,'G']];
+function figBars(){
+  const W=560,H=330,cs=62,gx=187,gy=12;let b=frame(W,H);
+  BARS.forEach((row,r)=>row.forEach((cell,c)=>{const x=gx+c*cs,y=gy+r*cs;b+=`<rect x="${x}" y="${y}" width="${cs}" height="${cs}" fill="${BG}" stroke="${STK}" stroke-width="1.5"/>`;
+    b+=cell?bars(x,y,...cell):lbl(x+31,y+43,'?',30)}));
+  [95,195,295,395].forEach((x,i)=>{b+=`<rect x="${x}" y="222" width="70" height="62" fill="${BG}" stroke="${STK}" stroke-width="1.5"/>`+bars(x,222,...BOPT[i],70)+lbl(x+35,312,ABCD[i],20)});
+  return svg(W,H,'A 3 by 3 grid of coloured bars with one cell missing, and four options labelled A to D',b);
+}
+
+/* ---------- PSA ---------- */
+function figText(t,label,size=44){
+  return svg(520,112,label,`<rect x="6" y="6" width="508" height="100" rx="6" fill="${PANEL}"/><text x="260" y="72" text-anchor="middle" font-size="${size}" fill="${PINK}" font-family="IBM Plex Mono, ui-monospace, monospace" xml:space="preserve">${t}</text>`);
+}
+function asi(cx,cy,R,v){
+  const ang=s=>(s-40)/160*300-150;
+  let s=`<circle cx="${cx}" cy="${cy}" r="${R}" fill="${PANEL}" stroke="var(--fig-frame)" stroke-width="2"/>`;
+  for(let k=40;k<=200;k+=10){const big=k%20===0;s+=`<line x1="${cx}" y1="${cy-R+3}" x2="${cx}" y2="${f(cy-R+(big?R*0.2:R*0.11))}" stroke="${PINK}" stroke-width="${big?2:1.2}" transform="rotate(${f(ang(k))} ${cx} ${cy})"/>`;
+    if(big){const a=ang(k)*Math.PI/180,rr=R*0.62;s+=`<text x="${f(cx+rr*Math.sin(a))}" y="${f(cy-rr*Math.cos(a)+R*0.06)}" text-anchor="middle" font-size="${f(R*0.17)}" font-weight="600" fill="${PINK}" font-family="Inter, system-ui, sans-serif">${k}</text>`}}
+  s+=`<text x="${cx}" y="${f(cy+R*0.42)}" text-anchor="middle" font-size="${f(R*0.14)}" fill="${PINK}" font-family="Inter, system-ui, sans-serif">KT</text>`;
+  s+=`<line x1="${cx}" y1="${cy}" x2="${cx}" y2="${f(cy-R*0.8)}" stroke="var(--amber)" stroke-width="3.5" stroke-linecap="round" transform="rotate(${f(ang(v))} ${cx} ${cy})"/><circle cx="${cx}" cy="${cy}" r="5" fill="var(--amber)"/>`;
+  return s;
+}
+function figASI(){const W=560,H=176;let b=frame(W,H);[125,145,135,115].forEach((v,i)=>{const cx=75+i*137;b+=asi(cx,80,62,v)+lbl(cx,166,ABCD[i],18)});return svg(W,H,'Four airspeed indicators labelled A to D',b)}
+const PLANE='M0,-14 L2,-10 L2,-3 L13,3 L13,6 L2,3 L2,9 L6,12 L6,14 L0,12 L-6,14 L-6,12 L-2,9 L-2,3 L-13,6 L-13,3 L-2,-3 L-2,-10 Z';
+function hdg(cx,cy,R,HD){
+  let s=`<circle cx="${cx}" cy="${cy}" r="${R+6}" fill="${PANEL}" stroke="var(--fig-frame)" stroke-width="2"/>`;
+  for(let a=0;a<360;a+=5){const big=a%10===0;s+=`<line x1="${cx}" y1="${cy-R}" x2="${cx}" y2="${f(cy-R+(big?R*0.13:R*0.07))}" stroke="${PINK}" stroke-width="${big?1.6:1}" transform="rotate(${a-HD} ${cx} ${cy})"/>`}
+  const lab={0:'N',30:'3',60:'6',90:'E',120:'12',150:'15',180:'S',210:'21',240:'24',270:'W',300:'30',330:'33'};
+  for(const a in lab)s+=`<text x="${cx}" y="${f(cy-R+R*0.33)}" text-anchor="middle" font-size="${f(R*0.18)}" font-weight="700" fill="${PINK}" font-family="Barlow Semi Condensed, Arial Narrow, sans-serif" transform="rotate(${a-HD} ${cx} ${cy})">${lab[a]}</text>`;
+  s+=`<polygon points="${cx},${cy-R+1} ${cx-6},${cy-R-10} ${cx+6},${cy-R-10}" fill="var(--amber)"/><path d="${PLANE}" transform="translate(${cx} ${cy}) scale(${f(R/55)})" fill="var(--amber)"/>`;
+  return s;
+}
+function figCompass(){const W=560,H=180;let b=frame(W,H);[74,47,227,37].forEach((h,i)=>{const cx=75+i*137;b+=hdg(cx,86,58,h)+lbl(cx,170,ABCD[i],18)});return svg(W,H,'Four heading indicators labelled A to D',b)}
+const SCENE=[
+  ['plane',10],['circle',0],['tri',80],['plane',190],['drone',0],['plane',300],
+  ['drone',0],['tri',150],['plane',60],['circle',0],['tri',270],['drone',0],
+  ['plane',240],['circle',0],['plane',120],['drone',0],['plane',330],['tri',40],
+  ['tri',210],['plane',70],['drone',0],['circle',0],['plane',180],null];
+const JIT=[[4,-6],[-8,5],[6,8],[-5,-4],[9,2],[-3,7],[5,9],[-7,-3],[2,-8],[-6,6],[8,-5],[3,4],[-9,4],[7,-7],[-4,5],[6,3],[-2,-9],[4,6],[8,-4],[-6,8],[3,-5],[-8,-2],[5,6],[0,0]];
+function icon(t,x,y,a){
+  if(t==='plane')return `<path d="${PLANE}" transform="translate(${x} ${y}) rotate(${a}) scale(1.25)" fill="${STK}"/>`;
+  if(t==='tri')return `<path d="M0,-13 L10,11 L0,5 L-10,11 Z" transform="translate(${x} ${y}) rotate(${a})" fill="${STK}"/>`;
+  if(t==='circle')return `<circle cx="${x}" cy="${y}" r="10" fill="none" stroke="${STK}" stroke-width="2.5"/>`;
+  return `<g transform="translate(${x} ${y})" stroke="${STK}" stroke-width="2.5" fill="none"><line x1="-8" y1="-8" x2="8" y2="8"/><line x1="-8" y1="8" x2="8" y2="-8"/><circle cx="-10" cy="-10" r="4"/><circle cx="10" cy="-10" r="4"/><circle cx="-10" cy="10" r="4"/><circle cx="10" cy="10" r="4"/></g>`;
+}
+function figScene(){const W=440,H=256;let b=frame(W,H);SCENE.forEach((it,i)=>{if(!it)return;const r=Math.floor(i/6),c=i%6;b+=icon(it[0],45+c*70+JIT[i][0],38+r*60+JIT[i][1],it[1])});return svg(W,H,'A display of aircraft, arrowheads, drones and circles',b)}
+const CHARS=['B36S09','60B93S','S90B63','3BS896','069 3BS'.replace(' ',''),'9S360B'];
+function figFind(){
+  const W=420,H=396,cs=56,x0=44,y0=40;let b=frame(W,H);
+  for(let c=0;c<6;c++)b+=lbl(x0+c*cs+cs/2,28,c+1,17);
+  CHARS.forEach((row,r)=>{b+=lbl(24,y0+r*cs+36,'ABCDEF'[r],17);[...row].forEach((ch,c)=>{const x=x0+c*cs,y=y0+r*cs;b+=`<rect x="${x}" y="${y}" width="${cs}" height="${cs}" fill="${BG}" stroke="${STK}" stroke-width="1.2"/><text x="${x+cs/2}" y="${y+38}" text-anchor="middle" font-size="28" fill="${TXT}" font-family="IBM Plex Mono, ui-monospace, monospace">${ch}</text>`})});
+  return svg(W,H,'A 6 by 6 grid of characters with rows A to F and columns 1 to 6',b);
+}
+const SCOL='RGBBRGGRBRBGRGBGRBRGBRGRBGBRGB',SSTAT='TXXTTXTXTXXTTXTXTTXXTXTTXXTXTX';
+function figStatus(){
+  const W=560,H=340,cw=84,ch=62,x0=28,y0=14;let b=frame(W,H);
+  for(let k=0;k<30;k++){const r=Math.floor(k/6),c=k%6,x=x0+c*cw,y=y0+r*ch;
+    b+=`<rect x="${x}" y="${y}" width="${cw}" height="${ch}" fill="${BG}" stroke="${STK}" stroke-width="1.2"/>`+txt(x+6,y+15,k+1,11.5,'start','var(--muted)');
+    b+=`<rect x="${x+14}" y="${y+24}" width="24" height="24" fill="${C[SCOL[k]]}" stroke="${STK}" stroke-width="1"/>`;
+    b+=SSTAT[k]==='T'?`<path d="M${x+50},${y+37} L${x+57},${y+44} L${x+70},${y+28}" fill="none" stroke="${STK}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`:`<path d="M${x+52},${y+29} L${x+68},${y+45} M${x+52},${y+45} L${x+68},${y+29}" fill="none" stroke="${STK}" stroke-width="3" stroke-linecap="round"/>`}
+  return svg(W,H,'A numbered grid of 30 cells, each with a coloured square and a tick or cross',b);
+}
+
+/* ---------- Working memory ---------- */
+const RCOUNT=[[-60,-40],[30,-80],[70,-20],[-20,30],[50,60],[-80,40],[10,-30]];
+function figRadarCount(){const W=280,H=280;let b=`<rect x="0" y="0" width="${W}" height="${H}" rx="8" fill="var(--radar-bg)"/>`+radarBase(140,140,120);RCOUNT.forEach(([x,y])=>b+=contact(140+x,140+y,6));return svg(W,H,'Radar screen with contacts',b,'small')}
+const DORIG=[[0,1,'R'],[0,3,'B'],[1,0,'G'],[1,2,'R'],[2,1,'B'],[2,3,'G'],[3,0,'R'],[3,2,'B']];
+function dotsBoard(list,label){let b=frame(260,260);for(let r=0;r<4;r++)for(let c=0;c<4;c++)b+=`<rect x="${14+c*58}" y="${14+r*58}" width="58" height="58" fill="${BG}" stroke="var(--fig-frame)"/>`;list.forEach(([r,c,col])=>b+=`<circle cx="${43+c*58}" cy="${43+r*58}" r="17" fill="${C[col]}" stroke="${STK}" stroke-width="1.5"/>`);return svg(260,260,label,b,'small')}
+const figDotsOrig=()=>dotsBoard(DORIG,'Grid of coloured dots');
+const figDotsNew=()=>dotsBoard(DORIG.map(d=>d[0]===2&&d[1]===3?[2,3,'R']:d),'Grid of coloured dots to compare');
+const IORIG=[['t','R'],['c','B'],['s','Y'],['c','G']];
+const IOPT=[[['t','R'],['c','B'],['s','G'],['c','G']],[['t','R'],['s','B'],['s','Y'],['c','G']],IORIG,[['t','R'],['s','Y'],['c','B'],['c','G']]];
+function figImgOrig(){let b=frame(300,90);IORIG.forEach(([t,c],i)=>b+=shp(t,60+i*60,47,22,C[c],false,true));return svg(300,90,'A row of four coloured shapes',b,'small')}
+function figImgOpts(){const W=560,H=120;let b=frame(W,H);IOPT.forEach((row,i)=>{const x=12+i*137;b+=`<rect x="${x}" y="12" width="125" height="64" rx="4" fill="${BG}" stroke="${STK}" stroke-width="1.5"/>`;row.forEach(([t,c],j)=>b+=shp(t,x+21+j*28,44,11,C[c],false,true));b+=lbl(x+62,104,ABCD[i],18)});return svg(W,H,'Four rows of shapes labelled A to D',b)}
+const RPOS=[[-50,-30],[20,-60],[60,30],[-20,55]];
+const RPOPT=[RPOS.map(([x,y])=>[-x,y]),RPOS,[[-50,-30],[20,-60],[60,-10],[-20,55]],[[-50,-30],[20,-60],[60,30],[-55,40]]];
+function figRadarPos(){const W=260,H=260;let b=`<rect x="0" y="0" width="${W}" height="${H}" rx="8" fill="var(--radar-bg)"/>`+radarBase(130,130,110);RPOS.forEach(([x,y])=>b+=contact(130+x,130+y,6));return svg(W,H,'Radar screen with four contacts',b,'small')}
+function figRadarOpts(){const W=560,H=176;let b=frame(W,H);RPOPT.forEach((set,i)=>{const cx=75+i*137;b+=radarBase(cx,80,62);set.forEach(([x,y])=>b+=contact(cx+x*0.62,80+y*0.62,4));b+=lbl(cx,166,ABCD[i],18)});return svg(W,H,'Four radar screens labelled A to D',b)}
+
+/* ================= Test 7: PSA + Working Memory, generated per visit ================= */
+const SEED=(Date.now()^Math.floor(Math.random()*1e9))>>>0;
+const RNG=(a=>()=>{a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296})(SEED);
+const ri=(a,b)=>a+Math.floor(RNG()*(b-a+1)),pick=a=>a[Math.floor(RNG()*a.length)],shuf=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(RNG()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const LOOK={O:'0Q',0:'OD',Q:'O',b:'dh',d:'b',5:'S6',S:'58',1:'l7',l:'1',8:'B3',B:'8R',2:'Z',Z:'2',M:'NW',N:'M',m:'n',n:'mh',P:'RF',R:'PB',E:'F',F:'EP',6:'G5',G:'6C',u:'v',v:'u',h:'n',k:'h',3:'8',7:'1',9:'g',g:'9',C:'G',D:'0',W:'M',t:'f',f:'t',x:'k',H:'N',T:'Y',Y:'T'};
+const CHP='ABCDEFGHKMNPRSTWXYZbdfghkmnrtx2356789';
+function variants(s,n=3,allowSwap=true){const out=new Set();let g=0;while(out.size<n&&g++<300){const a=[...s];const k=ri(0,a.length-1);
+  if(allowSwap&&RNG()<.25&&k<a.length-1&&a[k]!==a[k+1]){[a[k],a[k+1]]=[a[k+1],a[k]]}else{const lk=LOOK[a[k]];a[k]=lk&&RNG()<.8?pick([...lk]):pick([...CHP.replace(a[k],'')])}
+  const v=a.join('');if(v!==s)out.add(v)}return[...out]}
+function diffNote(s,v){if(v.length!==s.length)return v;const d=[];for(let i=0;i<s.length;i++)if(s[i]!==v[i])d.push(i);if(d.length===2&&s[d[0]]===v[d[1]])return `${v} swaps ${s[d[0]]} and ${s[d[1]]}`;return d.map(i=>`${v} has ${v[i]} instead of ${s[i]}`).join(', ')}
+const placeOpts=(c,d)=>{const all=shuf([c,...d]);return{opts:all,ans:c}};
+const L4=['A','B','C','D'];
+const Q=[];
+const PSA='Perceptual Speed and Accuracy',WM='Working Memory';
+const sp=s=>[...s].join(' ');
+
+/* ---- PSA generators ---- */
+function gSeq(){const s=Array.from({length:8},()=>pick([...CHP])).join('');const d=variants(s);
+  Q.push({sec:PSA,lock:true,prompt:'Select the sequence that exactly matches the one below.',fig:()=>figText(sp(s),'Sequence '+sp(s)),...placeOpts(s,d),mono:true,exp:'The match is '+s+'. '+d.map(v=>diffNote(s,v)).join('; ')+'. Compare in chunks of two or three characters rather than the whole string at once.'})}
+function gASI(){const v=ri(9,39)*5;const d=new Set();let g=0;while(d.size<3&&g++<100){const w=v+pick([-20,-15,-10,-5,5,10,15,20]);if(w>=45&&w<=195&&w!==v)d.add(w)}
+  const vals=shuf([v,...d]);const ix=vals.indexOf(v);
+  Q.push({sec:PSA,lock:true,prompt:`Select the Airspeed Indicator that shows a speed of ${v} knots:`,fig:()=>{const W=560,H=176;let b=frame(W,H);vals.forEach((x,i)=>{const cx=75+i*137;b+=asi(cx,80,62,x)+lbl(cx,166,L4[i],18)});return svg(W,H,'Four airspeed indicators labelled A to D',b)},
+    opts:L4,ans:L4[ix],exp:`Labels are every 20 kt and ticks every 10 kt. ${vals.map((x,i)=>`${L4[i]} shows ${x}`).join(', ')}. Find the nearest label first, then count ticks.`})}
+function gHDG(){const h=ri(0,359),f3=x=>String((x+360)%360).padStart(3,'0');const d=new Set();const s=f3(h);
+  const sw=s[0]+s[2]+s[1];if(+sw<360&&sw!==s)d.add(+sw);d.add((h+180)%360);let g=0;while(d.size<3&&g++<50){const w=(h+pick([-20,-15,-10,10,15,20])+360)%360;if(w!==h)d.add(w)}
+  const vals=shuf([h,...[...d].slice(0,3)]);const ix=vals.indexOf(h);
+  Q.push({sec:PSA,lock:true,prompt:`Select the Compass that shows a heading of ${f3(h)} degrees:`,fig:()=>{const W=560,H=180;let b=frame(W,H);vals.forEach((x,i)=>{const cx=75+i*137;b+=hdg(cx,86,58,x)+lbl(cx,170,L4[i],18)});return svg(W,H,'Four heading indicators labelled A to D',b)},
+    opts:L4,ans:L4[ix],exp:`Read the value under the top triangle. ${vals.map((x,i)=>`${L4[i]} shows ${f3(x)}${x===(h+180)%360?' (the reciprocal)':''}`).join(', ')}. Numbers on the card are tens of degrees (3 = 030, 33 = 330).`})}
+function gScene(){const T=['plane','tri','circle','drone'],NM={plane:'airplanes',tri:'arrowheads',circle:'circles',drone:'drones'},tg=pick(T),n=ri(5,10);
+  const cells=shuf([...Array(n).fill(tg),...Array.from({length:23-n},()=>pick(T.filter(x=>x!==tg))),null]).map(t=>t?[t,ri(0,35)*10,ri(-8,8),ri(-8,8)]:null);
+  const st=Math.max(1,n-ri(0,3)),opts=[0,1,2,3].map(i=>String(st+i));const rows=[0,1,2,3].map(r=>cells.slice(r*6,r*6+6).filter(c=>c&&c[0]===tg).length);
+  Q.push({sec:PSA,lock:true,prompt:`How many ${NM[tg]} are in the display?`,fig:()=>{const W=440,H=256;let b=frame(W,H);cells.forEach((it,i)=>{if(!it)return;const r=Math.floor(i/6),c=i%6;b+=icon(it[0],45+c*70+it[2],38+r*60+it[3],it[1])});return svg(W,H,'A display of aircraft, arrowheads, drones and circles',b)},
+    opts,ans:String(n),exp:`There are ${n} ${NM[tg]}: ${rows.join(', ')} in rows 1 to 4. Count row by row and ignore the other symbols.`})}
+const FAM=[['Q','O0DCG'],['8','B36S9'],['Z','2SN7'],['E','FBP3'],['5','S6G9'],['M','NWH'],['b','dhp6'],['R','PB8K']];
+function gFind(){const [t,o]=pick(FAM),r0=ri(0,5),c0=ri(0,5);const rows=[0,1,2,3,4,5].map(r=>[0,1,2,3,4,5].map(c=>r===r0&&c===c0?t:pick([...o])).join(''));const coord=(r,c)=>'ABCDEF'[r]+(c+1);
+  const d=new Set();let g=0;while(d.size<3&&g++<60){const r=Math.max(0,Math.min(5,r0+ri(-1,1))),c=Math.max(0,Math.min(5,c0+ri(-1,1)));if(r!==r0||c!==c0)d.add(coord(r,c))}
+  Q.push({sec:PSA,lock:true,prompt:`Find the '${t}' symbol in the grid`,fig:()=>{const W=420,H=396,cs=56,x0=44,y0=40;let b=frame(W,H);for(let c=0;c<6;c++)b+=lbl(x0+c*cs+cs/2,28,c+1,17);
+    rows.forEach((row,r)=>{b+=lbl(24,y0+r*cs+36,'ABCDEF'[r],17);[...row].forEach((ch,c)=>{const x=x0+c*cs,y=y0+r*cs;b+=`<rect x="${x}" y="${y}" width="${cs}" height="${cs}" fill="${BG}" stroke="${STK}" stroke-width="1.2"/><text x="${x+cs/2}" y="${y+38}" text-anchor="middle" font-size="28" fill="${TXT}" font-family="IBM Plex Mono, ui-monospace, monospace">${ch}</text>`})});return svg(W,H,'A 6 by 6 grid of characters with rows A to F and columns 1 to 6',b)},
+    ...placeOpts(coord(r0,c0),[...d]),mono:true,exp:`The ${t} is in row ${'ABCDEF'[r0]}, column ${c0+1}. The other characters (${[...o].join(', ')}) are lookalikes. Scan row by row.`})}
+function gStatus(){const col=Array.from({length:30},()=>pick('RGB')).join(''),st=Array.from({length:30},()=>pick('TX')).join(''),n=ri(1,30),CN={R:'red',G:'green',B:'blue'},nm=k=>`${st[k]==='T'?'Tick':'Cross'}, ${CN[col[k]]}`;
+  const all=['Tick, red','Tick, green','Tick, blue','Cross, red','Cross, green','Cross, blue'],c=nm(n-1);const near=[n-2,n,n-7,n+5].filter(k=>k>=0&&k<30).map(nm).filter(x=>x!==c);const d=[...new Set([...near,...shuf(all)])].filter(x=>x!==c).slice(0,3);
+  const r=Math.floor((n-1)/6)+1,cc=(n-1)%6+1;
+  Q.push({sec:PSA,lock:true,prompt:`What is the status and shape colour at grid number ${n}?`,fig:()=>{const W=560,H=340,cw=84,ch=62,x0=28,y0=14;let b=frame(W,H);
+    for(let k=0;k<30;k++){const rr=Math.floor(k/6),c2=k%6,x=x0+c2*cw,y=y0+rr*ch;b+=`<rect x="${x}" y="${y}" width="${cw}" height="${ch}" fill="${BG}" stroke="${STK}" stroke-width="1.2"/>`+txt(x+6,y+15,k+1,11.5,'start','var(--muted)')+`<rect x="${x+14}" y="${y+24}" width="24" height="24" fill="${C[col[k]]}" stroke="${STK}" stroke-width="1"/>`;
+      b+=st[k]==='T'?`<path d="M${x+50},${y+37} L${x+57},${y+44} L${x+70},${y+28}" fill="none" stroke="${STK}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>`:`<path d="M${x+52},${y+29} L${x+68},${y+45} M${x+52},${y+45} L${x+68},${y+29}" fill="none" stroke="${STK}" stroke-width="3" stroke-linecap="round"/>`}
+    return svg(W,H,'A numbered grid of 30 cells, each with a coloured square and a tick or cross',b)},
+    ...placeOpts(c,d),exp:`Grid number ${n} is cell ${cc} of row ${r}: ${c.toLowerCase().replace(',',' on')}. Each row holds 6 cells, so jump to the right row first (row = (n − 1) ÷ 6, rounded down, plus 1).`})}
+
+/* ---- WM generators ---- */
+function spread(n,R,minD){const p=[];let g=0;while(p.length<n&&g++<2000){const a=RNG()*Math.PI*2,d=Math.sqrt(RNG())*R,x=Math.round(Math.cos(a)*d),y=Math.round(Math.sin(a)*d);if(p.every(([u,v])=>Math.hypot(u-x,v-y)>=minD))p.push([x,y])}return p}
+function gRadarCount(){const n=ri(6,11),pts=spread(n,105,24),q=[0,0,0,0];pts.forEach(([x,y])=>q[(y<0?0:2)+(x<0?0:1)]++);const st=Math.max(3,n-ri(0,3));
+  Q.push({sec:WM,memo:true,prompt:'How many contacts were there on the radar image?',fig:()=>{const W=280,H=280;let b=`<rect x="0" y="0" width="${W}" height="${H}" rx="8" fill="var(--radar-bg)"/>`+radarBase(140,140,120);pts.forEach(([x,y])=>b+=contact(140+x,140+y,6));return svg(W,H,'Radar screen with contacts',b,'small')},
+    opts:[0,1,2,3].map(i=>String(st+i)),ans:String(n),exp:`There were ${n} contacts: ${q[0]} top-left, ${q[1]} top-right, ${q[2]} bottom-left and ${q[3]} bottom-right. Count by quadrant while the image shows.`})}
+const DOPTS=['A) Exactly the same','B) The dots are in the same place but 1 or more colours have been changed','C) One or more dots have moved','D) Unsure'];
+function gDots(kind){const cells=shuf([...Array(16).keys()]).slice(0,ri(6,9)),orig=cells.map(k=>[k>>2,k&3,pick('RGB')]);let nw=orig.map(d=>d.slice()),note;
+  const RC=['first','second','third','fourth'],CN={R:'red',G:'green',B:'blue'};
+  if(kind==='colour'){const i=ri(0,nw.length-1),c=pick('RGB'.replace(nw[i][2],''));note=`The dot in the ${RC[nw[i][0]]} row, ${RC[nw[i][1]]} column changed from ${CN[nw[i][2]]} to ${CN[c]}; every dot is still in the same square.`;nw[i][2]=c}
+  else if(kind==='move'){const free=[...Array(16).keys()].filter(k=>!cells.includes(k));const i=ri(0,nw.length-1),to=pick(free);note=`The ${CN[nw[i][2]]} dot in the ${RC[nw[i][0]]} row, ${RC[nw[i][1]]} column moved to the ${RC[to>>2]} row, ${RC[to&3]} column. The colours stayed the same.`;nw[i]=[to>>2,to&3,nw[i][2]]}
+  else note='Nothing changed: same squares, same colours.';
+  const ans=kind==='same'?DOPTS[0]:kind==='colour'?DOPTS[1]:DOPTS[2];
+  Q.push({sec:WM,memo:true,prompt:'Study this image and compare it with the one you memorised. Is it:',fig:()=>dotsBoard(orig,'Grid of coloured dots'),after:()=>dotsBoard(nw,'Grid of coloured dots to compare'),opts:DOPTS,ans,exp:note+' Memorise the pattern of positions first, then the colours row by row.'})}
+function gSeqMem(){const s=Array.from({length:6},(_,i)=>i%2?pick([...'23456789']):pick([...'BCDFGHKLMNPRSTVWXZ'])).join(''),d=variants(s);
+  Q.push({sec:WM,memo:true,prompt:'Select the option that is an exact match to the original sequence.',fig:()=>figText(sp(s),'Sequence '+sp(s)),...placeOpts(s,d),mono:true,exp:`The sequence was ${sp(s)}. Chunk it into pairs (${s.match(/../g).join(', ')}) while it is showing.`})}
+function gImg(){const SH=['t','c','s'],CO=['R','G','B','Y','P','O'],row=Array.from({length:4},()=>[pick(SH),pick(CO)]);const key=r=>r.map(x=>x.join('')).join('|');
+  const CN={R:'red',G:'green',B:'blue',Y:'yellow',P:'purple',O:'orange'},SN={t:'triangle',c:'circle',s:'square'};const vs=new Map();let g=0;
+  while(vs.size<3&&g++<200){const r=row.map(x=>x.slice()),k=ri(0,3),m=ri(0,2);let note;
+    if(m===0){const c=pick(CO.filter(x=>x!==r[k][1]));note=`changes the ${CN[r[k][1]]} ${SN[r[k][0]]} to ${CN[c]}`;r[k][1]=c}
+    else if(m===1){const s=pick(SH.filter(x=>x!==r[k][0]));note=`changes the ${SN[r[k][0]]} in position ${k+1} to a ${SN[s]}`;r[k][0]=s}
+    else{const j=k<3?k+1:k-1;if(key([r[k]])===key([r[j]]))continue;[r[k],r[j]]=[r[j],r[k]];note=`swaps shapes ${Math.min(k,j)+1} and ${Math.max(k,j)+1}`}
+    if(key(r)!==key(row)&&![...vs.keys()].includes(key(r)))vs.set(key(r),[r,note])}
+  const opts=shuf([[row,null],...vs.values()]),ix=opts.findIndex(o=>o[1]===null);
+  Q.push({sec:WM,memo:true,prompt:'Select the option that is an exact match to the original image.',fig:()=>{let b=frame(300,90);row.forEach(([t,c],i)=>b+=shp(t,60+i*60,47,22,C[c],false,true));return svg(300,90,'A row of four coloured shapes',b,'small')},
+    after:()=>{const W=560,H=120;let b=frame(W,H);opts.forEach(([r],i)=>{const x=12+i*137;b+=`<rect x="${x}" y="12" width="125" height="64" rx="4" fill="${BG}" stroke="${STK}" stroke-width="1.5"/>`;r.forEach(([t,c],j)=>b+=shp(t,x+21+j*28,44,11,C[c],false,true));b+=lbl(x+62,104,L4[i],18)});return svg(W,H,'Four rows of shapes labelled A to D',b)},
+    opts:L4,ans:L4[ix],exp:`The original was ${row.map(([t,c])=>CN[c]+' '+SN[t]).join(', ')}. `+opts.map((o,i)=>o[1]?`${L4[i]} ${o[1]}`:null).filter(Boolean).join('; ')+'.'})}
+function gRadarPos(){let pts,g=0;do{pts=spread(4,95,30)}while(g++<50&&pts.some(([x,y])=>Math.abs(x)<12||Math.abs(y)<12));
+  const mx=pts.map(([x,y])=>[-x,y]),fy=pts.map(([x,y])=>[x,-y]),k=ri(0,3),mv=pts.map((p,i)=>i===k?[p[0]+pick([-1,1])*ri(28,40),p[1]+pick([-1,1])*ri(28,40)]:p);
+  const opts=shuf([[pts,'matches'],[mx,'is a mirror image (left and right swapped)'],[fy,'is flipped top to bottom'],[mv,'has one contact moved']]),ix=opts.findIndex(o=>o[1]==='matches');
+  Q.push({sec:WM,memo:true,prompt:'Select the option that displays the radar contacts in the same positions.',fig:()=>{const W=260,H=260;let b=`<rect x="0" y="0" width="${W}" height="${H}" rx="8" fill="var(--radar-bg)"/>`+radarBase(130,130,110);pts.forEach(([x,y])=>b+=contact(130+x,130+y,6));return svg(W,H,'Radar screen with four contacts',b,'small')},
+    after:()=>{const W=560,H=176;let b=frame(W,H);opts.forEach(([set],i)=>{const cx=75+i*137;b+=radarBase(cx,80,62);set.forEach(([x,y])=>b+=contact(cx+x*0.62,80+y*0.62,4));b+=lbl(cx,166,L4[i],18)});return svg(W,H,'Four radar screens labelled A to D',b)},
+    opts:L4,ans:L4[ix],exp:opts.map((o,i)=>`${L4[i]} ${o[1]}`).join('; ')+'. Note which quadrant each contact is in as you look.'})}
+const NATO={B:'Bravo',C:'Charlie',D:'Delta',F:'Foxtrot',G:'Golf',H:'Hotel',K:'Kilo',L:'Lima',M:'Mike',N:'November',P:'Papa',R:'Romeo',S:'Sierra',T:'Tango',V:'Victor',W:'Whiskey',X:'X-ray',Z:'Zulu'},NUM=['Zero','One','Two','Three','Four','Five','Six','Seven','Eight','Nine'];
+function gAudio(){const s=Array.from({length:6},(_,i)=>i%2?String(ri(1,9)):pick(Object.keys(NATO))).join('');const say=[...s].map(c=>/\d/.test(c)?NUM[+c]:NATO[c]).join('. ')+'.';const d=variants(s);
+  Q.push({sec:WM,memo:true,audio:say,prompt:'Select the option that exactly matches the audio file.',fig:()=>figText(sp(s),'Audio sequence '+sp(s)),...placeOpts(s,d),mono:true,exp:`The audio said ${say.replace(/\./g,',').replace(/,$/,'')}: ${s}. Repeat it under your breath as it plays.`})}
+
+/* ================= Test 7: full-format test, generated per visit ================= */
+const NUMS='Numerical Reasoning',VERBS='Verbal Reasoning',SRRS='Spatial Relationship Reasoning',ABSS='Abstract Reasoning';
+const CNAME={R:'red',G:'green',B:'blue',Y:'yellow',O:'orange',P:'purple'};
+const fmtN=n=>n.toLocaleString('en-GB');
+function nearNums(ans,steps){const out=[];for(const s of shuf(steps)){const v=+(ans+s).toFixed(2);if(v>0&&v!==ans&&!out.includes(v))out.push(v);if(out.length===3)break}let k=1;while(out.length<3){const v=ans+k*(k%2?3:-3);if(v>0&&!out.includes(v)&&v!==ans)out.push(v);k++}return out}
+
+/* ---- Numerical ---- */
+function nEq(){const x=ri(3,15),a=ri(3,12),b=ri(2,40),plus=RNG()<.6,c=plus?a*x+b:a*x-b;const o=placeOpts(x,nearNums(x,[1,-1,2,-2]));
+  Q.push({sec:NUMS,prompt:`If ${a}x ${plus?'+':'−'} ${b} = ${c}, what is x?`,opts:o.opts.map(String),ans:String(x),exp:`${a}x = ${c} ${plus?'−':'+'} ${b} = ${a*x}, so x = ${a*x} ÷ ${a} = ${x}. Check: ${a} × ${x} ${plus?'+':'−'} ${b} = ${c}.`})}
+function nSeq(){const s=ri(1,9),d0=ri(1,4),dd=ri(1,3),t=[s];for(let k=0;k<5;k++)t.push(t[k]+d0+k*dd);const ans=t[4],gaps=t.slice(1).map((v,i)=>v-t[i]);
+  const o=placeOpts(ans,nearNums(ans,[1,-1,dd,-dd,2]));
+  Q.push({sec:NUMS,prompt:`What is the missing number in this sequence: ${t.slice(0,4).join(', ')}, ?, ${t[5]}`,opts:o.opts.map(String),ans:String(ans),exp:`The gaps grow by ${dd} each time: ${gaps.map(g=>'+'+g).join(', ')}. So ${t[3]} + ${gaps[3]} = ${ans}, and ${ans} + ${gaps[4]} = ${t[5]} confirms it.`})}
+function nFrac(){const den=pick([3,4,5,6,8,12]),num=pick([...Array(den-1).keys()].map(k=>k+1).filter(k=>{let a=k,b=den;while(b){[a,b]=[b,a%b]}return a===1})),N=den*ri(20,90),unit=N/den,ans=unit*num;
+  const o=placeOpts(ans,nearNums(ans,[unit,-unit,2*unit,10,-10]));
+  Q.push({sec:NUMS,prompt:`What is ${num}/${den} of ${fmtN(N)}?`,opts:o.opts.map(v=>fmtN(v)),ans:fmtN(ans),exp:`${fmtN(N)} ÷ ${den} = ${fmtN(unit)}, and ${fmtN(unit)} × ${num} = ${fmtN(ans)}. Divide by the bottom number first, then multiply by the top.`})}
+function nBracket(){const k=ri(4,9),q=ri(12,40),B=ri(20,120),A=k*q+B;const o=placeOpts(q,nearNums(q,[1,-1,2,-2]));
+  Q.push({sec:NUMS,prompt:`Calculate (${A} − ${B}) ÷ ${k}`,opts:o.opts.map(String),ans:String(q),exp:`${A} − ${B} = ${A-B}, and ${A-B} ÷ ${k} = ${q}. Check: ${k} × ${q} = ${A-B}.`})}
+function nUnit(){const U=[['kilograms','pounds',2.205,'1 kg = 2.205 lb','lb',[40,60,80,120,150,250]],['nautical miles','kilometres',1.852,'1 NM = 1.852 km','km',[20,35,50,75,120,150]],['feet','metres',0.3048,'1 ft = 0.3048 m','m',[1500,2500,3500,5000,8000,10000]],['US gallons','litres',3.785,'1 US gallon = 3.785 litres','L',[20,30,40,60,80,120]]];
+  const [from,to,f0,rule,ab,vals]=pick(U),v=pick(vals),exact=v*f0,ans=Math.round(exact),wrong=[Math.round(v/f0*10)/10,Math.round(exact*1.08),Math.round(exact*.92)].filter(x=>x!==ans);
+  const o=placeOpts(ans,[...new Set(wrong)].slice(0,3));while(o.opts.length<4){const x=ans+ri(5,15);if(!o.opts.includes(x))o.opts.push(x)}
+  Q.push({sec:NUMS,prompt:`How many ${to} are there in ${fmtN(v)} ${from} (given ${rule})?`,opts:o.opts.map(x=>fmtN(x)+' '+ab),ans:fmtN(ans)+' '+ab,exp:`${fmtN(v)} × ${f0} = ${(+exact.toFixed(2)).toLocaleString('en-GB')}, so about ${fmtN(ans)} ${ab}. ${fmtN(Math.round(v/f0*10)/10)} comes from dividing instead of multiplying.`})}
+function nRate(){if(RNG()<.5){const R=pick([1800,2100,2400,2700,3000]),m=pick([40,50,75,80,90,100,105,130,140]),ans=R/60*m,hm=`${Math.floor(m/60)?Math.floor(m/60)+' hour'+(m>=120?'s':'')+' ':''}${m%60?m%60+' minutes':''}`.trim();
+    const dec=R*(Math.floor(m/60)+(m%60)/100);const dl=[...new Set([Math.round(dec),ans+R/4,ans-R/12*2].filter(x=>x!==ans&&x>0))];let kk=1;while(dl.length<3){const x=ans+R/12*kk*(kk%2?1:-1);if(x>0&&x!==ans&&!dl.includes(x))dl.push(x);kk++}const o=placeOpts(ans,dl.slice(0,3));
+    Q.push({sec:NUMS,prompt:`An aircraft burns ${fmtN(R)} kg of fuel per hour. How much fuel does it burn in ${hm}?`,opts:o.opts.map(x=>fmtN(Math.round(x))+' kg'),ans:fmtN(ans)+' kg',exp:`${hm} is ${m} minutes. ${fmtN(R)} kg per hour is ${R/60} kg per minute, and ${R/60} × ${m} = ${fmtN(ans)} kg. Careful not to read ${Math.floor(m/60)} h ${m%60} min as ${Math.floor(m/60)}.${String(m%60).padStart(2,'0')} hours.`})}
+  else{const GS=pick([240,300,360,420,480]),m=pick([25,35,40,50,55,75,85]),ans=GS/60*m;const o=placeOpts(ans,nearNums(ans,[GS/60*5,-GS/60*5,GS/60*10,GS/12]));
+    Q.push({sec:NUMS,prompt:`An aircraft flies at a ground speed of ${GS} knots. How far does it travel in ${m} minutes?`,opts:o.opts.map(x=>fmtN(x)+' NM'),ans:fmtN(ans)+' NM',exp:`${GS} knots is ${GS/60} NM per minute, and ${GS/60} × ${m} = ${fmtN(ans)} NM.`})}}
+
+/* ---- Verbal ---- */
+const WORDS=['altitude','runway','horizon','aircraft','visibility','approach','pressure','landing','cockpit','headwind','overcast','airspeed','terminal','turbulence','navigate','crosswind'];
+function vAnagram(){const w=pick(WORDS),L=[...w],sorted=s=>[...s].sort().join(''),mix=a=>{let o;do{o=shuf(a)}while(o.join('')===a.join(''));return o};const AL='abcdefghilmnoprstuvwy';
+  const c=mix(L).join(' '),d=new Set();let g=0;while(d.size<3&&g++<300){let a=L.slice();const k=ri(0,2);if(k===0){const i=ri(0,a.length-1);let ch;do{ch=pick([...AL])}while(ch===a[i]);a[i]=ch}else if(k===1)a.splice(ri(0,a.length-1),1);else{const i=ri(0,a.length-1),j=(i+ri(1,a.length-1))%a.length;if(a[i]===a[j])continue;a[i]=a[j]}
+    const s=mix(a).join(' ');if(sorted(s.replace(/ /g,''))!==sorted(w)&&s!==c)d.add(s)}
+  Q.push({sec:VERBS,prompt:`Select the group of letters that can be reordered to spell the word '${w}'`,...placeOpts(c,[...d]),mono:true,exp:`'${w}' has ${w.length} letters: ${L.join(', ')}. Count each letter in the options: only one has exactly the same letters, the same number of times. The others have a letter missing, an extra or a wrong letter.`})}
+const ACR=[['VFR','Visual Flight Rules',['Variable Flight Route','Vertical Flight Reference','Visual Fixed Range']],['IFR','Instrument Flight Rules',['Inertial Flight Reference','International Flight Route','Instrument Final Range']],['ATC','Air Traffic Control',['Aircraft Transit Centre','Air Terminal Clearance','Automatic Traffic Control']],['ETA','Estimated Time of Arrival',['Expected Taxi Area','Emergency Terminal Approach','Estimated Take-off Altitude']],['ILS','Instrument Landing System',['Integrated Lighting System','Inertial Landing Sensor','International Landing Standard']],['TCAS','Traffic Collision Avoidance System',['Terrain Contour Alert System','Tactical Cockpit Advisory Service','Traffic Control Approach Sequence']],['GPWS','Ground Proximity Warning System',['Global Position Watch Service','Gear Position Warning Switch','Ground Power Wiring System']],['APU','Auxiliary Power Unit',['Automatic Pilot Unit','Approach Path Update','Aircraft Pressure Unit']],['CRM','Crew Resource Management',['Cockpit Radio Monitoring','Cabin Readiness Manual','Climb Rate Measurement']],['MTOW','Maximum Take-Off Weight',['Minimum Taxi Operating Weight','Maximum Turbine Output Wattage','Mean Take-Off Wind']],['ICAO','International Civil Aviation Organization',['Inter-Continental Air Operations','International Cockpit Avionics Office','Independent Civil Airworthiness Office']],['RVR','Runway Visual Range',['Runway Vector Reference','Radar Vertical Resolution','Required Visual Reference']],['ATIS','Automatic Terminal Information Service',['Air Traffic Instruction System','Automated Taxi Information Signal','Approach Terminal Instrument Survey']],['FMS','Flight Management System',['Fuel Monitoring Sensor','Final Missed-approach Segment','Flight Manual Standard']],['SOP','Standard Operating Procedure',['Safety Oversight Plan','Standard Oxygen Pressure','System Override Protocol']]];
+function vAcr(){const [a,c,w]=pick(ACR);Q.push({sec:VERBS,prompt:`What does ${a} stand for?`,...placeOpts(c,w),exp:`${a} stands for ${c}.`})}
+const LINK=[['Cloud',['Cumulus','Cirrus','Stratus','Nimbostratus']],['Planet',['Mars','Venus','Jupiter','Saturn']],['Instrument',['Altimeter','Compass','Variometer','Tachometer']],['Tree',['Oak','Pine','Birch','Maple']],['Metal',['Iron','Copper','Zinc','Nickel']],['Ocean',['Atlantic','Pacific','Indian','Arctic']],['Season',['Spring','Summer','Autumn','Winter']],['Fruit',['Apple','Pear','Plum','Cherry']],['Bird',['Sparrow','Eagle','Robin','Falcon']],['Continent',['Europe','Africa','Asia','Oceania']],['Colour',['Crimson','Amber','Indigo','Turquoise']],['Vehicle',['Truck','Tram','Van','Bus']]];
+function vLink(){const [l,m]=pick(LINK),three=shuf(m).slice(0,3),opts=shuf([...three,l]);Q.push({sec:VERBS,prompt:'Select the word that links or connects the other words together:',opts,ans:l,exp:`${three.join(', ')} are all types of ${l.toLowerCase()}, so ${l} is the word that links them.`})}
+const SYN=[['abundant','plentiful',['scarce','absent','narrow']],['rapid','swift',['gradual','heavy','steady']],['accurate','precise',['careless','vague','rough']],['reluctant','unwilling',['eager','certain','curious']],['vital','essential',['optional','minor','fragile']],['commence','begin',['finish','delay','repeat']],['hazard','danger',['benefit','reward','shelter']],['obscure','unclear',['obvious','famous','loud']],['diminish','reduce',['expand','increase','restore']],['ample','sufficient',['lacking','tiny','empty']],['adjacent','neighbouring',['distant','opposite','hidden']],['durable','long-lasting',['fragile','temporary','flimsy']]];
+function vSyn(){const [w,c,x]=pick(SYN);Q.push({sec:VERBS,prompt:`Select the word most similar in meaning to "${w}"`,...placeOpts(c[0].toUpperCase()+c.slice(1),x.map(s=>s[0].toUpperCase()+s.slice(1))),exp:`"${w[0].toUpperCase()+w.slice(1)}" means ${c}. ${x.map(s=>s[0].toUpperCase()+s.slice(1)).join(', ')} do not mean the same; some are close to the opposite.`})}
+const ANT=[['expand','contract',['enlarge','extend','widen']],['ascend','descend',['climb','rise','mount']],['scarce','plentiful',['rare','limited','sparse']],['rigid','flexible',['stiff','firm','solid']],['transparent','opaque',['clear','glassy','sheer']],['reveal','conceal',['show','expose','display']],['temporary','permanent',['brief','passing','short']],['include','exclude',['contain','involve','cover']],['maximum','minimum',['highest','peak','utmost']],['accelerate','decelerate',['speed up','hasten','quicken']],['vertical','horizontal',['upright','plumb','erect']],['generous','mean',['giving','kind','lavish']]];
+function vAnt(){const [w,c,x]=pick(ANT),cap=s=>s[0].toUpperCase()+s.slice(1);Q.push({sec:VERBS,prompt:`Select the word that is the opposite of "${w}"`,...placeOpts(cap(c),x.map(cap)),exp:`The opposite of ${w} is ${c}. ${x.map(cap).join(', ')} all mean something close to ${w}.`})}
+function vLogic(){const P=shuf(['Maria','Leo','Sam','Tara','Omar','Lena','Hugo','Nina']).slice(0,4),T=shuf(['A320','B737','ATR 72','E190','A220','CRJ']).slice(0,4),most=RNG()<.6;
+  const counts=most?shuf([3,2,2,1]):shuf([1,2,2,3]);let tgt;let sets;for(let g=0;g<200;g++){sets=P.map((p,i)=>shuf(T).slice(0,counts[i]));if(T.every(t=>sets.some(s=>s.includes(t))))break}
+  const best=most?Math.max(...counts):Math.min(...counts);tgt=P[counts.indexOf(best)];
+  const lines=shuf(T).map(t=>{const who=P.filter((p,i)=>sets[i].includes(t));return who.length===1?`${who[0]} flies the ${t}.`:`${who.slice(0,-1).join(', ')} and ${who[who.length-1]} fly the ${t}.`});
+  Q.push({sec:VERBS,prompt:`${lines.join(' ')} Who is qualified on the ${most?'greatest':'fewest'} number of different aircraft types?`,opts:shuf(P),ans:tgt,exp:P.map((p,i)=>`${p}: ${sets[i].join(', ')} (${counts[i]})`).join('; ')+`. Keep a tally for each name as you read.`})}
+
+/* ---- Spatial ---- */
+function sRefl(){const vert=RNG()<.5,T=shuf([[1,1],[-1,-1],[1,-1],[-1,1]]),corr=vert?'-1,1':'1,-1',ix=T.findIndex(t=>t.join()===corr);const NAME={'1,1':'an unchanged copy','-1,-1':'turned 180°','1,-1':'reflected in a horizontal line','-1,1':'reflected in a vertical line'};
+  Q.push({sec:SRRS,prompt:'Select the option that shows a reflection of this image in the red line.',fig:()=>{if(vert){const W=560,H=290;let b=frame(W,H);b+=reflPanel(200,14,1,1)+`<line x1="280" y1="6" x2="280" y2="114" stroke="${C.R}" stroke-width="3"/><rect x="300" y="14" width="60" height="90" fill="${BG}" stroke="${STK}" stroke-width="3"/>`+lbl(330,72,'?',36);T.forEach((s,i)=>{const x=90+i*110;b+=reflPanel(x,150,...s)+lbl(x+30,270,ABCD[i],20)});return svg(W,H,'A panel beside a vertical red line, with four options labelled A to D',b)}
+    const W=560,H=346;let b=frame(W,H);b+=reflPanel(250,8,1,1)+`<line x1="232" y1="104" x2="328" y2="104" stroke="${C.R}" stroke-width="3"/><rect x="250" y="110" width="60" height="90" fill="${BG}" stroke="${STK}" stroke-width="3"/>`+lbl(280,168,'?',36);T.forEach((s,i)=>{const x=90+i*110;b+=reflPanel(x,226,...s)+lbl(x+30,338,ABCD[i],20)});return svg(W,H,'A panel above a horizontal red line, with four options labelled A to D',b)},
+    opts:L4,ans:L4[ix],exp:`The red line is ${vert?'vertical, so the reflection swaps left and right but keeps top and bottom':'horizontal, so the reflection swaps top and bottom but keeps left and right'}. ${T.map((t,i)=>`${L4[i]} is ${NAME[t.join()]}`).join('; ')}.`})}
+const rotG=g=>[0,1,2].map(r=>[0,1,2].map(c=>g[2-c][r]).join('')),mirG=g=>g.map(r=>[...r].reverse().join('')),flipG=g=>g.slice().reverse();
+const allT=g=>{const o=[g];for(let k=0;k<3;k++)o.push(rotG(o[o.length-1]));const m=mirG(g);const om=[m];for(let k=0;k<3;k++)om.push(rotG(om[om.length-1]));return[...o,...om].map(x=>x.join('|'))};
+function sRot(){let g,ts;do{g=[0,1,2].map(()=>Array.from({length:3},()=>pick([...'RGBY'])).join(''));ts=allT(g)}while(new Set(ts).size<8);
+  const k=ri(1,3);let cor=g;for(let i=0;i<k;i++)cor=rotG(cor);const mir=mirG(cor);
+  let sw;for(let t=0;t<100;t++){const a=cor.map(r=>[...r]),r=ri(0,2),c=ri(0,1);[a[r][c],a[r][c+1]]=[a[r][c+1],a[r][c]];const x=a.map(r=>r.join(''));if(!ts.includes(x.join('|'))){sw=x;break}}
+  const a2=cor.map(r=>[...r]),rr=ri(0,2),cc=ri(0,2);a2[rr][cc]=pick([...'RGBY'].filter(x=>x!==a2[rr][cc]));const ch=a2.map(r=>r.join(''));
+  const V=[[cor,`turned ${k===2?'180°':k===1?'90° clockwise':'90° anticlockwise'}`],[mir,'a mirror image'],[sw||mirG(g),'two cells swapped'],[ch,'one square changed colour']];const opts=shuf(V),ix=opts.findIndex(v=>v[0]===cor);
+  Q.push({sec:SRRS,prompt:'Select the matching rotated shape.',fig:()=>{const W=560,H=338;let b=frame(W,H);b+=grid3(213,14,g,34,6,10);opts.forEach(([rows],i)=>{const x=30+i*132;b+=grid3(x,184,rows,26,5,8)+lbl(x+52,320,ABCD[i],22)});return svg(W,H,'A 3 by 3 colour grid and four options labelled A to D',b)},
+    opts:L4,ans:L4[ix],exp:`${L4[ix]} is the original ${V[0][1]}. `+opts.map((v,i)=>i===ix?null:`${L4[i]} is ${v[1]}`).filter(Boolean).join('; ')+'. Track one distinctive corner cell to check a rotation quickly.'})}
+const FN={U:[0,1,0],D:[0,-1,0],F:[0,0,1],B:[0,0,-1],R:[1,0,0],L:[-1,0,0]},OPP={U:'D',D:'U',F:'B',B:'F',R:'L',L:'R'};
+const det3=(a,b,c)=>a[0]*(b[1]*c[2]-b[2]*c[1])-a[1]*(b[0]*c[2]-b[2]*c[0])+a[2]*(b[0]*c[1]-b[1]*c[0]);
+const validView=(t,l,r)=>{const A=FN[t],Bv=FN[r],Cv=FN[l];const dot=(x,y)=>x[0]*y[0]+x[1]*y[1]+x[2]*y[2];return dot(A,Bv)===0&&dot(A,Cv)===0&&dot(Bv,Cv)===0&&det3(A,Bv,Cv)===-1};
+function sCube(){const cols=shuf([...'RGBYOP']),FC={};['U','F','R','B','L','D'].forEach((f,i)=>FC[f]=cols[i]);
+  const faces=Object.keys(FN);let cor;for(;;){const t=pick(faces),r=pick(faces),l=pick(faces);if(validView(t,l,r)){cor=[t,l,r];break}}
+  const mir=[cor[0],cor[2],cor[1]];let opp;for(;;){const t=pick(faces),l=OPP[t],r=pick(faces.filter(x=>x!==t&&x!==l));opp=RNG()<.5?[t,l,r]:[t,r,l];if(opp.join()!==cor.join())break}
+  let other;for(;;){const t=pick(faces),r=pick(faces),l=pick(faces);const v=[t,l,r];if(new Set(v).size<3)continue;const inv=!validView(t,l,r);const k=v.join();if(inv&&k!==mir.join()&&k!==opp.join()){other=v;break}}
+  const V=[[cor,'valid'],[mir,'mirror'],[opp,'opp'],[other,'bad']],opts=shuf(V),ix=opts.findIndex(v=>v[1]==='valid'),cc=v=>v.map(f=>FC[f]);
+  const why=(v,kind)=>{const n=v.map(f=>CNAME[FC[f]]);if(v.some(f=>v.includes(OPP[f]))){const a=v.find(f=>v.includes(OPP[f]));return `shows ${CNAME[FC[a]]} next to ${CNAME[FC[OPP[a]]]}, which are opposite faces`}return `shows ${n[0]}, ${n[2]} and ${n[1]} in the mirror-image order`};
+  Q.push({sec:SRRS,prompt:'Identify the cube that can be made from the pattern below.',fig:()=>{const W=560,H=356,s=46,x0=188,y0=18;let b=frame(W,H);const sq=(c,r,col)=>`<rect x="${x0+c*s}" y="${y0+r*s}" width="${s}" height="${s}" fill="${C[col]}" stroke="${STK}" stroke-width="2.5"/>`;
+      b+=sq(1,0,FC.U)+sq(0,1,FC.L)+sq(1,1,FC.F)+sq(2,1,FC.R)+sq(3,1,FC.B)+sq(1,2,FC.D);opts.forEach(([v],i)=>{const cx=80+i*133;b+=isoCube(cx,252,44,...cc(v))+lbl(cx,338,ABCD[i],22)});return svg(W,H,'A cross-shaped cube net of six coloured squares and four cubes labelled A to D',b)},
+    opts:L4,ans:L4[ix],exp:`Fold with ${CNAME[FC.F]} as the front: ${CNAME[FC.U]} goes on top, ${CNAME[FC.D]} underneath, ${CNAME[FC.L]} left, ${CNAME[FC.R]} right and ${CNAME[FC.B]} at the back. Opposite pairs are ${CNAME[FC.U]}–${CNAME[FC.D]}, ${CNAME[FC.L]}–${CNAME[FC.R]} and ${CNAME[FC.F]}–${CNAME[FC.B]}, so no cube can show both colours of a pair. `+opts.map((v,i)=>i===ix?null:`${L4[i]} ${why(v[0])}`).filter(Boolean).join('; ')+`. ${L4[ix]} is the only possible corner.`})}
+const ROADV=['Elm Way','Church Lane','Harbour Road','Mill Lane','King Street','Park Avenue','Bridge Street','Oak Drive'],ROADH=['High Street','Park Road','Station Road','Queen Street','Market Way','North Road','Victoria Road','West Lane'],
+  BNAMES=['Museum','Bank','Hospital','Market','Bakery','Gym','School','Library','Hotel','Cinema','Pharmacy','Garage','Church','Café','Florist','Post Office'];
+function sMap(){const VX=[80,220,360],HY=[60,180,300],DIRW={'1,0':'east','-1,0':'west','0,-1':'north','0,1':'south'},ORD=['first','second'];
+  for(let tries=0;tries<800;tries++){const vn=shuf(ROADV).slice(0,3),hn=shuf(ROADH).slice(0,3),nm=shuf(BNAMES);let ni=0;const big=[ri(0,1),ri(0,1)],bl=[[],[]];
+    for(let i=0;i<2;i++)for(let j=0;j<2;j++)bl[i][j]=i===big[0]&&j===big[1]?{big:pick(['Stadium','Park','Sports Ground'])}:{w:nm[ni++],e:nm[ni++]};
+    const inG=p=>p[0]>=0&&p[0]<=2&&p[1]>=0&&p[1]<=2,add=(p,h,k=1)=>[p[0]+h[0]*k,p[1]+h[1]*k],L=h=>[h[1],-h[0]],Rt=h=>[-h[1],h[0]];
+    const sideB=(P,Qn,s)=>{const h=[Qn[0]-P[0],Qn[1]-P[1]],v=s==='left'?L(h):Rt(h);if(h[1]===0){const i=Math.min(P[0],Qn[0]),j=v[1]<0?P[1]-1:P[1];if(j<0||j>1)return null;const b=bl[i][j];return b.big?[b.big]:[b.w,b.e]}
+      const j=Math.min(P[1],Qn[1]),i=v[0]>0?P[0]:P[0]-1;if(i<0||i>1)return null;const b=bl[i][j];return b.big?[b.big]:[v[0]>0?b.w:b.e]};
+    const road=(P,h)=>h[1]===0?hn[P[1]]:vn[P[0]];
+    const A=[ri(0,2),ri(0,2)],h0=pick([[1,0],[-1,0],[0,1],[0,-1]]),B=add(A,h0);if(!inG(B))continue;
+    const ss=pick(['left','right']),sb=sideB(A,B,ss);if(!sb)continue;
+    const n1=ri(1,2),J1=add(B,h0,n1-1);if(!inG(J1))continue;const t1=pick(['left','right']),h1=t1==='left'?L(h0):Rt(h0),J2=add(J1,h1);if(!inG(J2))continue;
+    const t2=pick(['left','right']),h2=t2==='left'?L(h1):Rt(h1),J3=add(J2,h2);if(!inG(J3))continue;const ask=pick(['left','right']),ansL=sideB(J2,J3,ask);if(!ansL)continue;
+    const ans=ansL.join(' and '),pool=[];for(let i=0;i<2;i++)for(let j=0;j<2;j++){const b=bl[i][j];if(b.big)pool.push(b.big);else pool.push(`${b.w} and ${b.e}`,b.w,b.e)}
+    const opp=sideB(J2,J3,ask==='left'?'right':'left');const d=[...new Set([opp&&opp.join(' and '),...shuf(pool)].filter(x=>x&&x!==ans&&!ans.includes(x)&&!x.includes(ans)))].slice(0,3);if(d.length<3)continue;
+    const startTxt=`Starting on ${road(A,h0)} heading ${DIRW[h0.join()]} with the ${sb.join(' and the ')} on your ${ss}`;
+    const prompt=`${startTxt}, take the ${ORD[n1-1]} junction on the ${t1}. Follow this road and take the first junction on the ${t2}. Which building${ansL.length>1?'s are':' is'} on your ${ask} as you drive along this road?`;
+    const exp=`Heading ${DIRW[h0.join()]} on ${road(A,h0)}, the ${ORD[n1-1]} junction is ${road(J1,h1)}, where you turn ${t1} to head ${DIRW[h1.join()]}. The first junction on the ${t2} is ${road(J2,h2)}, so you turn ${DIRW[h2.join()]}. Driving ${DIRW[h2.join()]} along ${road(J2,h2)}, the ${ans} ${ansL.length>1?'are':'is'} on your ${ask}.${opp?` The ${opp.join(' and ')} ${opp.length>1?'are':'is'} on the other side.`:''} Turn the map in your head so you are always facing up the road, or say "left" and "right" out loud as you trace it.`;
+    Q.push({sec:SRRS,prompt,fig:()=>{const W=460,H=390;let b=frame(W,H);const st='var(--fig-street)';VX.forEach(x=>b+=`<rect x="${x-12}" y="36" width="24" height="288" fill="${st}"/>`);HY.forEach(y=>b+=`<rect x="56" y="${y-12}" width="328" height="24" fill="${st}"/>`);
+        const sl=(x,y,t,rot)=>`<text x="${x}" y="${y}" text-anchor="middle" font-size="10.5" font-weight="600" fill="var(--muted)" font-family="Inter, system-ui, sans-serif" ${rot?`transform="rotate(-90 ${x} ${y})"`:''}>${t}</text>`;
+        HY.forEach((y,j)=>{b+=sl(150,y+4,hn[j])+sl(290,y+4,hn[j])});VX.forEach((x,i)=>{b+=sl(x+4,120,vn[i],1)+sl(x+4,240,vn[i],1)});
+        const box=(x,y,w,h,name,fill)=>`<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="3" fill="${fill||'var(--fig-block)'}" stroke="${STK}" stroke-width="1.3"/>`+txt(x+w/2,y+h/2+5,name,name.length>8?11:13);
+        for(let i=0;i<2;i++)for(let j=0;j<2;j++){const x0=VX[i]+16,y0=HY[j]+16,bb=bl[i][j];b+=bb.big?box(x0,y0,108,88,bb.big,'var(--fig-park)'):box(x0,y0,52,88,bb.w)+box(x0+56,y0,52,88,bb.e)}
+        const ax=VX[A[0]]+(VX[B[0]]-VX[A[0]])*.32,ay=HY[A[1]]+(HY[B[1]]-HY[A[1]])*.32,[hx,hy]=h0,tip=[ax+hx*10,ay+hy*10];b+=`<polygon points="${tip[0]},${tip[1]} ${ax-hx*10-hy*8},${ay-hy*10+hx*8} ${ax-hx*10+hy*8},${ay-hy*10-hx*8}" fill="var(--amber)" stroke="${STK}" stroke-width="1.2"/>`;
+        b+=`<line x1="430" y1="78" x2="430" y2="50" stroke="${STK}" stroke-width="2.5"/><polygon points="430,40 423,54 437,54" fill="${STK}"/>`+lbl(430,98,'N',18);return svg(W,H,'Street map with named roads and buildings',b)},
+      ...placeOpts(ans,d),exp});return}}
+function plateB(cx,cy,rot,mirror){const inner=`<rect x="-34" y="-34" width="68" height="68" rx="3" fill="var(--plate)" stroke="var(--plate-edge)" stroke-width="2"/><circle cx="16" cy="-16" r="7" fill="${BG}" stroke="var(--plate-edge)" stroke-width="1.5"/><rect x="-25" y="-4" width="8" height="26" rx="2" fill="${BG}" stroke="var(--plate-edge)" stroke-width="1.5"/><rect x="2" y="12" width="10" height="10" rx="1.5" fill="${BG}" stroke="var(--plate-edge)" stroke-width="1.5"/>`;
+  const t=`translate(${cx} ${cy}) rotate(${rot})${mirror?' scale(-1 1)':''}`;return `<g transform="translate(5 6)"><g transform="${t}"><rect x="-34" y="-34" width="68" height="68" rx="3" fill="var(--plate-edge)"/></g></g><g transform="${t}">${inner}</g>`}
+function sPlate(){const pf=RNG()<.5?plate:plateB,mi=ri(0,3),rots=shuf([0,40,90,130,180,220,270,310]).slice(0,4);
+  Q.push({sec:SRRS,prompt:'Select the plate that is different from the other 3 plates.',fig:()=>{const W=560,H=200;let b=frame(W,H);rots.forEach((r,i)=>{const cx=80+i*133;b+=pf(cx,86,r,i===mi?1:0)+lbl(cx,182,ABCD[i],20)});return svg(W,H,'Four square plates with holes, labelled A to D',b)},
+    opts:L4,ans:L4[mi],exp:`Turn each plate in your head so the round hole is in the same corner. The holes on three plates then line up the same way; on ${L4[mi]} they are the other way round, because ${L4[mi]} is a mirror image, which no rotation can produce.`})}
+function sCross(){let P,cs,ok=false;for(let g=0;g<500&&!ok;g++){P=[ri(105,195),ri(105,195)];const a1=RNG()*Math.PI*2,a2=a1+(.35+RNG()*.45)*Math.PI*(RNG()<.5?1:-1);
+    cs=[a1,a2].map(a=>{const d=ri(65,95);return[Math.round(P[0]+Math.cos(a)*d),Math.round(P[1]+Math.sin(a)*d)]});ok=cs.every(([x,y])=>Math.hypot(x-150,y-150)<104)}
+  const on=(i,f)=>[Math.round(cs[i][0]+(P[0]-cs[i][0])*f),Math.round(cs[i][1]+(P[1]-cs[i][1])*f)];let cand=[P,on(0,RNG()<.5?.5:1.45),on(1,RNG()<.5?.5:1.45)];
+  let rnd,g=0;do{rnd=[ri(70,230),ri(70,230)];g++}while(g<200&&(cand.some(c=>Math.hypot(c[0]-rnd[0],c[1]-rnd[1])<35)||Math.hypot(rnd[0]-150,rnd[1]-150)>105));cand.push(rnd);
+  cand=cand.map(c=>[Math.max(40,Math.min(260,c[0])),Math.max(40,Math.min(260,c[1]))]);const order=shuf([0,1,2,3]),ix=order.indexOf(0),pts=order.map(k=>cand[k]);const role=['where both paths meet','only on the first contact\'s path','only on the second contact\'s path','on neither path'];
+  Q.push({sec:SRRS,prompt:'The faded lines show where each radar contact has come from. If both continue in the same direction, at which point will their paths cross?',fig:()=>{const W=300,H=300;let b=`<rect x="0" y="0" width="${W}" height="${H}" rx="8" fill="var(--radar-bg)"/>`+radarBase(150,150,120);
+      cs.forEach(([x,y])=>{const dx=P[0]-x,dy=P[1]-y,L=Math.hypot(dx,dy);b+=`<line x1="${(x-dx/L*24).toFixed(1)}" y1="${(y-dy/L*24).toFixed(1)}" x2="${x}" y2="${y}" stroke="${C.R}" stroke-width="3" stroke-opacity=".55" stroke-linecap="round"/>`+contact(x,y,6)});
+      pts.forEach(([x,y],i)=>{b+=`<path d="M${x-5},${y-5} L${x+5},${y+5} M${x-5},${y+5} L${x+5},${y-5}" stroke="#fff" stroke-width="2"/>`+lbl(x+12,y-6,ABCD[i],15,'#fff')});return svg(W,H,'Radar with two contacts and their trails, and four candidate crossing points A to D',b,'small')},
+    opts:L4,ans:L4[ix],exp:`Extend each trail as a straight line in the direction of travel. They meet at ${L4[ix]}. `+order.map((k,i)=>k===0?null:`${L4[i]} is ${role[k]}`).filter(Boolean).join('; ')+'.'})}
+
+/* ---- Abstract ---- */
+function aOdd(){const S=pick([12,14,15,16,18]),part=tot=>{for(let g=0;g<500;g++){const n=ri(2,4),a=Array.from({length:n},()=>ri(3,6));if(a.reduce((x,y)=>x+y,0)===tot)return a}return null};
+  let boxes;for(let g=0;g<100;g++){const odd=S+pick([-2,-1,1,2]);const b3=[part(S),part(S),part(S)],bo=part(odd);if(b3.every(Boolean)&&bo&&new Set(b3.map(x=>x.slice().sort().join())).size===3){boxes=[...b3.map(x=>[x,S]),[bo,odd]];break}}
+  const order=shuf([0,1,2,3]),ix=order.indexOf(3),bx=order.map(k=>boxes[k]),NM={3:'triangle',4:'square',5:'pentagon',6:'hexagon'};
+  Q.push({sec:ABSS,prompt:'Select the odd image that does not fit with the other images.',fig:()=>{const W=560,H=176;let b=frame(W,H);const slots={2:[[36,40],[84,84]],3:[[30,32],[88,42],[56,94]],4:[[30,30],[88,32],[32,92],[90,90]]};
+      bx.forEach(([sides],i)=>{const x0=20+i*135,y0=12;b+=`<rect x="${x0}" y="${y0}" width="120" height="120" fill="${BG}" stroke="${STK}" stroke-width="2"/>`;sides.forEach((n,j)=>{const [x,y]=slots[sides.length][j];b+=`<polygon points="${ngon(n,x0+x,y0+y,n===3?17:15,j*17)}" fill="var(--fig-stroke)"/>`});b+=lbl(x0+60,162,ABCD[i],22)});return svg(W,H,'Four boxes of dark polygons labelled A to D',b)},
+    opts:L4,ans:L4[ix],exp:`Add up the sides in each box. ${bx.map(([s,t],i)=>`${L4[i]}: ${s.join(' + ')} = ${t}`).join('; ')}. Three boxes total ${S}; ${L4[ix]} does not. The number and type of shapes are just distractions.`})}
+function aSeq(){const s0=ri(3,6),st=s0>=5?-1:pick([1,-1].filter(v=>s0+3*v>=3&&s0+3*v<=8)),a0=pick([0,90,180,270]),as=pick([90,-90,45,-45]);const nS=s0+3*st,nA=((a0+3*as)%360+360)%360;
+  const V=[[nS,nA],[nS+st*-1,nA],[nS,((nA-as)%360+360)%360],[nS-st,((nA+as)%360+360)%360]];if(nS-st===nS)V[3][0]=nS+1;const opts=shuf(V),ix=opts.findIndex(v=>v[0]===nS&&v[1]===nA);
+  const DIRN=a=>({0:'up',45:'up-right',90:'right',135:'down-right',180:'down',225:'down-left',270:'left',315:'up-left'})[a];
+  Q.push({sec:ABSS,prompt:'Select the image that completes the sequence.',fig:()=>{const W=560,H=372,xs=[70,175,280,385];let b=frame(W,H);for(let i=0;i<3;i++)b+=seqPanel(xs[i],12,s0+i*st,((a0+i*as)%360+360)%360);
+      b+=`<rect x="${xs[3]}" y="12" width="80" height="140" fill="${BG}" stroke="${STK}" stroke-width="1.5"/>`+lbl(xs[3]+40,96,'?',44)+`<line x1="40" y1="170" x2="520" y2="170" stroke="var(--fig-frame)" stroke-width="1.5" stroke-dasharray="4 5"/>`;
+      opts.forEach((p,i)=>{b+=seqPanel(xs[i],186,...p)+lbl(xs[i]+40,358,ABCD[i],20)});return svg(W,H,'Sequence of three two-part panels and a question mark, with four options labelled A to D',b)},
+    opts:L4,ans:L4[ix],exp:`Top row: the shape ${st>0?'gains':'loses'} a side each step (${s0}, ${s0+st}, ${s0+2*st}, so next has ${nS}). Bottom row: the arrow turns ${Math.abs(as)}° ${as>0?'clockwise':'anticlockwise'} each step, so next points ${DIRN(nA)}. Only ${L4[ix]} has both.`})}
+function aComp(){const TR={cw:[rotG,'turned 90° clockwise'],ccw:[g=>rotG(rotG(rotG(g))),'turned 90° anticlockwise'],mir:[mirG,'reflected left to right'],flip:[flipG,'flipped top to bottom']};
+  for(let tries=0;tries<300;tries++){const g1=[0,1,2].map(()=>Array.from({length:3},()=>pick([...'FGH'])).join('')),g2=[0,1,2].map(()=>Array.from({length:3},()=>pick([...'TMH'])).join(''));
+    const keys=Object.keys(TR),rule=pick(keys),res1=TR[rule][0](g1).join('|');if(keys.some(k=>k!==rule&&TR[k][0](g1).join('|')===res1)||res1===g1.join('|'))continue;
+    const outs=keys.map(k=>TR[k][0](g2).join('|'));if(new Set([...outs,g2.join('|')]).size<5)continue;
+    const cor=TR[rule][0](g2),others=shuf(keys.filter(k=>k!==rule)).slice(0,2).map(k=>[TR[k][0](g2),TR[k][1]]);const ch=cor.map(r=>[...r]),r=ri(0,2),c=ri(0,2);ch[r][c]=pick([...'TMH'].filter(x=>x!==ch[r][c]));
+    const V=[[cor,'correct'],...others,[ch.map(x=>x.join('')),'the right turn but with one cell changed']];if(new Set(V.map(v=>v[0].join('|'))).size<4)continue;const opts=shuf(V),ix=opts.findIndex(v=>v[1]==='correct');const r1=TR[rule][0](g1);
+    Q.push({sec:ABSS,prompt:'Select the image that completes the comparison statement.',fig:()=>{const W=560,H=436;let b=frame(W,H);b+=dotGrid(140,12,g1,'dot')+txt(280,64,'is to:',18)+dotGrid(320,12,r1,'dot')+txt(280,128,'as',18);
+        b+=dotGrid(140,150,g2,'pent')+txt(280,202,'is to:',18)+`<rect x="320" y="150" width="96" height="96" rx="4" fill="${BG}" stroke="${STK}" stroke-width="2"/>`+lbl(368,212,'?',40)+`<line x1="40" y1="268" x2="520" y2="268" stroke="var(--fig-frame)" stroke-width="1.5" stroke-dasharray="4 5"/>`;
+        opts.forEach(([g],i)=>{const x=40+i*130;b+=dotGrid(x,286,g,'pent')+lbl(x+48,418,ABCD[i],20)});return svg(W,H,'Comparison: a grid of circles is to its changed version as a grid of pentagons is to which option, A to D',b)},
+      opts:L4,ans:L4[ix],exp:`The circle grid is ${TR[rule][1]}. Do the same to the pentagon grid to get ${L4[ix]}. `+opts.map((v,i)=>i===ix?null:`${L4[i]} is ${v[1]}`).filter(Boolean).join('; ')+'. Check the first rule against all four corners before applying it.'});return}}
+function aBars(){for(let g=0;g<300;g++){const a=ri(1,6),dr=pick([-1,1,2,-2]),dc=pick([-1,1]),cols=shuf([...'RBGY']).slice(0,3),v=(r,c)=>a+dr*r+dc*c;let ok=true;for(let r=0;r<3;r++)for(let c=0;c<3;c++)if(v(r,c)<1||v(r,c)>6)ok=false;if(!ok)continue;
+    const ans=[v(2,2),cols[2]],wc=pick([...'RBGY'].filter(x=>x!==cols[2])),dn=ans[0]+(ans[0]>1?-1:1);const V=[[ans,'correct'],[[dn,cols[2]],'wrong number'],[[ans[0],wc],'wrong colour'],[[dn,wc],'both wrong']];const opts=shuf(V),ix=opts.findIndex(x=>x[1]==='correct');
+    Q.push({sec:ABSS,prompt:'Select the image that completes the grid.',fig:()=>{const W=560,H=330,cs=62,gx=187,gy=12;let b=frame(W,H);for(let r=0;r<3;r++)for(let c=0;c<3;c++){const x=gx+c*cs,y=gy+r*cs;b+=`<rect x="${x}" y="${y}" width="${cs}" height="${cs}" fill="${BG}" stroke="${STK}" stroke-width="1.5"/>`;b+=r===2&&c===2?lbl(x+31,y+43,'?',30):bars(x,y,v(r,c),cols[r])}
+        [95,195,295,395].forEach((x,i)=>{b+=`<rect x="${x}" y="222" width="70" height="62" fill="${BG}" stroke="${STK}" stroke-width="1.5"/>`+bars(x,222,...opts[i][0],70)+lbl(x+35,312,ABCD[i],20)});return svg(W,H,'A 3 by 3 grid of coloured bars with one cell missing, and four options labelled A to D',b)},
+      opts:L4,ans:L4[ix],exp:`Across each row the number of bars ${dc>0?'goes up':'goes down'} by 1, and down each column it ${dr>0?'goes up':'goes down'} by ${Math.abs(dr)}. Each row keeps one colour, and the bottom row is ${CNAME[cols[2]]}. The missing cell needs ${ans[0]} ${CNAME[cols[2]]} bar${ans[0]>1?'s':''}, which is ${L4[ix]}.`});return}}
+
+/* ---- build: same 34-question structure as the practice test ---- */
+[nEq,nSeq,nFrac,nBracket,nUnit,nRate].forEach(f=>f());
+shuf([vAnagram,vAcr,vLink,vSyn,vAnt]).concat([vLogic]).forEach(f=>f());
+[sRefl,sRot,sCube,sMap,sPlate,sCross].forEach(f=>f());
+[aOdd,aSeq,aComp,aBars].forEach(f=>f());
+shuf([gSeq,gASI,gHDG,gScene,gFind,gStatus]).forEach(f=>f());
+shuf([gRadarCount,()=>gDots(pick(['same','colour','move'])),gSeqMem,gImg,gRadarPos]).forEach(f=>f());gAudio();
+
+const SECS=[...new Set(Q.map(q=>q.sec))];
+const PACE=40,SLOW=60;
+
+let view='intro',cur=0,ans=Array(Q.length).fill(null),flags=new Set(),spent=Array(Q.length).fill(0),memo=Array(Q.length).fill('idle');
+let t0=0,tick=null,total=0,enteredAt=0,memoTimer=null,confirming=false,onlyMisses=false;
+const $=id=>document.getElementById(id);
+const fmt=s=>{s=Math.round(s);return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')};
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
+const flagSvg='<svg class="flagic" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1v12M3 2h8l-2 3 2 3H3" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>';
+const canSpeak=()=>{try{return 'speechSynthesis' in window&&typeof SpeechSynthesisUtterance!=='undefined'}catch(e){return false}};
+
+function renderNav(){
+  let h='',last='';
+  Q.forEach((q,i)=>{
+    if(q.sec!==last){h+=`<div class="navsec">${q.sec}</div>`;last=q.sec}
+    let cls='';
+    if(view==='results')cls=ans[i]===q.ans?'good':'bad';
+    else{if(ans[i]!=null)cls+=' done';if(view==='q'&&i===cur)cls+=' cur'}
+    h+=`<button class="qbtn ${cls}" data-i="${i}" ${view==='intro'?'disabled':''}><span class="dot"></span>Question ${i+1}${flags.has(i)?flagSvg:''}</button>`;
+  });
+  $('nav').innerHTML=h;
+}
+
+function renderIntro(){
+  $('secname').textContent='34 questions · 6 sections';
+  const counts=SECS.map(s=>`<div><b>${s}</b><span>${Q.filter(q=>q.sec===s).length} questions</span></div>`).join('');
+  $('main').innerHTML=`<div class="intro">
+    <h2 style="font-size:26px">Before you start</h2>
+    <p>A full-length practice run with the same structure as the Cognitive Reasoning Practice test: 34 questions across six sections, in the same order and formats. Every visit generates a new set (this is set ${SEED%100000}); reload the page for a fresh one.</p>
+    <div class="secgrid">${counts}</div>
+    <ul>
+      <li>Aim for about ${PACE} seconds per question, roughly 23 minutes in total. The timer runs from the moment you start.</li>
+      <li>In Perceptual Speed and Accuracy your first answer is locked, as in the real test, so be sure before you click.</li>
+      <li>Working Memory images show once, for 5 seconds. The last question plays a short audio clip once, so turn your sound on.</li>
+      <li>You can flag questions and move between them. Answers and explanations appear only after you press Finish.</li>
+    </ul>
+    <div><button class="btn primary" id="start">Start test</button></div>
+  </div>`;
+  $('start').onclick=start;
+}
+
+function start(){
+  view='q';cur=0;t0=Date.now();clearInterval(tick);
+  tick=setInterval(()=>{$('timer').textContent=fmt((Date.now()-t0)/1000)},1000);
+  enter(0);
+}
+function stopAudio(){try{if(canSpeak())speechSynthesis.cancel()}catch(e){}}
+function leave(){
+  if(view!=='q')return;
+  spent[cur]+=(Date.now()-enteredAt)/1000;
+  if(memo[cur]==='showing'){clearTimeout(memoTimer);memo[cur]='done';stopAudio()}
+}
+function enter(i){cur=i;enteredAt=Date.now();confirming=false;render();window.scrollTo({top:0})}
+function goTo(i){leave();enter(i)}
+
+function renderQ(){
+  const q=Q[cur],i=cur,audio=q.audio&&canSpeak();
+  $('secname').textContent=q.sec;
+  let body='';
+  if(q.memo&&memo[i]==='idle'){
+    body=audio?`<div class="memo"><p class="prompt" style="font-size:15px">Listen to the audio clip. It plays once, then the question appears.</p><button class="btn primary" id="showmemo">Play audio</button></div>`
+      :`<div class="memo"><p class="prompt" style="font-size:15px">Memorise the ${q.audio?'sequence':'image'}. It appears once, for 5 seconds, then the question appears.</p><button class="btn primary" id="showmemo">Show ${q.audio?'sequence':'image'}</button></div>`;
+  }else if(q.memo&&memo[i]==='showing'){
+    body=audio?`<div class="memo"><span class="chip flag">Playing audio…</span></div>`
+      :`<div class="memo"><div class="figwrap">${q.fig()}</div><div class="countbar"><i></i></div><span class="chip" id="memoleft">5 s left</span></div>`;
+  }else{
+    const fig=q.memo?(q.after?`<div class="figwrap">${q.after()}</div>`:''):(q.fig?`<div class="figwrap">${q.fig()}</div>`:'');
+    const locked=q.lock&&ans[i]!=null;
+    const note=(q.memo?`<span class="chip">The ${q.audio?'clip has':'image has'} been hidden</span> `:'')+(q.lock?`<span class="chip${locked?' flag':''}">${locked?'Answer locked':'Your first answer is final'}</span>`:'');
+    const opts=q.opts.map((o,j)=>`<label class="opt ${ans[i]===o?'sel':''}" for="q${i}-o${j}"><input type="radio" name="q${i}" id="q${i}-o${j}" value="${esc(o)}" ${ans[i]===o?'checked':''} ${locked?'disabled':''}><span class="box"></span><span class="${q.mono?'mono':''}">${esc(o)}</span></label>`).join('');
+    body=`${note?`<div>${note}</div>`:''}<p class="prompt">${q.prompt}</p>${fig}<fieldset><legend class="sr">Answer options</legend>${opts}</fieldset>`;
+  }
+  const unanswered=ans.filter(a=>a==null).length;
+  const conf=confirming?`<div class="confirm"><p>${unanswered?`You have ${unanswered} unanswered question${unanswered>1?'s':''}. `:''}Finish the test and see your results?</p><button class="btn" id="keep">Keep going</button><button class="btn primary" id="dofinish">Finish test</button></div>`:'';
+  $('main').innerHTML=`<div class="qhead"><h2>Question ${i+1} <span style="color:var(--muted);font-weight:600">of ${Q.length}</span></h2><span class="sec">${q.sec}</span>${flags.has(i)?'<span class="chip flag">Flagged</span>':''}</div>
+    ${body}
+    <div class="actions"><button class="btn" id="prev" ${i===0?'disabled':''}>Previous</button><button class="btn ${flags.has(i)?'flagged':''}" id="flag">${flags.has(i)?'Unflag':'Flag'}</button><button class="btn primary" id="next" ${i===Q.length-1?'disabled':''}>Next</button><span class="spacer"></span><button class="btn" id="finish">Finish</button></div>${conf}`;
+  $('prev').onclick=()=>goTo(i-1);
+  $('next').onclick=()=>goTo(i+1);
+  $('flag').onclick=()=>{flags.has(i)?flags.delete(i):flags.add(i);render()};
+  $('finish').onclick=()=>{confirming=true;render()};
+  if(confirming){$('keep').onclick=()=>{confirming=false;render()};$('dofinish').onclick=finish}
+  if($('showmemo'))$('showmemo').onclick=()=>{
+    memo[i]='showing';render();
+    const fin=()=>{if(memo[i]!=='showing')return;memo[i]='done';clearTimeout(memoTimer);if(view==='q'&&cur===i)render()};
+    if(audio){
+      try{stopAudio();const u=new SpeechSynthesisUtterance(q.audio);u.rate=0.85;u.lang='en-GB';u.onend=fin;u.onerror=fin;speechSynthesis.speak(u)}catch(e){fin()}
+      memoTimer=setTimeout(fin,15000);
+    }else{
+      let left=5;
+      const step=()=>{left--;if(left<=0)fin();else{const el=$('memoleft');if(el)el.textContent=left+' s left';memoTimer=setTimeout(step,1000)}};
+      memoTimer=setTimeout(step,1000);
+    }
+  };
+  document.querySelectorAll(`input[name="q${i}"]`).forEach(inp=>inp.onchange=()=>{ans[i]=inp.value;
+    if(q.lock){render();return}
+    document.querySelectorAll('.opt').forEach(l=>l.classList.toggle('sel',l.querySelector('input').checked));renderNav()});
+}
+
+function finish(){
+  leave();stopAudio();total=(Date.now()-t0)/1000;clearInterval(tick);$('timer').textContent=fmt(total);
+  view='results';render();window.scrollTo({top:0});
+}
+
+function renderResults(){
+  $('secname').textContent='Results';
+  const right=Q.filter((q,i)=>ans[i]===q.ans).length;
+  const rows=SECS.map(s=>{const idx=Q.map((q,i)=>i).filter(i=>Q[i].sec===s);const ok=idx.filter(i=>ans[i]===Q[i].ans).length;const avg=idx.reduce((a,i)=>a+spent[i],0)/idx.length;
+    return `<tr><td>${s}</td><td>${ok} / ${idx.length}</td><td>${Math.round(ok/idx.length*100)}%</td><td>${avg.toFixed(1)} s</td></tr>`}).join('');
+  const slow=spent.filter(s=>s>SLOW).length;
+  const cards=Q.map((q,i)=>{
+    const ok=ans[i]===q.ans,un=ans[i]==null;
+    if(onlyMisses&&ok)return '';
+    const chip=ok?'<span class="chip good">Correct</span>':un?'<span class="chip bad">Unanswered</span>':'<span class="chip bad">Incorrect</span>';
+    const t=spent[i]>SLOW?`<span class="chip flag">${spent[i].toFixed(1)} s · slow</span>`:`<span class="chip">${spent[i].toFixed(1)} s</span>`;
+    let fig='';
+    if(q.fig)fig=`<div class="figwrap">${q.memo?`<p style="margin:0 0 6px;font-size:13px;color:var(--muted)">${q.audio?'What the audio said':'The image you memorised'}</p>`:''}${q.fig()}</div>`;
+    if(q.after)fig+=`<div class="figwrap"><p style="margin:0 0 6px;font-size:13px;color:var(--muted)">What you compared it with</p>${q.after()}</div>`;
+    return `<article class="rev ${ok?'good':'bad'}" id="rev-${i}"><div class="qhead"><h3 style="font-size:20px">Question ${i+1}</h3><span class="sec">${q.sec}</span>${chip}${t}</div>
+      <p class="prompt" style="font-size:16px">${q.prompt}</p>${fig}
+      <div class="ans"><span>Your answer: <b class="${q.mono?'mono':''}">${un?'none':esc(ans[i])}</b></span><span>Correct: <b class="${q.mono?'mono':''}">${esc(q.ans)}</b></span></div>
+      <p class="exp">${q.exp}</p></article>`}).join('');
+  $('main').innerHTML=`<div class="qhead"><h2>Your results</h2></div>
+    <div class="score">
+      <div class="stat"><b>${Math.round(right/Q.length*100)}%</b><span>${right} of ${Q.length} correct</span></div>
+      <div class="stat"><b>${fmt(total)}</b><span>total time</span></div>
+      <div class="stat"><b>${(total/Q.length).toFixed(1)} s</b><span>average per question</span></div>
+      <div class="stat"><b>${slow}</b><span>question${slow===1?'':'s'} over ${SLOW} s</span></div>
+    </div>
+    <div class="tablewrap"><table><thead><tr><th>Section</th><th>Correct</th><th>Score</th><th>Avg reaction time</th></tr></thead><tbody>${rows}</tbody></table></div>
+    <div class="actions" style="border-top:0;padding-top:0"><label class="toggle" for="misses"><input type="checkbox" id="misses" ${onlyMisses?'checked':''}> Show only questions to review</label><span class="spacer"></span><button class="btn" id="retake">Retake test</button></div>
+    ${cards||'<p>Every answer was correct.</p>'}`;
+  $('misses').onchange=e=>{onlyMisses=e.target.checked;renderResults()};
+  $('retake').onclick=()=>{view='intro';ans=Array(Q.length).fill(null);flags=new Set();spent=Array(Q.length).fill(0);memo=Array(Q.length).fill('idle');onlyMisses=false;$('timer').textContent='00:00';render();window.scrollTo({top:0})};
+}
+
+function render(){renderNav();if(view==='intro')renderIntro();else if(view==='q')renderQ();else renderResults()}
+
+$('nav').addEventListener('click',e=>{const b=e.target.closest('.qbtn');if(!b||b.disabled)return;const i=+b.dataset.i;
+  if(view==='q')goTo(i);else if(view==='results'){const el=$('rev-'+i);if(el)el.scrollIntoView({behavior:'smooth'})}});
+render();
+</script>
+
+</body>
+</html>

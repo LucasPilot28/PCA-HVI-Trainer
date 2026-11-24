@@ -1,18 +1,128 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pilot Aptitude Practice</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css">
 <style>
-:root{--bg:#f4f6f9;--card:#fff;--fg:#14213d;--muted:#5b6475;--line:#dde2ea;--accent:#1d4ed8}
-@media (prefers-color-scheme:dark){:root{--bg:#0f1420;--card:#18202f;--fg:#e8edf5;--muted:#9aa6ba;--line:#2a3447;--accent:#7aa2ff}}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
-main{max-width:880px;margin:0 auto;padding:40px max(16px,env(safe-area-inset-left)) 56px max(16px,env(safe-area-inset-right))}
-h1{font-size:28px;margin:0 0 6px} p{color:var(--muted);margin:0 0 28px;max-width:65ch}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
-.card{display:flex;flex-direction:column;gap:6px;padding:16px;background:var(--card);border:1px solid var(--line);border-radius:10px;color:inherit;text-decoration:none}
-.card:hover{border-color:var(--accent)} .card span{color:var(--muted);font-size:14px}
-small{display:block;margin-top:28px;color:var(--muted);font-size:13px;max-width:70ch}
-</style></head><body><main>
+:root{--bg:#161826;--surface:#232532;--text:#e9e9ed;--accent:#9184d9;--divider:color-mix(in srgb,#e9e9ed 16%,transparent);--n200:#e4e7f5;--n400:#b2b6ca;--a200:#e7e5fe;--a300:#d2cefd;--s2:5.6px;--s4:11.2px;--s6:16.8px;--s8:22.4px;--r:8px;--font:"Inter",system-ui,-apple-system,Segoe UI,sans-serif}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--text);font:15px/1.55 var(--font);background:radial-gradient(ellipse 900px 420px at 12% -10%,color-mix(in srgb,var(--accent) 14%,transparent),transparent 70%),var(--bg) no-repeat}
+a{color:var(--a300);text-decoration:none}a:hover{color:var(--a200)}
+:focus{outline:none}:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+::selection{background:color-mix(in srgb,var(--accent) 30%,transparent)}
+.wrap{max-width:1200px;margin:0 auto;padding-inline:calc(var(--s8)*2)}
+header{display:flex;align-items:center;gap:10px;padding-block:var(--s4);font-size:18px;font-weight:500;white-space:nowrap}
+header i{font-size:20px;color:var(--accent)}
+main{padding-block:calc(var(--s8)*2) calc(var(--s8)*3)}
+.intro{max-width:720px;display:flex;flex-direction:column;gap:var(--s6)}
+h1{margin:0;font-weight:500;font-size:44px;line-height:1.08;letter-spacing:-.02em}
+.intro p{margin:0;font-size:17px;color:var(--n200);max-width:62ch;text-wrap:pretty}
+.rule{height:1px;margin:calc(var(--s8)*2) 0;background:linear-gradient(90deg,transparent,var(--divider) 48px,var(--divider) calc(100% - 48px),transparent)}
+.layout{display:flex;flex-wrap:wrap;gap:calc(var(--s8)*2);align-items:flex-start}
+aside{flex:1 1 200px;max-width:240px;position:sticky;top:var(--s4);display:flex;flex-direction:column;gap:var(--s4)}
+.search{position:relative;display:block}
+.search i{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:15px;color:var(--n400);pointer-events:none}
+.search input{width:100%;min-height:36px;padding:6px 10px 6px 32px;font:inherit;font-size:14px;color:var(--text);caret-color:var(--accent);background:transparent;border:1px solid var(--divider);border-radius:var(--r)}
+.search input:focus-visible{outline:none;border-color:var(--accent)}
+.search input::placeholder{color:var(--n400)}
+nav{display:flex;flex-direction:column;gap:2px}
+.label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--n400);padding:0 10px var(--s2)}
+nav button{display:flex;align-items:center;gap:10px;width:100%;padding:8px 10px;border:none;border-radius:var(--r);font:inherit;font-size:14px;text-align:left;cursor:pointer;background:transparent;color:var(--n200)}
+nav button:hover{background:color-mix(in srgb,var(--text) 7%,transparent)}
+nav button i{font-size:17px;color:var(--n400)}
+nav button span:first-of-type{flex:1}
+nav button .n{font-size:12px;font-variant-numeric:tabular-nums;color:var(--n400)}
+nav button[aria-pressed=true]{background:color-mix(in srgb,var(--accent) 12%,transparent);color:var(--text);box-shadow:inset 2px 0 0 var(--accent)}
+nav button[aria-pressed=true] i{color:var(--accent)}
+.content{flex:999 1 560px;min-width:0;display:flex;flex-direction:column;gap:calc(var(--s8)*2)}
+section{display:flex;flex-direction:column;gap:var(--s6)}
+.head{display:flex;align-items:baseline;gap:var(--s2)}
+h2{margin:0;font-weight:500;font-size:20px;letter-spacing:-.01em}
+.head span{font-size:13px;color:var(--n400)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:var(--s6)}
+.card{display:flex;flex-direction:column;gap:var(--s2);min-height:132px;padding:var(--s8);border-radius:var(--r);background:var(--surface);color:var(--text);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--text) 6%,transparent);transition:box-shadow .15s}
+.card:hover{color:var(--text);box-shadow:inset 0 0 0 1px var(--accent),0 0 24px -8px color-mix(in srgb,var(--accent) 50%,transparent)}
+.kicker{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--accent)}
+.card b{font-weight:500;font-size:17px;line-height:1.2}
+.card p{margin:0;flex:1;font-size:13px;line-height:1.45;opacity:.8;text-wrap:pretty}
+.go{display:flex;align-items:center;justify-content:flex-end;gap:6px;font-size:11px;color:var(--a300)}
+.empty{display:flex;flex-direction:column;align-items:flex-start;gap:var(--s2);padding:var(--s8) 0;color:var(--n200)}
+.btn{display:inline-flex;align-items:center;padding:7px 14px;font:inherit;font-size:13px;color:var(--text);background:transparent;border:1px solid var(--divider);border-radius:var(--r);cursor:pointer}
+.btn:hover{background:color-mix(in srgb,var(--text) 7%,transparent)}
+small{display:block;margin-top:calc(var(--s8)*3);color:var(--n400);font-size:13px;line-height:1.5;max-width:70ch}
+[hidden]{display:none!important}
+@media (max-width:640px){.wrap{padding-inline:var(--s8)}h1{font-size:34px}aside{position:static;max-width:none}}
+</style></head><body>
+<div class="wrap">
+<header><i class="ph ph-airplane-tilt"></i>Pilot Aptitude Practice</header>
+<main>
+<div class="intro">
 <h1>Pilot Aptitude Practice</h1>
 <p>Practice tests for airline pilot selection: a flying-task simulator, cognitive reasoning sets and CRM scenarios. Each visit to a cognitive test generates a new set of questions.</p>
-<div class="grid"><a class="card" href="fast-simulator.html"><b>FAST simulator</b><span>Flying task with heading, altitude and speed control, waypoint navigation and timed side tasks.</span></a><a class="card" href="cognitive-test-12.html"><b>Cognitive Test 12: Real Layout + Physics</b><span>46 questions: the full six-section layout plus a physics section.</span></a><a class="card" href="cognitive-test-11.html"><b>Cognitive Test 11</b><span>48 questions in the six-section format.</span></a><a class="card" href="cognitive-test-10.html"><b>Cognitive Test 10: Exam Level</b><span>34 questions at exam-level difficulty.</span></a><a class="card" href="cognitive-test-9.html"><b>Cognitive Test 9: Hard</b><span>Hard mixed set.</span></a><a class="card" href="cognitive-test-8.html"><b>Cognitive Test 8</b><span>Hard mixed set.</span></a><a class="card" href="cognitive-test-7.html"><b>Cognitive Test 7</b><span>Full six-section set.</span></a><a class="card" href="abstract-speed-memory-2.html"><b>Abstract, Speed and Memory 2</b><span>50 questions on abstract reasoning, perceptual speed and working memory.</span></a><a class="card" href="abstract-speed-memory-1.html"><b>Abstract, Speed and Memory 1</b><span>50 questions on the same three sections.</span></a><a class="card" href="spatial-abstract.html"><b>Spatial and Abstract</b><span>Spatial and abstract reasoning practice.</span></a><a class="card" href="speed-memory.html"><b>Speed and Memory</b><span>Perceptual speed and working memory practice.</span></a><a class="card" href="crm-test-4.html"><b>CRM Practice Test 4</b><span>45 scenarios and 5 prioritisation tasks with a scored profile.</span></a><a class="card" href="crm-test-3.html"><b>CRM Practice Test 3</b><span>45 scenarios and 5 prioritisation tasks with a scored profile.</span></a></div>
+</div>
+<div class="rule"></div>
+<div class="layout">
+<aside>
+<label class="search"><i class="ph ph-magnifying-glass"></i><input id="q" type="search" placeholder="Search tests" aria-label="Search tests"></label>
+<nav aria-label="Categories">
+<span class="label">Categories</span>
+<button type="button" data-cat="all" aria-pressed="true"><i class="ph ph-squares-four"></i><span>All tests</span><span class="n"></span></button>
+<button type="button" data-cat="sim" aria-pressed="false"><i class="ph ph-airplane-tilt"></i><span>Flying task</span><span class="n"></span></button>
+<button type="button" data-cat="cog" aria-pressed="false"><i class="ph ph-brain"></i><span>Cognitive reasoning</span><span class="n"></span></button>
+<button type="button" data-cat="asm" aria-pressed="false"><i class="ph ph-lightning"></i><span>Abstract, speed &amp; memory</span><span class="n"></span></button>
+<button type="button" data-cat="crm" aria-pressed="false"><i class="ph ph-users-three"></i><span>CRM scenarios</span><span class="n"></span></button>
+</nav>
+</aside>
+<div class="content">
+<section data-cat="sim"><div class="head"><h2>Flying task</h2><span class="c"></span></div><div class="grid">
+<a class="card" href="fast-simulator.html"><span class="kicker">Flying task</span><b>FAST simulator</b><p>Flying task with heading, altitude and speed control, waypoint navigation and timed side tasks.</p><span class="go">Start<i class="ph ph-arrow-right"></i></span></a>
+</div></section>
+<section data-cat="cog"><div class="head"><h2>Cognitive reasoning</h2><span class="c"></span></div><div class="grid">
+<a class="card" href="cognitive-test-12.html"><span class="kicker">Cognitive reasoning</span><b>Cognitive Test 12: Real Layout + Physics</b><p>46 questions: the full six-section layout plus a physics section.</p><span class="go">Start<i class="ph ph-arrow-right"></i></span></a>
+<a class="card" href="cognitive-test-11.html"><span class="kicker">Cognitive reasoning</span><b>Cognitive Test 11</b><p>48 questions in the six-section format.</p><span class="go">Start<i class="ph ph-arrow-right"></i></span></a>
+<a class="card" href="cognitive-test-10.html"><span class="kicker">Cognitive reasoning</span><b>Cognitive Test 10: Exam Level</b><p>34 questions at exam-level difficulty.</p><span class="go">Start<i class="ph ph-arrow-right"></i></span></a>
+<a class="card" href="cognitive-test-9.html"><span class="kicker">Cognitive reasoning</span><b>Cognitive Test 9: Hard</b><p>Hard mixed set.</p><span class="go">Start<i class="ph ph-arrow-right"></i></span></a>
+<a class="card" href="cognitive-test-8.html"><span class="kicker">Cognitive reasoning</span><b>Cognitive Test 8</b><p>Hard mixed set.</p><span class="go">Start<i class="ph ph-arrow-right"></i></span></a>
+<a class="card" href="cognitive-test-7.html"><span class="kicker">Cognitive reasoning</span><b>Cognitive Test 7</b><p>Full six-section set.</p><span class="go">Start<i class="ph ph-arrow-right"></i></span></a>
+</div></section>
+<section data-cat="asm"><div class="head"><h2>Abstract, speed &amp; memory</h2><span class="c"></span></div><div class="grid">
+<a class="card" href="abstract-speed-memory-2.html"><span class="kicker">Abstract, speed &amp; memory</span><b>Abstract, Speed and Memory 2</b><p>50 questions on abstract reasoning, perceptual speed and working memory.</p><span class="go">Start<i class="ph ph-arrow-right"></i></span></a>
+<a class="card" href="abstract-speed-memory-1.html"><span class="kicker">Abstract, speed &amp; memory</span><b>Abstract, Speed and Memory 1</b><p>50 questions on the same three sections.</p><span class="go">Start<i class="ph ph-arrow-right"></i></span></a>
+<a class="card" href="spatial-abstract.html"><span class="kicker">Abstract, speed &amp; memory</span><b>Spatial and Abstract</b><p>Spatial and abstract reasoning practice.</p><span class="go">Start<i class="ph ph-arrow-right"></i></span></a>
+<a class="card" href="speed-memory.html"><span class="kicker">Abstract, speed &amp; memory</span><b>Speed and Memory</b><p>Perceptual speed and working memory practice.</p><span class="go">Start<i class="ph ph-arrow-right"></i></span></a>
+</div></section>
+<section data-cat="crm"><div class="head"><h2>CRM scenarios</h2><span class="c"></span></div><div class="grid">
+<a class="card" href="crm-test-4.html"><span class="kicker">CRM scenarios</span><b>CRM Practice Test 4</b><p>45 scenarios and 5 prioritisation tasks with a scored profile.</p><span class="go">Start<i class="ph ph-arrow-right"></i></span></a>
+<a class="card" href="crm-test-3.html"><span class="kicker">CRM scenarios</span><b>CRM Practice Test 3</b><p>45 scenarios and 5 prioritisation tasks with a scored profile.</p><span class="go">Start<i class="ph ph-arrow-right"></i></span></a>
+</div></section>
+<div class="empty" id="empty" hidden><span id="emptyMsg"></span><button class="btn" type="button" id="reset">Clear search</button></div>
+</div>
+</div>
 <small>Independent practice material. Not affiliated with, endorsed by or derived from any airline or test publisher. Scores are practice feedback only and do not predict results in any real assessment.</small>
-</main></body></html>
+</main>
+</div>
+<script>
+(function(){
+  var cat='all', q=document.getElementById('q'), btns=[].slice.call(document.querySelectorAll('nav button')),
+      secs=[].slice.call(document.querySelectorAll('section[data-cat]')), empty=document.getElementById('empty');
+  function match(card,n){return !n||card.textContent.toLowerCase().indexOf(n)>-1}
+  function render(){
+    var n=q.value.trim().toLowerCase(), counts={all:0}, shown=0;
+    secs.forEach(function(s){
+      var c=0, on=cat==='all'||cat===s.dataset.cat;
+      [].forEach.call(s.querySelectorAll('.card'),function(card){var m=match(card,n);card.hidden=!(m&&on);if(m)c++;if(m&&on)shown++});
+      counts[s.dataset.cat]=c; counts.all+=c;
+      s.hidden=!on||!c;
+      s.querySelector('.c').textContent=c+(c===1?' test':' tests');
+    });
+    btns.forEach(function(b){b.setAttribute('aria-pressed',b.dataset.cat===cat);b.querySelector('.n').textContent=counts[b.dataset.cat]});
+    empty.hidden=shown>0;
+    document.getElementById('emptyMsg').textContent='No tests match \u201c'+q.value+'\u201d.';
+  }
+  btns.forEach(function(b){b.addEventListener('click',function(){cat=b.dataset.cat;render()})});
+  q.addEventListener('input',render);
+  document.getElementById('reset').addEventListener('click',function(){q.value='';cat='all';render()});
+  render();
+})();
+</script>
+</body></html>
